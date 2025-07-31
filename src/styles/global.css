@@ -1,0 +1,22 @@
+/* Estilos globales adicionales */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Aplicar Roboto Serif a headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Roboto Serif', Georgia, serif;
+  font-weight: 600;
+}
+
+/* Aplicar Inter al body text */
+p, span, div, a, button, input, textarea, select {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}

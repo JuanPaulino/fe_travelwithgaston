@@ -1,0 +1,184 @@
+---
+// Props que recibe el componente
+const { data } = Astro.props;
+
+// Extraer los datos del bloque
+const title = data?.headline || "Gaston's picks";
+const description = data?.tagline || "Yorem ipsum dolor sit amet, consectetur adipiscing elit.";
+const items = data?.items || [];
+
+// Construir la URL de Directus para las imágenes
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
+
+// Procesar los items para extraer solo los datos necesarios
+const hotelItems = items.map(item => ({
+  id: item.id,
+  hotelName: item.hotel_name,
+  location: item.location,
+  description: item.description,
+  image: item.image?.id ? `${DIRECTUS_URL}/assets/${item.image.id}` : null
+}));
+---
+
+<section class="featured-hotels-section py-16 px-4">
+  <div class="max-w-7xl mx-auto">
+    <!-- Header con título y controles -->
+    <div class="flex justify-between items-start mb-8">
+      <div class="flex-1">
+        <h2 class="text-black font-bold text-3xl mb-2">
+          {title}
+        </h2>
+        <p class="text-gray-600 text-lg">
+          {description}
+        </p>
+      </div>
+      
+      <!-- Controles de navegación -->
+      <div class="flex gap-2">
+        <button 
+          class="hotel-nav-btn prev-btn w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+          aria-label="Previous hotels"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <button 
+          class="hotel-nav-btn next-btn w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+          aria-label="Next hotels"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenedor de hoteles con scroll horizontal -->
+    <div class="hotels-container relative">
+      <div class="hotels-scroll flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+        {hotelItems.map((hotel) => (
+          <div class="hotel-card flex-shrink-0 w-full h-80 md:w-[900px] md:h-[500px]">
+            <div class="relative w-full h-full overflow-hidden">
+              {hotel.image ? (
+                <img
+                  src={hotel.image}
+                  alt={hotel.hotelName}
+                  class="w-full h-full object-cover"
+                />
+              ) : (
+                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <span class="text-gray-500">No image</span>
+                </div>
+              )}
+              
+              <!-- Overlay flotante con efecto glass blur -->
+              <div class="glass-overlay absolute bottom-6 left-6 max-w-md rounded-lg p-6 shadow-lg md:bottom-6 md:left-6 md:max-w-md bottom-4 left-4 right-4 max-w-none">
+                <h3 class="text-white font-bold text-xl mb-1 md:text-xl text-lg">
+                  {hotel.hotelName}
+                </h3>
+                <p class="text-white text-sm mb-3">
+                  {hotel.location}
+                </p>
+                <p class="text-white text-sm leading-relaxed line-clamp-3">
+                  {hotel.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .featured-hotels-section {
+    background: white;
+  }
+  
+  .hotel-card {
+    transition: transform 0.3s ease;
+  }
+  
+  .hotel-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  /* Ocultar scrollbar pero mantener funcionalidad */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Línea de texto truncada */
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Efecto glass blur mejorado */
+  .glass-overlay {
+    background: rgba(255, 255, 255, 0.33);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(4.9px);
+    -webkit-backdrop-filter: blur(4.9px);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+  }
+  
+  /* Responsive para móvil */
+  @media (max-width: 768px) {
+    .hotel-card {
+      width: 100vw !important;
+      height: 320px !important;
+      margin-left: -1rem;
+      margin-right: -1rem;
+    }
+    
+    .glass-overlay {
+      left: 1rem !important;
+      right: 1rem !important;
+      bottom: 1rem !important;
+      max-width: none !important;
+      border-radius: 12px;
+    }
+    
+    .hotels-scroll {
+      gap: 0;
+    }
+  }
+</style>
+
+<script>
+  // Funcionalidad de navegación con botones
+  document.addEventListener('DOMContentLoaded', function() {
+    const scrollContainer = document.querySelector('.hotels-scroll');
+    const prevBtn = document.querySelector('.prev-btn');
+    const nextBtn = document.querySelector('.next-btn');
+    
+    if (!scrollContainer || !prevBtn || !nextBtn) return;
+    
+    const scrollAmount = 924; // Ancho de una tarjeta (900px) + gap (24px)
+    
+    prevBtn.addEventListener('click', () => {
+      scrollContainer.scrollBy({
+        left: -scrollAmount,
+        behavior: 'smooth'
+      });
+    });
+    
+    nextBtn.addEventListener('click', () => {
+      scrollContainer.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    });
+  });
+</script> 

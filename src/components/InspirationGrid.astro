@@ -1,0 +1,92 @@
+---
+// Props que recibe el componente
+const { data } = Astro.props;
+
+// Extraer los datos del bloque
+const title = data?.headline;
+const description = data?.tagline;
+const items = data?.items || [];
+
+// Construir la URL de Directus para las imágenes
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
+
+// Procesar los items para extraer solo los datos necesarios
+const gridItems = items.map(item => ({
+  id: item.id,
+  title: item.title,
+  description: item.short_description,
+  image: item.image?.id ? `${DIRECTUS_URL}/assets/${item.image.id}` : null
+}));
+---
+
+<section class="inspiration-section py-16 px-4">
+  <!-- Título superior -->
+  <div class="text-center mb-12">
+    <h2 class="text-black font-bold text-2xl max-w-2xl mx-auto mb-4">
+      {title}
+    </h2>
+    <p class="text-black text-xl font-normal max-w-2xl mx-auto">
+      {description}
+    </p>
+  </div>
+
+  <!-- Grid de inspiraciones -->
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      {gridItems.map((item) => (
+        <div class="inspiration-card group cursor-pointer">
+          <!-- Imagen -->
+          <div class="relative overflow-hidden rounded-lg mb-4 aspect-[4/3]">
+            {item.image ? (
+              <img
+                src={item.image}
+                alt={item.title}
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : (
+              <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                <span class="text-gray-500">No image</span>
+              </div>
+            )}
+          </div>
+          
+          <!-- Título -->
+          <h3 class="text-black text-lg font-medium mb-2 transition-colors duration-200">
+            {item.title}
+          </h3>
+          
+          <!-- Descripción -->
+          {item.description && (
+            <p class="text-black text-base">
+              {item.description}
+            </p>
+          )}
+        </div>
+      ))}
+    </div>
+
+    <!-- Botón CTA -->
+    <div class="text-center">
+      <a 
+        href="#"
+        class="inline-block px-8 py-3 border border-black text-black font-medium rounded-md hover:bg-black hover:text-white transition-all duration-200"
+      >
+        View all inspiration
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .inspiration-section {
+    background: transparent;
+  }
+  
+  .inspiration-card {
+    transition: all 0.3s ease;
+  }
+  
+  .inspiration-card:hover {
+    transform: translateY(-2px);
+  }
+</style> 

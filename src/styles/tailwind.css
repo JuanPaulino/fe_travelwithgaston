@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/* Clases personalizadas para el sistema de tipografía */
+@layer utilities {
+  .font-heading {
+    font-family: 'Roboto Serif', Georgia, serif;
+  }
+  
+  .font-body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+}
+
+@layer components {
+  /* Escala de encabezados responsive */
+  .text-h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+  }
+  
+  .text-h2 {
+    font-size: 2.25rem;
+    line-height: 1.2;
+  }
+  
+  .text-h3 {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  
+  .text-h4 {
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+  
+  .text-h5 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+  }
+  
+  .text-h6 {
+    font-size: 1.125rem;
+    line-height: 1.4;
+  }
+  
+  .text-tagline {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  
+  /* Variantes desktop para sm y superiores */
+  @media (min-width: 640px) {
+    .sm\:text-h1-desktop {
+      font-size: 3.5rem;
+      line-height: 1.2;
+    }
+    
+    .sm\:text-h2-desktop {
+      font-size: 3rem;
+      line-height: 1.2;
+    }
+    
+    .sm\:text-h3-desktop {
+      font-size: 2.5rem;
+      line-height: 1.2;
+    }
+    
+    .sm\:text-h4-desktop {
+      font-size: 2rem;
+      line-height: 1.3;
+    }
+    
+    .sm\:text-h5-desktop {
+      font-size: 1.5rem;
+      line-height: 1.4;
+    }
+    
+    .sm\:text-h6-desktop {
+      font-size: 1.25rem;
+      line-height: 1.4;
+    }
+  }
+} 

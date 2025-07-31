@@ -1,0 +1,12 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import AuthModalWrapper from '../components/AuthModalWrapper';
+import Page from '../components/Page.astro';
+---
+
+<Layout title="TravelWithGaston - Inicio">
+	<Header />
+	<Page />
+	<AuthModalWrapper client:load />
+</Layout>

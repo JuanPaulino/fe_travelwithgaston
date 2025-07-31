@@ -1,0 +1,82 @@
+---
+// Footer.astro - Componente de pie de página
+import Heading from './common/Heading.jsx';
+import Text from './common/Text.jsx';
+---
+
+<footer class="bg-black text-white">
+  <!-- Sección superior con columnas de enlaces -->
+  <div class="container mx-auto px-6 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+      
+      <!-- Columna 1: About -->
+      <div class="space-y-4">
+        <Heading level={5} className="text-white font-semibold">About</Heading>
+        <ul class="space-y-2">
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">Our hotels</a></li>
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">The team</a></li>
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">Careers</a></li>
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">Partner with us</a></li>
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">Press</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 2: Become a member -->
+      <div class="space-y-4">
+        <Heading level={5} className="text-white font-semibold">Become a member</Heading>
+        <ul class="space-y-2">
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">Membership</a></li>
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">FAQ</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Gift cards -->
+      <div class="space-y-4">
+        <Heading level={5} className="text-white font-semibold">Gift cards</Heading>
+        <ul class="space-y-2">
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">Buy an e-gift card</a></li>
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">Redeem your e-gift card</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 4: Independent Travel Agent -->
+      <div class="space-y-4">
+        <Heading level={5} className="text-white font-semibold">Independent Travel Agent</Heading>
+        <ul class="space-y-2">
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">About MyLER</a></li>
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">Enquire</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 5: Contact us -->
+      <div class="space-y-4">
+        <Heading level={5} className="text-white font-semibold">Contact us</Heading>
+        <ul class="space-y-2">
+          <li><a href="#" class="font-body text-base text-gray-300 hover:text-white transition-colors">@</a></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Sección inferior con branding y enlaces legales -->
+  <div class="border-t border-gray-800">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
+        
+        <!-- Lado izquierdo: Branding -->
+        <div class="space-y-1">
+          <Heading level={3} className="text-amber-400 font-bold">Travel with Gastón</Heading>
+          <Text size="sm" className="text-gray-400">Powered by Little Emperors</Text>
+        </div>
+
+        <!-- Lado derecho: Enlaces legales -->
+        <div class="flex space-x-6">
+          <a href="#" class="font-body text-sm text-gray-300 hover:text-white transition-colors">Terms and conditions</a>
+          <a href="#" class="font-body text-sm text-gray-300 hover:text-white transition-colors">Privacy policy</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</footer> 

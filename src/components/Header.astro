@@ -1,0 +1,111 @@
+---
+// Header.astro - Componente de navegación principal
+---
+
+<script>
+  // Script para manejar el menú móvil
+  let menuOpen = false;
+
+  function toggleMenu() {
+    menuOpen = !menuOpen;
+    updateMenuVisibility();
+  }
+
+  function closeMenu() {
+    menuOpen = false;
+    updateMenuVisibility();
+  }
+
+  function updateMenuVisibility() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('mobile-overlay');
+    
+    if (menuOpen && mobileMenu && overlay) {
+      mobileMenu.classList.remove('hidden');
+      overlay.classList.remove('hidden');
+    } else if (mobileMenu && overlay) {
+      mobileMenu.classList.add('hidden');
+      overlay.classList.add('hidden');
+    }
+  }
+
+  function handleNavClick() {
+    closeMenu();
+  }
+
+  // Funciones para abrir el modal de autenticación
+  function openAuthenticationModal() {
+    // Disparar un evento personalizado para que React lo escuche
+    window.dispatchEvent(new CustomEvent('openAuthModal'));
+  }
+
+  // Exponer la función globalmente
+  window.openAuthenticationModal = openAuthenticationModal;
+</script>
+
+<header class="bg-neutral-white text-neutral-darkest relative">
+  <!-- Top bar -->
+  <div class="flex items-center justify-between px-4 py-4 md:py-6 md:px-12">
+    <!-- Mensaje de valor (desktop) -->
+    <div class="hidden md:block md:w-1/3 text-left text-base text-neutral">
+      Core message or value proposition
+    </div>
+    <!-- Logo -->
+    <div class="flex-1 text-left md:text-center">
+      <span class="text-2xl md:text-3xl font-semibold text-primary">Travel with Gastón</span>
+    </div>
+    <!-- Acciones de usuario (login/signup) solo desktop -->
+    <div class="hidden md:flex md:w-1/3 justify-end items-center gap-4">
+      <button 
+        onclick="openAuthenticationModal()"
+        class="text-neutral hover:text-primary transition-colors px-3 py-1 rounded"
+      >
+        Join us
+      </button>
+      <button 
+        onclick="openAuthenticationModal()"
+        class="bg-black text-white px-4 py-1.5 rounded hover:bg-primary transition-colors"
+      >
+        Sign in
+      </button>
+    </div>
+    <!-- Menú hamburguesa (solo móvil) -->
+    <button class="md:hidden ml-4 z-20" aria-label="Abrir menú" onclick="toggleMenu()">
+      <div class="space-y-1">
+        <span class="block w-6 h-0.5 bg-neutral-lighter"></span>
+        <span class="block w-6 h-0.5 bg-neutral-lighter"></span>
+        <span class="block w-6 h-0.5 bg-neutral-lighter"></span>
+      </div>
+    </button>
+  </div>
+  <!-- Línea divisoria -->
+  <div class="border-t border-neutral-lighter/50"></div>
+  <!-- Navegación (solo desktop) -->
+  <nav class="hidden md:flex justify-center gap-10 py-4">
+    <a href="/" class="text-xl text-neutral hover:text-primary transition-colors">Home</a>
+    <a href="/search" class="text-xl text-neutral hover:text-primary transition-colors">Search</a>
+    <a href="#" class="text-xl text-neutral hover:text-primary transition-colors">Custom Journeys & Honeymoons</a>
+    <a href="#" class="text-xl text-neutral hover:text-primary transition-colors">Corporate Services</a>
+  </nav>
+  
+  <!-- Menú móvil desplegable -->
+  <div id="mobile-overlay" class="fixed inset-0 bg-black/40 z-10 hidden" onclick="closeMenu()"></div>
+  <nav
+    id="mobile-menu"
+    class="absolute top-0 right-0 w-64 h-full bg-white shadow-lg flex flex-col gap-6 p-8 z-30 hidden"
+    onclick="event.stopPropagation()"
+  >
+    <button 
+      onclick="openAuthenticationModal(); closeMenu();"
+      class="text-neutral hover:text-primary transition-colors px-3 py-2 rounded text-lg"
+    >
+      Join us
+    </button>
+    <button 
+      onclick="openAuthenticationModal(); closeMenu();"
+      class="bg-neutral-darkest text-white px-4 py-2 rounded hover:bg-primary transition-colors text-lg"
+    >
+      Sign in
+    </button>
+  </nav>
+</header> 
