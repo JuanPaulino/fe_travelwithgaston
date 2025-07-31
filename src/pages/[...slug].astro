@@ -1,0 +1,60 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getPageData } from '../lib/directus.js';
+import DynamicBlocks from '../components/DynamicBlocks.astro';
+import DebugInfo from '../components/DebugInfo.jsx';
+
+// Obtener el slug de los parámetros de la URL
+export async function getStaticPaths() {
+  // En modo SSR, no necesitamos generar rutas estáticas
+  // Astro manejará las rutas dinámicamente
+  return [];
+}
+
+// Obtener el slug de la URL
+const { slug } = Astro.params;
+console.log(slug);
+// Si no hay slug, mostrar la página de inicio
+if (!slug) {
+  return Astro.redirect('/');
+}
+
+// Obtener los datos de la página desde Directus
+const { data: pageData, error } = await getPageData(slug);
+
+// Si hay un error o la página no existe, redirigir a 404
+if (error || !pageData) {
+  return Astro.redirect('/404');
+}
+
+// Extraer el permalink y otros datos de la página
+const { permalink, title, content, blocks } = pageData;
+---
+
+<Layout title={title || 'Página Dinámica'}>
+  <main class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+      <!-- Título de la página -->
+      {title && (
+        <h1 class="text-4xl font-bold text-gray-900 mb-8">
+          {title}
+        </h1>
+      )}
+
+      <!-- Contenido de la página -->
+      {content && (
+        <div class="prose prose-lg max-w-none mb-8">
+          <div set:html={content} />
+        </div>
+      )}
+
+      <!-- Bloques dinámicos unificados -->
+      {blocks && blocks.length > 0 && (
+        <DynamicBlocks blocks={blocks} />
+      )}
+
+      <!-- Información de debug (solo en desarrollo) -->
+      <DebugInfo pageData={pageData} slug={slug} client:load />
+    </div>
+  </main>
+</Layout> 

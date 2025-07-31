@@ -2,11 +2,51 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import AuthModalWrapper from '../components/AuthModalWrapper';
-import Page from '../components/Page.astro';
+import { getPageData } from '../lib/directus.js';
+import DynamicBlocks from '../components/DynamicBlocks.astro';
+import JoinNow from '../components/JoinNow.astro';
+import Footer from '../components/Footer.astro';
+
+// Obtener datos de la página de inicio desde Directus
+const { data: pageData, error } = await getPageData('/');
+
+// Si hay un error, usar datos por defecto
+const blocks = pageData?.blocks || [];
+const title = pageData?.title || 'TravelWithGaston - Inicio';
 ---
 
-<Layout title="TravelWithGaston - Inicio">
+<Layout title={title}>
 	<Header />
-	<Page />
+	
+	<!-- Contenido principal -->
+	<main>
+		{/* Título de la página si existe */}
+		{pageData?.title && (
+			<div class="container mx-auto px-4 py-8">
+				<h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">
+					{pageData.title}
+				</h1>
+			</div>
+		)}
+
+		{/* Contenido de la página si existe */}
+		{pageData?.content && (
+			<div class="container mx-auto px-4 py-8">
+				<div class="prose prose-lg max-w-none mb-8">
+					<div set:html={pageData.content} />
+				</div>
+			</div>
+		)}
+
+		{/* Bloques dinámicos */}
+		{blocks && blocks.length > 0 && (
+			<DynamicBlocks blocks={blocks} />
+		)}
+
+		{/* Componentes fijos de la página de inicio */}
+		<JoinNow />
+		<Footer />
+	</main>
+
 	<AuthModalWrapper client:load />
 </Layout>

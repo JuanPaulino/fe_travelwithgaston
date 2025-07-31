@@ -1,0 +1,190 @@
+---
+interface PricingCard {
+  id: string;
+  title: string;
+  description: string;
+  price: string;
+  badge?: string | null;
+  features: string[];
+  is_highlighted: boolean;
+  button: {
+    label: string;
+    url: string;
+  };
+}
+
+interface PricingProps {
+  id: string;
+  sort: number;
+  page: string;
+  collection: string;
+  hide_block: boolean;
+  background: string;
+  item: {
+    id: string;
+    headline: string;
+    tagline: string;
+    pricing_cards: Array<PricingCard>;
+  };
+}
+
+const data = Astro.props.data as PricingProps;
+const { background, item: { headline, tagline, pricing_cards } } = data;
+---
+
+<section class={`pricing ${background}`}>
+  <div class="container">
+    <div class="pricing-header">
+      <span class="tagline">{tagline}</span>
+      <h2>{headline}</h2>
+    </div>
+    <div class="pricing-grid">
+      {
+        pricing_cards.map((card) => (
+          <div
+            class={`pricing-card ${card.is_highlighted ? "highlighted" : ""}`}
+          >
+            {card.badge && <span class="badge">{card.badge}</span>}
+            <h3 class="card-title">{card.title}</h3>
+            <p class="card-description">{card.description}</p>
+            <p class="card-price">{card.price}</p>
+            <ul class="card-features">
+              {card.features.map((feature, index) => (
+                <li>{feature}</li>
+              ))}
+            </ul>
+            <a href={card.button.url} class="card-cta">
+              {card.button.label}
+            </a>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .pricing {
+    padding: 4rem 2rem;
+    background-color: #fff;
+    color: #333; 
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .pricing.dark {
+    background-color: #333;
+    color: #fff;
+  }
+
+  .pricing-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .tagline {
+    display: block;
+    font-size: 1rem;
+    font-style: italic;
+    color: #888;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #333; 
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    width: 100%;
+  }
+
+  .pricing-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+    position: relative;
+  }
+
+  .pricing-card.highlighted {
+    border: 2px solid #007bff;
+    transform: scale(1.05);
+    background-color: #f3f6f8;
+  }
+
+  .badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #007bff;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: bold;
+    border-radius: 4px;
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  .card-description {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: #555; 
+  }
+
+  .card-price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #007bff; 
+  }
+
+  .card-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+  }
+ .card-features li:before {
+    content: "✓";
+    color: #38a169;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  .card-features li {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: #555; 
+  }
+
+  .card-cta {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff; 
+    background-color: #007bff;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+  }
+
+  .card-cta:hover {
+    background-color: #0056b3;
+  }
+</style>

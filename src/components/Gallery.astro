@@ -1,0 +1,124 @@
+---
+import { Image } from "astro:assets";
+
+interface GalleryItem {
+  directus_file: {
+    id: string;
+    filename_disk: string;
+    title: string;
+    width: number;
+    height: number;
+  };
+}
+
+interface GalleryProps {
+  id: string;
+  sort: number;
+  page: string;
+  collection: string;
+  hide_block: boolean;
+  background: string;
+  item: {
+    headline: string;
+    id: string;
+    tagline: string;
+    items: Array<GalleryItem>;
+  };
+}
+
+const { background, item: { headline, tagline, items } } = Astro.props as GalleryProps;
+
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL;
+---
+
+<section class={`gallery ${background}`}>
+  <div class="gallery-header">
+    <span class="tagline">{tagline}</span>
+    <h2>{headline}</h2>
+  </div>
+  <div class="gallery-grid">
+    {items.map((item) => (
+      <div class="gallery-item">
+        <Image
+          src={`${DIRECTUS_URL}/assets/${item.directus_file.filename_disk}`}
+          alt={item.directus_file.title}
+          width={item.directus_file.width}
+          height={item.directus_file.height}
+          class="gallery-image"
+        />
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .gallery {
+    padding: 4rem 2rem;
+    background-color: #e2e8f0;
+    color: #333333;
+  }
+
+  .gallery.light {
+    background-color: #ffffff;
+    color: #333333;
+  }
+
+  .gallery-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .tagline {
+    display: block;
+    font-size: 1rem;
+    font-style: italic;
+    color: #888888;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #333333;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+  }
+
+  .gallery-item {
+    background-color: #444444;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  .gallery-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .gallery-item-content {
+    padding: 1rem;
+  }
+
+  .gallery-item-content h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+  }
+
+  .gallery-item-content p {
+    font-size: 1rem;
+    color: #cccccc;
+  }
+</style>

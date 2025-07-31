@@ -7,6 +7,9 @@ const client = createDirectus(DIRECTUS_URL).with(rest());
 
 export async function getPageData(slug) {
   try {
+    if (!slug.startsWith("/")) {
+      slug = `/${slug}`;
+    }
     const pages = await client.request(
       readItems("pages", {
         fields: [
@@ -15,19 +18,29 @@ export async function getPageData(slug) {
           "blocks.item.*",
           "blocks.item.items.*",
           "blocks.item.items.image.*",
+          "blocks.item.items.pricing_cards.*",
           // Evitar la relación circular: NO incluir "blocks.item.items.block_inspiration"
         ],
         filter: {
-          permalink: {
-            _eq: slug,
-          },
+          _and: [
+            {
+              permalink: {
+                _eq: slug,
+              },
+            },
+            {
+              status: {
+                _eq: "published",
+              },
+            },
+          ],
         },
         limit: 1, // Fetch only one page
       })
     );
 
     if (pages.length === 0) {
-      throw new Error(`Page with slug "${slug}" not found.`);
+      throw new Error(`Page with slug "${slug}" not found or not published.`);
     }
 
     return {
