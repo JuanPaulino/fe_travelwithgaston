@@ -3,6 +3,36 @@ export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
     extend: {
+      colors: {
+        neutral: {
+          white: '#FFFFFF',
+          lightest: '#EEEEEE',
+          lighter: '#CCCCCC',
+          light: '#AAAAAA',
+          DEFAULT: '#666666',
+          dark: '#444444',
+          darker: '#222222',
+          darkest: '#000000',
+        },
+        primary: {
+          lightest: '#FAF5EC',
+          lighter: '#F5ECDA',
+          light: '#DCEB7D',
+          DEFAULT: '#CEA346',
+          dark: '#A48238',
+          darker: '#52411C',
+          darkest: '#3D3015',
+        },
+        secondary: {
+          lightest: '#FAEDED',
+          lighter: '#F6D0B0',
+          light: '#E18183',
+          DEFAULT: '#D54B4F',
+          dark: '#AA3C3F',
+          darker: '#551E1F',
+          darkest: '#3F1617',
+        },
+      },
       fontFamily: {
         heading: ['"Roboto Serif"', 'serif'],
         body: ['Inter', 'sans-serif'],

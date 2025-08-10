@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../lib/useAuth';
+import { handleAPIError } from '../../lib/http';
 
 const SignInForm = ({ onSwitchToSignUp }) => {
   const [formData, setFormData] = useState({
@@ -7,8 +9,10 @@ const SignInForm = ({ onSwitchToSignUp }) => {
     keepSignedIn: true
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Usar el hook de autenticación
+  const { login, loading, error, clearError } = useAuth();
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -50,33 +54,43 @@ const SignInForm = ({ onSwitchToSignUp }) => {
       return;
     }
     
-    setIsLoading(true);
+    // Limpiar errores previos
+    setErrors({});
+    clearError();
     
     try {
-      // Aquí iría la lógica de inicio de sesión
-      console.log('Iniciando sesión con:', formData);
+      const result = await login({
+        email: formData.email,
+        password: formData.password
+      });
       
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // TODO: Implementar lógica de inicio de sesión real
-      // const response = await authService.signIn(formData);
-      
-      console.log('Sesión iniciada exitosamente');
+      if (result.success) {
+        console.log('Sesión iniciada exitosamente');
+        // Aquí podrías redirigir al usuario o cerrar el modal
+        // window.location.href = '/dashboard';
+      } else {
+        setErrors({ general: result.error });
+      }
       
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
-      setErrors({ general: 'Error al iniciar sesión. Inténtalo de nuevo.' });
-    } finally {
-      setIsLoading(false);
+      const errorData = handleAPIError(error);
+      setErrors({ general: errorData.message });
     }
   };
 
+  // Escuchar cambios en el error del store
+  useEffect(() => {
+    if (error && !errors.general) {
+      setErrors({ general: error });
+    }
+  }, [error, errors.general]);
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {errors.general && (
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
+      {(errors.general || error) && (
         <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-          {errors.general}
+          {errors.general || error}
         </div>
       )}
       
@@ -90,7 +104,7 @@ const SignInForm = ({ onSwitchToSignUp }) => {
           value={formData.email}
           onChange={handleInputChange}
           placeholder="*required"
-          className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-colors ${
+          className={`w-full h-10 px-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-colors ${
             errors.email ? 'border-red-300' : 'border-gray-300'
           }`}
         />
@@ -110,7 +124,7 @@ const SignInForm = ({ onSwitchToSignUp }) => {
             value={formData.password}
             onChange={handleInputChange}
             placeholder="*required"
-            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-colors pr-12 ${
+            className={`w-full h-10 px-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-colors ${
               errors.password ? 'border-red-300' : 'border-gray-300'
             }`}
           />
@@ -147,10 +161,10 @@ const SignInForm = ({ onSwitchToSignUp }) => {
 
       <button
         type="submit"
-        disabled={isLoading}
+        disabled={loading}
         className="w-full bg-black text-white py-4 px-6 rounded-md hover:bg-gray-800 transition-colors font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isLoading ? 'Iniciando sesión...' : 'Sign in'}
+        {loading ? 'Iniciando sesión...' : 'Sign in'}
       </button>
     </form>
   );

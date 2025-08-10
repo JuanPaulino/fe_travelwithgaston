@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import SignInForm from './SignInForm';
-import JoinUsForm from './JoinUsForm';
+import JoinUsSteps from './JoinUsSteps';
 
 const AuthenticationModal = ({ isOpen, onClose }) => {
   const [currentTab, setCurrentTab] = useState('signin');
@@ -55,9 +55,9 @@ const AuthenticationModal = ({ isOpen, onClose }) => {
           
           <div className="text-center">
             <div className="flex justify-center mb-4">
-              <img src="/logo.png" alt="Travel with Gaston" />
+              <img src="/logo.png" alt="Travel with Gaston" className="w-40" />
             </div>
-            <p className="font-body text-sm text-gray-600">Core message or value proposition</p>
+            <p className="font-body text-sm text-neutral-600">Crafting Journeys Beyond Expectations</p>
           </div>
 
           {/* Tabs */}
@@ -90,7 +90,7 @@ const AuthenticationModal = ({ isOpen, onClose }) => {
           {currentTab === 'signin' ? (
             <SignInForm onSwitchToSignUp={() => switchTab('joinus')} />
           ) : (
-            <JoinUsForm onSwitchToSignIn={() => switchTab('signin')} />
+            <JoinUsSteps onSwitchToSignIn={() => switchTab('signin')} />
           )}
         </div>
 

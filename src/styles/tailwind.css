@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+@theme {
+  --color-neutral-white: #FFFFFF;
+  --color-neutral-lightest: #EEEEEE;
+  --color-neutral-lighter: #CCCCCC;
+  --color-neutral-light: #AAAAAA;
+  --color-neutral-DEFAULT: #666666;
+  --color-neutral-dark: #444444;
+  --color-neutral-darker: #222222;
+  --color-neutral-darkest: #000000;
+
+  --color-primary-lightest: #FAF5EC;
+  --color-primary-lighter: #F5ECDA;
+  --color-primary-light: #DCEB7D;
+  --color-primary: #CEA346;
+  --color-primary-dark: #A48238;
+  --color-primary-darker: #52411C;
+  --color-primary-darkest: #3D3015;
+
+  --color-secondary-lightest: #FAEDED;
+  --color-secondary-lighter: #F6D0B0;
+  --color-secondary-light: #E18183;
+  --color-secondary-DEFAULT: #D54B4F;
+  --color-secondary-dark: #AA3C3F;
+  --color-secondary-darker: #551E1F;
+  --color-secondary-darkest: #3F1617;
+}
+
 /* Clases personalizadas para el sistema de tipografía */
 @layer utilities {
   .font-heading {
