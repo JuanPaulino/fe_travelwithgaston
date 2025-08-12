@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
+import SearchFilters from '../components/SearchFilters.jsx';
+import { getPageData } from '../lib/directus.js';
+import DynamicBlocks from '../components/DynamicBlocks.astro';
+import JoinNow from '../components/JoinNow.astro';
+import Footer from '../components/Footer.astro';
+
+// Si hay un error, usar datos por defecto
+const title = 'Search';
+---
+
+<Layout title={title}>
+	<Header />
+	
+	<!-- Contenido principal -->
+	<main class="container mx-auto px-4 py-8">
+		<div class="flex gap-8">
+			<!-- Sidebar izquierdo -->
+			<aside class="w-80 flex-shrink-0">
+				<SearchFilters client:load />
+			</aside>
+			
+			<!-- Contenedor principal con filas de cards -->
+			<div class="flex-1">
+				<!-- Fila 1 -->
+				<div class="mb-8">
+					<!-- Cards de la fila 1 aquí -->
+				</div>
+				
+				<!-- Fila 2 -->
+				<div class="mb-8">
+					<!-- Cards de la fila 2 aquí -->
+				</div>
+				
+				<!-- Fila 3 -->
+				<div class="mb-8">
+					<!-- Cards de la fila 3 aquí -->
+				</div>
+			</div>
+		</div>
+	</main>
+	<Footer />
+
+	<AuthModalWrapper client:load />
+</Layout>

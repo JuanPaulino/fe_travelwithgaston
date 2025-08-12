@@ -30,7 +30,7 @@
 /* Clases personalizadas para el sistema de tipografía */
 @layer utilities {
   .font-heading {
-    font-family: 'Roboto Serif', Georgia, serif;
+    font-family: 'Roboto Serif', Georgia, serif !important;
   }
   
   .font-body {
