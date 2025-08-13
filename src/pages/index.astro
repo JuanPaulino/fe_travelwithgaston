@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
+import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
 import { getPageData } from '../lib/directus.js';
 import DynamicBlocks from '../components/DynamicBlocks.astro';
 import JoinNow from '../components/JoinNow.astro';
@@ -49,4 +50,5 @@ const title = pageData?.title || 'TravelWithGaston - Inicio';
 	</main>
 
 	<AuthModalWrapper client:load />
+	<StoreDebuggerWrapper client:load />
 </Layout>

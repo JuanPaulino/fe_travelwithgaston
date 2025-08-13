@@ -2,11 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
+import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
 import SearchFilters from '../components/SearchFilters.jsx';
 import { getPageData } from '../lib/directus.js';
 import DynamicBlocks from '../components/DynamicBlocks.astro';
 import JoinNow from '../components/JoinNow.astro';
 import Footer from '../components/Footer.astro';
+import SearchForm from '../components/SearchForm.jsx';
+
 
 // Si hay un error, usar datos por defecto
 const title = 'Search';
@@ -14,9 +17,11 @@ const title = 'Search';
 
 <Layout title={title}>
 	<Header />
-	
 	<!-- Contenido principal -->
 	<main class="container mx-auto px-4 py-8">
+		<div class="bg-neutral-darkest px-10 py-6">
+			<SearchForm client:load initialData={{}} />
+		</div>
 		<div class="flex gap-8">
 			<!-- Sidebar izquierdo -->
 			<aside class="w-80 flex-shrink-0">
@@ -45,4 +50,5 @@ const title = 'Search';
 	<Footer />
 
 	<AuthModalWrapper client:load />
+	<StoreDebuggerWrapper client:load />
 </Layout>

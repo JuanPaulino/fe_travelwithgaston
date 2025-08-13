@@ -101,6 +101,31 @@ export const authAPI = {
   }
 };
 
+export const hotelsApi = {
+  // search
+  search: async (query, limit = 10) => {
+    try {
+      const params = new URLSearchParams()
+      
+      if (query) params.append('query', query)
+      if (limit) params.append('limit', limit)
+
+      const response = await http.get(`/api/hotels/search?${params}`)
+      const data = response.data
+
+      // Si la respuesta es exitosa, retornar los resultados
+      if (data.success && data.data) {
+        return data.data
+      }
+      
+      return []
+    } catch (error) {
+      console.error('Error searching:', error)
+      return []
+    }
+  },
+};
+
 // Función helper para manejar errores
 export const handleAPIError = (error) => {
   if (error.response) {
