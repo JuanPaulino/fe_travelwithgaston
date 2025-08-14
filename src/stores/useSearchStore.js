@@ -1,5 +1,7 @@
 import { atom } from 'nanostores';
 import { useState, useEffect } from 'react';
+import { hotelsApi } from '../lib/http.js';
+import { config } from '../config/config.js';
 
 // Estado inicial de la búsqueda
 const initialSearchData = {
@@ -14,11 +16,23 @@ const initialSearchData = {
   rooms: 1,
   adults: 2,
   children: 0,
+  childrenAges: [],
   totalGuests: 2
+};
+
+// Estado inicial de los resultados
+const initialResultsData = {
+  hotels: [],
+  loading: false,
+  error: null,
+  lastSearch: null
 };
 
 // Store principal de búsqueda
 export const searchStore = atom(initialSearchData);
+
+// Store de resultados de búsqueda
+export const resultsStore = atom(initialResultsData);
 
 // Acciones para manipular la búsqueda
 export const searchActions = {
@@ -75,17 +89,37 @@ export const searchActions = {
   setChildren: (children) => {
     const currentData = searchStore.get();
     let newRooms = currentData.rooms;
+    let newChildrenAges = currentData.childrenAges;
     
     // Si se agregan niños y hay más de 1 habitación, forzar a 1 habitación
     if (children > 0 && newRooms > 1) {
       newRooms = 1;
     }
     
+    // Ajustar el array de edades según el número de niños
+    if (children > currentData.children) {
+      // Agregar niños: agregar edades por defecto (8 años)
+      const newAges = Array(children).fill(8);
+      newChildrenAges = newAges;
+    } else if (children < currentData.children) {
+      // Remover niños: mantener solo las edades necesarias
+      newChildrenAges = currentData.childrenAges.slice(0, children);
+    }
+    
     searchStore.set({
       ...currentData,
       children,
       rooms: newRooms,
+      childrenAges: newChildrenAges,
       totalGuests: currentData.adults + children
+    });
+  },
+
+  // Actualizar edades de los niños
+  setChildrenAges: (ages) => {
+    searchStore.set({
+      ...searchStore.get(),
+      childrenAges: ages
     });
   },
 
@@ -111,38 +145,143 @@ export const searchActions = {
   // Verificar si la búsqueda es válida
   isSearchValid: () => {
     const data = searchStore.get();
-    return data.searchText && data.selectedDestination && data.checkInDate && data.checkOutDate;
+    console.log('🔍 isSearchValid - Verificando datos:', {
+      hasSearchText: !!data.searchText,
+      hasSelectedDestination: !!data.selectedDestination,
+      hasCheckInDate: !!data.checkInDate,
+      hasCheckOutDate: !!data.checkOutDate,
+      selectedDestination: data.selectedDestination
+    });
+    
+    // Solo necesitamos destino seleccionado y fechas válidas
+    // El searchText puede variar pero no es crítico para la búsqueda
+    return data.selectedDestination && data.checkInDate && data.checkOutDate;
   },
 
   // Ejecutar búsqueda (aquí puedes agregar la lógica de API)
   executeSearch: async () => {
     const searchData = searchStore.get();
     
+    console.log('🔍 executeSearch - Iniciando búsqueda con datos:', searchData)
+    
     if (!searchActions.isSearchValid()) {
-      console.warn('Búsqueda no válida:', searchData);
+      console.warn('❌ executeSearch - Búsqueda no válida:', searchData);
       return null;
     }
 
-    console.log('Ejecutando búsqueda con:', searchData);
-    
-    // Aquí puedes agregar la llamada a la API
-    // const results = await searchAPI.search(searchData);
-    
-    return searchData;
+    console.log('✅ executeSearch - Búsqueda válida, procediendo...')
+
+    // Actualizar estado de carga
+    resultsStore.set({
+      ...resultsStore.get(),
+      loading: true,
+      error: null
+    });
+
+    try {
+      // Usar directamente el destino ya seleccionado por el usuario
+      const selectedDestination = searchData.selectedDestination;
+      const locationId = selectedDestination.location_id || selectedDestination.id;
+
+      console.log('🏨 executeSearch - Destino seleccionado:', selectedDestination)
+      console.log('🏨 executeSearch - Location ID:', locationId)
+
+      if (!locationId) {
+        throw new Error('No se pudo obtener el ID de ubicación del destino seleccionado');
+      }
+
+      // Transformar datos al formato que espera el endpoint
+      const searchParams = {
+        location_id: locationId,
+        start_date: searchData.checkInDate,
+        end_date: searchData.checkOutDate,
+        rooms: [
+          {
+            adults: searchData.adults,
+            ...(searchData.children > 0 && {
+              children: searchData.childrenAges.map(age => ({ age }))
+            })
+          }
+        ],
+        currency: config.search.defaultCurrency,
+        language: config.search.defaultLanguage
+      };
+
+      // Si hay niños, agregar sus edades
+      if (searchData.children > 0) {
+        searchParams.rooms[0].children_ages = searchData.childrenAges;
+      }
+
+      console.log('🏨 executeSearch - Parámetros de búsqueda:', searchParams)
+
+      // Llamar a la API de disponibilidad
+      const results = await hotelsApi.getAvailability(searchParams);
+      
+      console.log('🏨 executeSearch - Resultados recibidos:', results?.length || 0, 'hoteles')
+      
+      // Actualizar resultados
+      resultsStore.set({
+        hotels: results,
+        loading: false,
+        error: null,
+        lastSearch: {
+          ...searchParams,
+          rooms: searchData.rooms, // Usar el número de habitaciones del store, no el array de la API
+          adults: searchData.adults,
+          children: searchData.children,
+          totalGuests: searchData.totalGuests
+        }
+      });
+
+      return results;
+    } catch (error) {
+      
+      // Actualizar estado de error
+      resultsStore.set({
+        ...resultsStore.get(),
+        loading: false,
+        error: error.message || 'Error al buscar hoteles. Intenta nuevamente.'
+      });
+
+      return null;
+    }
   }
 };
 
 // Hook personalizado para usar el store en componentes React
 export const useSearchStore = () => {
   const [searchData, setSearchData] = useState(searchStore.get());
+  const [resultsData, setResultsData] = useState(resultsStore.get());
 
   useEffect(() => {
-    const unsubscribe = searchStore.subscribe(setSearchData);
-    return unsubscribe;
+    console.log('🔄 useSearchStore - Configurando suscripciones...')
+    
+    const unsubscribeSearch = searchStore.subscribe((newSearchData) => {
+      console.log('🔄 useSearchStore - Search data actualizado:', newSearchData)
+      setSearchData(newSearchData)
+    });
+    
+    const unsubscribeResults = resultsStore.subscribe((newResultsData) => {
+      console.log('🔄 useSearchStore - Results data actualizado:', newResultsData)
+      setResultsData(newResultsData)
+    });
+    
+    return () => {
+      console.log('🔄 useSearchStore - Limpiando suscripciones...')
+      unsubscribeSearch();
+      unsubscribeResults();
+    };
   }, []);
+
+  console.log('🔄 useSearchStore - Hook ejecutado, datos actuales:', {
+    searchData: !!searchData,
+    resultsData: !!resultsData,
+    hotelsCount: resultsData?.hotels?.length || 0
+  })
 
   return {
     searchData,
+    resultsData,
     ...searchActions
   };
 };

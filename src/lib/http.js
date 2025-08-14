@@ -1,11 +1,10 @@
 import axios from 'axios';
+import { config } from '../config/config.js';
 
 // Configuración base de axios
 const http = axios.create({
-  baseURL: process.env.NODE_ENV === 'production' 
-    ? 'https://api.travelwithgaston.com' 
-    : 'http://localhost:3000',
-  timeout: 10000,
+  baseURL: config.api.baseURL,
+  timeout: config.api.timeout,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -122,6 +121,41 @@ export const hotelsApi = {
     } catch (error) {
       console.error('Error searching:', error)
       return []
+    }
+  },
+
+  // Buscar destinos para obtener location_id
+  searchDestinations: async (query) => {
+    try {
+      const response = await http.get(`/api/hotels/search?query=${encodeURIComponent(query)}&limit=5`)
+      const data = response.data
+
+      if (data.success && data.data) {
+        return data.data
+      }
+      
+      return []
+    } catch (error) {
+      console.error('Error searching destinations:', error)
+      return []
+    }
+  },
+
+  // Obtener disponibilidad de hoteles
+  getAvailability: async (searchParams) => {
+    try {
+      const response = await http.post('/api/hotels/availability', searchParams)
+      const data = response.data
+
+      // Si la respuesta es exitosa, retornar los resultados
+      if (data.success && data.data) {
+        return data.data
+      }
+      
+      return []
+    } catch (error) {
+      console.error('Error getting hotel availability:', error)
+      throw error // Re-lanzar el error para manejarlo en el store
     }
   },
 };

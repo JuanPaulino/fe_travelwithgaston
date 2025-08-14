@@ -1,10 +1,15 @@
+import React from 'react'
+import ChildrenAgeSelector from './ChildrenAgeSelector.jsx'
+
 const GuestSelector = ({ 
   adults = 2, 
   children = 0, 
-  rooms = 1, 
+  rooms = 1,
+  childrenAges = [],
   onAdultsChange, 
   onChildrenChange, 
   onRoomsChange,
+  onChildrenAgesChange,
   disabled = false,
   className = "",
   forceSingleRoom = false
@@ -142,6 +147,15 @@ const GuestSelector = ({
           </button>
         </div>
       </div>
+      
+      {/* Selector de edades de niños */}
+      {children > 0 && onChildrenAgesChange && (
+        <ChildrenAgeSelector
+          children={children}
+          childrenAges={childrenAges}
+          onChildrenAgesChange={onChildrenAgesChange}
+        />
+      )}
     </div>
   )
 }

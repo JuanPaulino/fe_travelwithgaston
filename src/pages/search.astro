@@ -9,6 +9,7 @@ import DynamicBlocks from '../components/DynamicBlocks.astro';
 import JoinNow from '../components/JoinNow.astro';
 import Footer from '../components/Footer.astro';
 import SearchForm from '../components/SearchForm.jsx';
+import SearchResults from '../components/SearchResults.jsx';
 
 
 // Si hay un error, usar datos por defecto
@@ -22,28 +23,16 @@ const title = 'Search';
 		<div class="bg-neutral-darkest px-10 py-6">
 			<SearchForm client:load initialData={{}} />
 		</div>
+		
 		<div class="flex gap-8">
 			<!-- Sidebar izquierdo -->
 			<aside class="w-80 flex-shrink-0">
 				<SearchFilters client:load />
 			</aside>
 			
-			<!-- Contenedor principal con filas de cards -->
+			<!-- Contenedor principal con resultados de búsqueda -->
 			<div class="flex-1">
-				<!-- Fila 1 -->
-				<div class="mb-8">
-					<!-- Cards de la fila 1 aquí -->
-				</div>
-				
-				<!-- Fila 2 -->
-				<div class="mb-8">
-					<!-- Cards de la fila 2 aquí -->
-				</div>
-				
-				<!-- Fila 3 -->
-				<div class="mb-8">
-					<!-- Cards de la fila 3 aquí -->
-				</div>
+				<SearchResults client:load />
 			</div>
 		</div>
 	</main>

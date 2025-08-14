@@ -14,6 +14,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     setRooms, 
     setAdults, 
     setChildren,
+    setChildrenAges,
     executeSearch 
   } = useSearchStore()
 
@@ -90,6 +91,11 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   // Manejar cambio en número de niños
   const handleChildrenChange = (newChildren) => {
     setChildren(newChildren)
+  }
+
+  // Manejar cambio en edades de niños
+  const handleChildrenAgesChange = (newAges) => {
+    setChildrenAges(newAges)
   }
 
   // Calcular total de huéspedes
@@ -221,11 +227,8 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                 type="button"
                 onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
                 disabled={disabled}
-                className="flex items-center gap-2 text-base font-medium text-gray-900 hover:text-gray-700 transition-colors"
+                className=" flex items-center gap-2 text-base font-medium text-gray-900 hover:text-gray-700 transition-colors"
               >
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                </svg>
                 <span>{searchData.adults} Adults, {searchData.children} child, {searchData.rooms} rooms</span>
               </button>
 
@@ -238,9 +241,11 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                     adults={searchData.adults}
                     children={searchData.children}
                     rooms={searchData.rooms}
+                    childrenAges={searchData.childrenAges}
                     onAdultsChange={handleAdultsChange}
                     onChildrenChange={handleChildrenChange}
                     onRoomsChange={handleRoomsChange}
+                    onChildrenAgesChange={handleChildrenAgesChange}
                     disabled={disabled}
                     forceSingleRoom={shouldForceSingleRoom()}
                   />
@@ -265,11 +270,11 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
             </div>
 
             {/* Botón de búsqueda - Dorado-marrón como en la imagen */}
-            <div className="flex ">
-                              <button
+            <div className="flex">
+                <button
                   type="submit"
                   disabled={disabled || !searchData.checkInDate || !searchData.checkOutDate}
-                  className="bg-primary hover:bg-primary-dark text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full h-full px-6 py-4"
+                  className="cursor-pointer bg-primary hover:bg-primary-dark text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full h-full px-6 py-4"
                 >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -302,7 +307,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
               {/* Campo de destino */}
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <SearchAutocomplete
-                  value={searchText}
+                  value={searchData.searchText}
                   onChange={handleSearchTextChange}
                   onSelectionChange={handleDestinationSelection}
                   placeholder="Search by destination or hotel"
@@ -356,7 +361,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                       </span>
                       <span className="text-gray-400 text-lg">🛏️</span>
                       <span className="text-base font-medium text-gray-900">
-                        {rooms} room{rooms > 1 ? 's' : ''}
+                        {searchData.rooms} room{searchData.rooms > 1 ? 's' : ''}
                       </span>
                     </div>
                   </div>
@@ -384,9 +389,11 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                           adults={searchData.adults}
                           children={searchData.children}
                           rooms={searchData.rooms}
+                          childrenAges={searchData.childrenAges}
                           onAdultsChange={handleAdultsChange}
                           onChildrenChange={handleChildrenChange}
                           onRoomsChange={handleRoomsChange}
+                          onChildrenAgesChange={handleChildrenAgesChange}
                           disabled={disabled}
                           className="space-y-6"
                           forceSingleRoom={shouldForceSingleRoom()}
