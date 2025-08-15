@@ -2,6 +2,7 @@ import { atom } from 'nanostores';
 import { useState, useEffect } from 'react';
 import { hotelsApi } from '../lib/http.js';
 import { config } from '../config/config.js';
+import { filtersStore } from './useFiltersStore.js';
 
 // Estado inicial de la búsqueda
 const initialSearchData = {
@@ -190,6 +191,9 @@ export const searchActions = {
         throw new Error('No se pudo obtener el ID de ubicación del destino seleccionado');
       }
 
+      // Obtener filtros activos del store de filtros
+      const activeFilters = filtersStore.get();
+      
       // Transformar datos al formato que espera el endpoint
       const searchParams = {
         location_id: locationId,
@@ -212,8 +216,15 @@ export const searchActions = {
         searchParams.rooms[0].children_ages = searchData.childrenAges;
       }
 
-      console.log('🏨 executeSearch - Parámetros de búsqueda:', searchParams)
+      // Agregar filtros activos con sufijo _ids
+      Object.entries(activeFilters).forEach(([filterKey, filterValues]) => {
+        if (filterValues && filterValues.length > 0) {
+          const paramKey = `${filterKey}_ids`;
+          searchParams[paramKey] = filterValues;
+        }
+      });
 
+      console.log('🏨 executeSearch - Parámetros de búsqueda:', searchParams)
       // Llamar a la API de disponibilidad
       const results = await hotelsApi.getAvailability(searchParams);
       

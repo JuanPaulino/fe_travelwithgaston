@@ -27,7 +27,6 @@ const SearchFilters = () => {
       const response = await http.get('/api/hotels/filters');
       if (response.data.success) {
         setFilters(response.data.data);
-        // Inicializar categorías expandidas
         const initialExpanded = {};
         Object.keys(response.data.data).forEach(category => {
           initialExpanded[category] = false;
@@ -62,10 +61,10 @@ const SearchFilters = () => {
   if (loading) {
     return (
       <div className="animate-pulse">
-        <div className="h-6 bg-gray-200 rounded mb-4"></div>
+        <div className="h-6 bg-gray-200 mb-4"></div>
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-4 bg-gray-200 rounded"></div>
+            <div key={i} className="h-4 bg-gray-200"></div>
           ))}
         </div>
       </div>
@@ -85,7 +84,7 @@ const SearchFilters = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
+    <div className="bg-white p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-gray-900">Filter by</h2>
@@ -93,7 +92,7 @@ const SearchFilters = () => {
           onClick={resetFilters}
           className="text-primary hover:text-primary-darker text-sm font-medium"
         >
-          Reset filters
+          Reset
         </button>
       </div>
 

@@ -3,14 +3,14 @@ import { useState, useEffect } from 'react';
 
 // Estado inicial de los filtros
 const initialFilters = {
-  activities_ids: [],
-  family_facilities_ids: [],
-  hotel_facilities_ids: [],
-  property_types_ids: [],
-  location_types_ids: [],
-  trip_types_ids: [],
-  wellness_ids: [],
-  hotel_group_ids: []
+  activities: [],
+  family_facilities: [],
+  hotel_facilities: [],
+  property_types: [],
+  location_types: [],
+  trip_types: [],
+  wellness: [],
+  hotel_group: []
 };
 
 // Store principal de filtros
@@ -62,6 +62,7 @@ export const filtersActions = {
 
   // Establecer filtros específicos
   setFilters: (newFilters) => {
+    console.log('setFilters', newFilters);
     filtersStore.set({
       ...initialFilters,
       ...newFilters

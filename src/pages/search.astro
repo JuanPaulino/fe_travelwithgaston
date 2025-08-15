@@ -20,13 +20,13 @@ const title = 'Search';
 	<Header />
 	<!-- Contenido principal -->
 	<main class="container mx-auto px-4 py-8">
-		<div class="bg-neutral-darkest px-10 py-6">
+		<div class="bg-neutral-darkest px-10 py-6 mb-8">
 			<SearchForm client:load initialData={{}} />
 		</div>
-		
-		<div class="flex gap-8">
+		<div class="w-full h-[1px] bg-neutral-lighter mb-8"></div>
+		<div class="flex gap-6 mb-8">
 			<!-- Sidebar izquierdo -->
-			<aside class="w-80 flex-shrink-0">
+			<aside class="w-52 flex-shrink-0">
 				<SearchFilters client:load />
 			</aside>
 			

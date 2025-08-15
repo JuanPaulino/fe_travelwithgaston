@@ -20,7 +20,7 @@ export const authActions = {
     authStore.set({ ...authStore.get(), loading: true, error: null })
     
     try {
-      const data = await authAPI.login(credentials)
+      const payload = await authAPI.login(credentials)
       
       if (payload.success && payload.data?.token) {
         // Guardar token y refresh token en localStorage
