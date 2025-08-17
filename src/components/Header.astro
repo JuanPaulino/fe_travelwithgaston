@@ -39,15 +39,8 @@
     window.dispatchEvent(new CustomEvent('openAuthModal'));
   }
 
-  // Función para abrir el modal de debugger de stores
-  function openStoreDebugger() {
-    // Disparar un evento personalizado para que React lo escuche
-    window.dispatchEvent(new CustomEvent('openStoreDebugger'));
-  }
-
   // Exponer la función globalmente
   window.openAuthenticationModal = openAuthenticationModal;
-  window.openStoreDebugger = openStoreDebugger;
 </script>
 
 <header class="bg-neutral-white text-neutral-darkest relative">
@@ -63,13 +56,6 @@
     </div>
     <!-- Acciones de usuario (login/signup) solo desktop -->
     <div class="hidden md:flex md:w-1/3 justify-end items-center gap-4">
-      <button 
-        onclick="openStoreDebugger()"
-        class="text-blue-600 hover:text-blue-800 px-3 py-1 rounded border border-blue-600 hover:bg-blue-50 transition-colors"
-        title="Debug Stores"
-      >
-        🐛 Debug
-      </button>
       <button 
         onclick="openAuthenticationModal()"
         class="text-neutral hover:text-primary transition-colors px-3 py-1 rounded"

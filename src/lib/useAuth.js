@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { authStore, authActions } from '../stores/useAuthStore';
+import { authStore, authActions } from '../stores/authStore';
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState(authStore.get());

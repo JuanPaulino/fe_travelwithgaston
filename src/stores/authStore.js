@@ -1,5 +1,5 @@
 import { atom } from 'nanostores'
-import { authAPI, handleAPIError } from './http'
+import { authAPI, handleAPIError } from '../lib/http'
 
 // Estado inicial
 const initialState = {
