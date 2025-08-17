@@ -3,6 +3,7 @@ import HeroSection from './HeroSection.astro';
 import InspirationGrid from './InspirationGrid.astro';
 import FeaturedHotels from './FeaturedHotels.astro';
 import RichText from './RichText.astro';
+import FormBlock from './FormBlock.jsx';
 
 export interface Props {
   blocks: any[];
@@ -28,11 +29,16 @@ const { blocks } = Astro.props;
       return <FeaturedHotels data={block.item} />;
     }
     
+    // Form Block
+    if (block.collection === 'block_form') {
+      return <FormBlock data={block.item} background={block.background} />;
+    }
+    
     // Content Block / Rich Text
     if (block.collection === 'content_block' || block.collection === 'block_content') {
       return (
         <div class="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h3 class="text-2xl font-semibold mb-4">
+          <h3 class="text-3xl font-semibold mb-4">
             {block.item?.title || 'Bloque de Contenido'}
           </h3>
           {block.item?.content && (

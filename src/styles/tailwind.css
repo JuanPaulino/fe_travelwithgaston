@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  /* Colores neutrales oficiales */
   --color-neutral-white: #FFFFFF;
   --color-neutral-lightest: #EEEEEE;
   --color-neutral-lighter: #CCCCCC;
@@ -10,6 +11,7 @@
   --color-neutral-darker: #222222;
   --color-neutral-darkest: #000000;
 
+  /* Colores primarios oficiales - Paleta dorada */
   --color-primary-lightest: #FAF5EC;
   --color-primary-lighter: #F5ECDA;
   --color-primary-light: #DCEB7D;
@@ -18,6 +20,7 @@
   --color-primary-darker: #52411C;
   --color-primary-darkest: #3D3015;
 
+  /* Colores secundarios oficiales - Paleta roja */
   --color-secondary-lightest: #FAEDED;
   --color-secondary-lighter: #F6D0B0;
   --color-secondary-light: #E18183;
@@ -25,54 +28,72 @@
   --color-secondary-dark: #AA3C3F;
   --color-secondary-darker: #551E1F;
   --color-secondary-darkest: #3F1617;
+
+  /* Fuentes oficiales del sistema de diseño */
+  --font-family-heading: 'Roboto Serif', Georgia, serif;
+  --font-family-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Clases personalizadas para el sistema de tipografía */
+/* Sistema de tipografía oficial */
 @layer utilities {
   .font-heading {
-    font-family: 'Roboto Serif', Georgia, serif !important;
+    font-family: var(--font-family-heading) !important;
   }
   
   .font-body {
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font-family-body) !important;
   }
 }
 
 @layer components {
-  /* Escala de encabezados responsive */
+  /* Escala de encabezados responsive oficial */
   .text-h1 {
+    font-family: var(--font-family-heading);
     font-size: 2.5rem;
     line-height: 1.2;
+    font-weight: 700;
   }
   
   .text-h2 {
+    font-family: var(--font-family-heading);
     font-size: 2.25rem;
     line-height: 1.2;
+    font-weight: 600;
   }
   
   .text-h3 {
+    font-family: var(--font-family-heading);
     font-size: 2rem;
     line-height: 1.2;
+    font-weight: 600;
   }
   
   .text-h4 {
+    font-family: var(--font-family-heading);
     font-size: 1.5rem;
     line-height: 1.4;
+    font-weight: 600;
   }
   
   .text-h5 {
+    font-family: var(--font-family-heading);
     font-size: 1.25rem;
     line-height: 1.4;
+    font-weight: 500;
   }
   
   .text-h6 {
+    font-family: var(--font-family-heading);
     font-size: 1.125rem;
     line-height: 1.4;
+    font-weight: 500;
   }
   
   .text-tagline {
+    font-family: var(--font-family-body);
     font-size: 1rem;
     line-height: 1.5;
+    font-weight: 400;
   }
   
   /* Variantes desktop para sm y superiores */
