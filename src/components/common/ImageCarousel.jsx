@@ -79,18 +79,16 @@ const ImageCarousel = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      
       {/* Imagen principal */}
-      <div className="relative max-w-[400px] w-full">
+      <div className="relative flex items-center justify-center">
         <img
           src={limitedImages[currentIndex].thumbnail_url || limitedImages[currentIndex].url || limitedImages[currentIndex]}
           alt={limitedImages[currentIndex].alt || `Imagen ${currentIndex + 1} del hotel`}
-          className="w-full h-full object-cover transition-opacity duration-300"
-          onError={(e) => {
-            e.target.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-          }}
+          className="w-full h-full transition-opacity duration-300 object-cover aspect-[3/2]"
           onClick={() => onImageClick?.(currentIndex)}
         />
-
+      </div>
         {/* Botones de navegación */}
         <button
           onClick={prevImage}
@@ -128,56 +126,6 @@ const ImageCarousel = ({
           ))}
         </div>
       </div>
-
-      {/* Miniaturas */}
-      {/*
-      showThumbnails && limitedImages.length > 1 && (
-        <div className="mt-3 flex space-x-2 overflow-x-auto pb-2">
-          {limitedImages.map((image, index) => (
-            <button
-              key={index}
-              onClick={() => goToImage(index)}
-              className={`flex-shrink-0 w-16 h-12 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                index === currentIndex 
-                  ? 'border-amber-500 scale-105' 
-                  : 'border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <img
-                src={image.thumbnail_url || image.url || image}
-                alt={image.alt || `Miniatura ${index + 1}`}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'
-                }}
-              />
-            </button>
-          ))}
-        </div>
-      )
-      */}
-
-      {/* Controles de auto-play */}
-      {/*limitedImages.length > 1 && (
-        <div className="absolute top-4 right-4">
-          <button
-            onClick={() => setIsAutoPlaying(!isAutoPlaying)}
-            className="bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200"
-            aria-label={isAutoPlaying ? 'Pausar auto-play' : 'Reanudar auto-play'}
-          >
-            {isAutoPlaying ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            )}
-          </button>
-        </div>
-      )*/}
-    </div>
   )
 }
 

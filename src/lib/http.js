@@ -158,9 +158,27 @@ export const hotelsApi = {
       throw error // Re-lanzar el error para manejarlo en el store
     }
   },
-};
 
-// Función helper para manejar errores
+  // Obtener hotel por ID (endpoint público)
+  getHotelById: async (id) => {
+    try {
+      // Usar axios directamente sin interceptores para endpoints públicos
+      const response = await axios.get(`${config.api.baseURL}/api/hotels/${id}`)
+      const data = response.data
+
+      // Si la respuesta es exitosa, retornar los datos del hotel
+      if (data.success && data.data) {
+        return data.data
+      }
+      
+      return null
+    } catch (error) {
+      console.error('Error getting hotel by ID:', error)
+      return null
+    }
+  },
+};
+"ReferenceError: localStorage is not defined\n    at eval (/Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/src/lib/http.js:22:19)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async Axios.request (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/axios/lib/core/Axios.js:40:14)\n    at async Object.getHotelById (/Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/src/lib/http.js:171:24)\n    at async eval (/Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/src/pages/hotels/[id_hotel].astro:37:17)\n    at async callComponentAsTemplateResultOrResponse (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/runtime/server/render/astro/render.js:91:25)\n    at async renderToAsyncIterable (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/runtime/server/render/astro/render.js:133:26)\n    at async renderPage (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/runtime/server/render/page.js:36:24)\n    at async lastNext (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/core/render-context.js:198:25)\n    at async callMiddleware (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/core/middleware/callMiddleware.js:11:10)\n    at async RenderContext.render (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/core/render-context.js:232:22)\n    at async handleRoute (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/vite-plugin-astro-server/route.js:178:16)\n    at async run (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/vite-plugin-astro-server/request.js:40:14)\n    at async runWithErrorHandling (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/vite-plugin-astro-server/controller.js:64:5)\n    at async handleRequest (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/vite-plugin-astro-server/request.js:34:3)"// Función helper para manejar errores
 export const handleAPIError = (error) => {
   if (error.response) {
     // Error de respuesta del servidor

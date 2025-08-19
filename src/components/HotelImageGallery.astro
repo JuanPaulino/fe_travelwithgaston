@@ -1,0 +1,193 @@
+---
+// Props del componente
+export interface Props {
+  images?: Array<{
+    url: string;
+    thumbnail_url?: string;
+    description?: string;
+  }>;
+  className?: string;
+}
+
+const { images = [], className = '' } = Astro.props;
+---
+
+<div class={`relative ${className}`}>
+  <div class="relative overflow-hidden">
+    <img
+      src={images[0]?.url}
+      alt={images[0]?.description || 'Imagen del hotel'}
+      class="w-full h-64 md:h-[500px] object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+      id="hotel-main-image"
+    />
+    
+    <!-- Indicador de imagen actual -->
+    <div class="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+      1 / {images.length}
+    </div>
+  </div>
+</div>
+
+<!-- Vista completa (se mostrará con JavaScript) -->
+<div
+  id="fullscreen-gallery"
+  class="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center hidden"
+>
+  <!-- Botón cerrar -->
+  <button
+    id="close-gallery"
+    class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10"
+    aria-label="Cerrar galería"
+  >
+    ✕
+  </button>
+
+  <!-- Imagen principal -->
+  <div class="relative max-w-4xl max-h-full p-4">
+    <img
+      id="fullscreen-image"
+      src={images[0]?.url}
+      alt={images[0]?.description || 'Imagen del hotel'}
+      class="max-w-full max-h-full object-contain"
+    />
+    
+    <!-- Descripción de la imagen -->
+    {images[0]?.description && (
+      <div id="image-description" class="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded">
+        {images[0].description}
+      </div>
+    )}
+  </div>
+
+  <!-- Botones de navegación -->
+  {images.length > 1 && (
+    <>
+      <button
+        id="prev-image"
+        class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+        aria-label="Imagen anterior"
+      >
+        ‹
+      </button>
+      
+      <button
+        id="next-image"
+        class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+        aria-label="Siguiente imagen"
+      >
+        ›
+      </button>
+    </>
+  )}
+
+  <!-- Indicador de imagen actual en vista completa -->
+  <div id="fullscreen-counter" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full">
+    1 / {images.length}
+  </div>
+</div>
+
+<script define:vars={{ images }}>
+  let currentImageIndex = 0;
+
+  // Elementos del DOM
+  const mainImage = document.getElementById('hotel-main-image');
+  const fullscreenGallery = document.getElementById('fullscreen-gallery');
+  const fullscreenImage = document.getElementById('fullscreen-image');
+  const imageDescription = document.getElementById('image-description');
+  const fullscreenCounter = document.getElementById('fullscreen-counter');
+  const closeGallery = document.getElementById('close-gallery');
+  const prevButton = document.getElementById('prev-image');
+  const nextButton = document.getElementById('next-image');
+
+  // Funciones de navegación
+  const updateImage = (index) => {
+    currentImageIndex = index;
+    const image = images[index];
+    
+    if (fullscreenImage) {
+      fullscreenImage.src = image.url;
+      fullscreenImage.alt = image.description || 'Imagen del hotel';
+    }
+    
+    if (imageDescription) {
+      if (image.description) {
+        imageDescription.textContent = image.description;
+        imageDescription.style.display = 'block';
+      } else {
+        imageDescription.style.display = 'none';
+      }
+    }
+    
+    if (fullscreenCounter) {
+      fullscreenCounter.textContent = `${index + 1} / ${images.length}`;
+    }
+  };
+
+  const nextImage = () => {
+    const nextIndex = (currentImageIndex + 1) % images.length;
+    updateImage(nextIndex);
+  };
+
+  const previousImage = () => {
+    const prevIndex = (currentImageIndex - 1 + images.length) % images.length;
+    updateImage(prevIndex);
+  };
+
+  const openFullscreen = () => {
+    if (fullscreenGallery) {
+      fullscreenGallery.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+  };
+
+  const closeFullscreen = () => {
+    if (fullscreenGallery) {
+      fullscreenGallery.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+  };
+
+  // Event listeners
+  if (mainImage) {
+    mainImage.addEventListener('click', openFullscreen);
+  }
+
+  if (closeGallery) {
+    closeGallery.addEventListener('click', closeFullscreen);
+  }
+
+  if (fullscreenGallery) {
+    fullscreenGallery.addEventListener('click', (e) => {
+      if (e.target === fullscreenGallery) {
+        closeFullscreen();
+      }
+    });
+  }
+
+  if (prevButton) {
+    prevButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      previousImage();
+    });
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      nextImage();
+    });
+  }
+
+  // Controles de teclado
+  document.addEventListener('keydown', (e) => {
+    if (fullscreenGallery && !fullscreenGallery.classList.contains('hidden')) {
+      if (e.key === 'Escape') {
+        closeFullscreen();
+      } else if (e.key === 'ArrowLeft') {
+        previousImage();
+      } else if (e.key === 'ArrowRight') {
+        nextImage();
+      }
+    }
+  });
+</script>
