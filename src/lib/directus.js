@@ -18,7 +18,7 @@ export async function getPageData(slug) {
           "blocks.item.*",
           "blocks.item.items.*",
           "blocks.item.items.image.*",
-          "blocks.item.items.pricing_cards.*",
+          "blocks.item.pricing_cards.*",
           // Evitar la relación circular: NO incluir "blocks.item.items.block_inspiration"
         ],
         filter: {
