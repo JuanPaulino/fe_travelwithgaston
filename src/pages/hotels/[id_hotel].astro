@@ -10,6 +10,7 @@ import HotelImageGallery from '../../components/HotelImageGallery.astro';
 import HotelMap from '../../components/HotelMap.jsx';
 import { hotelsApi } from '../../lib/http.js';
 
+
 // Obtener el ID del hotel de los parámetros de la URL
 export async function getStaticPaths() {
   // En modo SSR, no necesitamos generar rutas estáticas
@@ -38,7 +39,8 @@ try {
 
 // Si no se encontró el hotel, usar datos de ejemplo como fallback
   // Datos de ejemplo del hotel para demostración (fallback)
-let hotelAvailability = [
+/*
+  hotelAvailability = [
   {
     "hotel_id": 11076,
     "hotel_name": "The Madrid EDITION",
@@ -2140,11 +2142,11 @@ let hotelAvailability = [
     }
   }
 ];
-
+*/
 // Crear array de imágenes del hotel (usando las primeras imágenes de cada tipo de habitación)
 const hotelImages = [];
-if (hotelAvailability && hotelAvailability.length > 0 && hotelAvailability[0].room_types) {
-  hotelAvailability[0].room_types.forEach(room => {
+if (hotelData && hotelData.room_types) {
+  hotelData.room_types.forEach(room => {
     if (room.images && room.images.length > 0) {
       hotelImages.push(room.images[0]);
     }
@@ -2334,7 +2336,7 @@ const title = `Hotel ${hotelData.name}`;
            }
          </div>
       </div>
-			<AvailableHotelRooms client:load hotelData={hotelAvailability} />
+			<AvailableHotelRooms client:load />
       <div class="flex flex-col">
         <HotelMap 
           client:load 

@@ -3,11 +3,15 @@ import { useState, useEffect } from 'react';
 import { hotelsApi } from '../lib/http.js';
 import { config } from '../config/config.js';
 import { filtersStore } from './useFiltersStore.js';
+import { persistentMap } from '@nanostores/persistent'
 
 // Estado inicial de la búsqueda
 const initialSearchData = {
   searchText: '',
-  selectedDestination: null,
+  selectedDestinationId: null,
+  selectedDestinationText: '',
+  selectedDestinationType: null,
+  selectedDestinationLocation: '',
   checkInDate: new Date().toISOString().split('T')[0],
   checkOutDate: (() => {
     const tomorrow = new Date();
@@ -29,8 +33,8 @@ const initialResultsData = {
   lastSearch: null
 };
 
-// Store principal de búsqueda
-export const searchStore = atom(initialSearchData);
+// Store principal de búsqueda - usar atom regular para compatibilidad
+export const searchStore = persistentMap('searchStore', initialSearchData)
 
 // Store de resultados de búsqueda
 export const resultsStore = atom(initialResultsData);
@@ -49,7 +53,10 @@ export const searchActions = {
   setSelectedDestination: (destination) => {
     searchStore.set({
       ...searchStore.get(),
-      selectedDestination: destination
+      selectedDestinationId: destination?.id || null,
+      selectedDestinationText: destination?.text || '',
+      selectedDestinationType: destination?.type || null,
+      selectedDestinationLocation: destination?.location || ''
     });
   },
 
@@ -148,15 +155,15 @@ export const searchActions = {
     const data = searchStore.get();
     console.log('🔍 isSearchValid - Verificando datos:', {
       hasSearchText: !!data.searchText,
-      hasSelectedDestination: !!data.selectedDestination,
+      hasSelectedDestinationId: !!data.selectedDestinationId,
       hasCheckInDate: !!data.checkInDate,
       hasCheckOutDate: !!data.checkOutDate,
-      selectedDestination: data.selectedDestination
+      selectedDestinationId: data.selectedDestinationId
     });
     
     // Solo necesitamos destino seleccionado y fechas válidas
     // El searchText puede variar pero no es crítico para la búsqueda
-    return data.selectedDestination && data.checkInDate && data.checkOutDate;
+    return data.selectedDestinationId && data.checkInDate && data.checkOutDate;
   },
 
   // Ejecutar búsqueda (aquí puedes agregar la lógica de API)
@@ -181,13 +188,20 @@ export const searchActions = {
 
     try {
       // Usar directamente el destino ya seleccionado por el usuario
-      const selectedDestination = searchData.selectedDestination;
-      const locationId = selectedDestination.location_id || selectedDestination.id;
+      const selectedDestination = {
+        id: searchData.selectedDestinationId,
+        text: searchData.selectedDestinationText,
+        type: searchData.selectedDestinationType,
+        location: searchData.selectedDestinationLocation
+      };
+      
+      const destinationId = selectedDestination.id;
+      const destinationKey = selectedDestination.type === 'location' ? 'location_id' : 'hotel_id';
 
       console.log('🏨 executeSearch - Destino seleccionado:', selectedDestination)
-      console.log('🏨 executeSearch - Location ID:', locationId)
+      console.log('🏨 executeSearch - Location ID:', destinationId)
 
-      if (!locationId) {
+      if (!destinationId) {
         throw new Error('No se pudo obtener el ID de ubicación del destino seleccionado');
       }
 
@@ -196,7 +210,7 @@ export const searchActions = {
       
       // Transformar datos al formato que espera el endpoint
       const searchParams = {
-        location_id: locationId,
+        [destinationKey]: destinationId,
         start_date: searchData.checkInDate,
         end_date: searchData.checkOutDate,
         rooms: [
@@ -227,7 +241,7 @@ export const searchActions = {
       console.log('🏨 executeSearch - Parámetros de búsqueda:', searchParams)
       // Llamar a la API de disponibilidad
       const results = await hotelsApi.getAvailability(searchParams);
-      
+      debugger
       console.log('🏨 executeSearch - Resultados recibidos:', results?.length || 0, 'hoteles')
       
       // Actualizar resultados
@@ -241,10 +255,11 @@ export const searchActions = {
           adults: searchData.adults,
           children: searchData.children,
           totalGuests: searchData.totalGuests
-        }
+        },
+        search_type: selectedDestination.type,
       });
 
-      return results;
+      return {results, search_type: selectedDestination.type};
     } catch (error) {
       
       // Actualizar estado de error

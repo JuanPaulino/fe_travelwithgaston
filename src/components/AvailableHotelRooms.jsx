@@ -1,9 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ImageCarousel from './common/ImageCarousel.jsx'
+import { useSearchStore } from '../stores/useSearchStore.js'
 
+const AvailableHotelRooms = ({ }) => {
+  const { searchData, executeSearch } = useSearchStore();
+  const [hotelData, setHotelData] = useState();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-const AvailableHotelRooms = ({ hotelData }) => {
-  const hotel = hotelData?.[0] || {};
+  // Ejecutar búsqueda cuando el componente se monta o cambian los datos de búsqueda
+  useEffect(() => {
+    const fetchHotelAvailability = async () => {
+      // Solo ejecutar si tenemos un destino seleccionado
+      if (searchData?.selectedDestinationId) {
+        setLoading(true);
+        setError(null);
+        
+        try {
+          const response = await executeSearch();
+          if (response && response.search_type === 'hotel') {
+            setHotelData(response.results[0]);
+          }
+        } catch (err) {
+          setError(err.message || 'Error al obtener la disponibilidad del hotel');
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchHotelAvailability();
+  }, [searchData?.selectedDestinationId, executeSearch]);
+
+  const hotel = hotelData;
   const roomTypes = hotel.room_types || [];
   
   // Función para formatear el precio
@@ -16,6 +45,40 @@ const AvailableHotelRooms = ({ hotelData }) => {
     }).format(price);
   };
 
+  // Mostrar estado de carga
+  if (loading) {
+    return (
+      <div className="mb-8 w-full">
+        <h2 className="text-h3 sm:text-h3-desktop font-heading text-neutral-darkest mb-6">
+          Select your room
+        </h2>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <span className="ml-3 text-neutral-darkest">Cargando disponibilidad...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar error si ocurrió alguno
+  if (error) {
+    return (
+      <div className="mb-8 w-full">
+        <h2 className="text-h3 sm:text-h3-desktop font-heading text-neutral-darkest mb-6">
+          Select your room
+        </h2>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <p className="text-red-800">Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-3 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mb-8 w-full">

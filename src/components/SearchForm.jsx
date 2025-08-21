@@ -40,7 +40,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
 
   // Mostrar campos adicionales si hay datos iniciales
   useEffect(() => {
-    if (initialData.selectedDestination) {
+    if (initialData.selectedDestinationId) {
       setShowAdditionalFields(true)
     }
   }, [initialData, setShowAdditionalFields])
@@ -69,7 +69,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   // Manejar cambio de texto en el input de búsqueda
   const handleSearchTextChange = (text) => {
     setSearchText(text)
-    if (searchData.selectedDestination && text !== searchData.selectedDestination.text) {
+    if (searchData.selectedDestinationId && text !== searchData.selectedDestinationText) {
       setSelectedDestination(null)
       // En móvil, ocultar campos adicionales si se borra la selección
       if (isMobile && !text) {
@@ -138,9 +138,14 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     }
     
     // Ejecutar búsqueda usando el store
-    const result = await executeSearch()
-    if (result) {
-      console.log('Búsqueda ejecutada exitosamente:', result)
+    const response = await executeSearch()
+    if (response.search_type === 'hotel') {
+      // Redireccionar a la página del hotel específico
+      window.location.href = `/hotels/${searchData.selectedDestinationId}`
+      return
+    }
+    if (response.results) {
+      console.log('Búsqueda ejecutada exitosamente:', response.results)
     }
   }
 
@@ -161,7 +166,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                   disabled={disabled}
                   className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 placeholder-gray-400"
                 />
-                {searchData.selectedDestination && (
+                {searchData.selectedDestinationId && (
                   <button
                     type="button"
                     onClick={() => {
