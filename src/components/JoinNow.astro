@@ -1,57 +1,59 @@
 ---
 // Componente JoinNow.astro
+export interface Props {
+  data: {
+    title: string;
+    subtitle: string;
+    columns: number;
+    items: Array<{
+      icon: string;
+      title: string;
+      description: string;
+    }>;
+    cta: {
+      label: string;
+      url: string;
+    };
+  };
+  background?: string;
+}
+
+const { data, background = 'light' } = Astro.props;
+
+// Debug: Log de los datos recibidos
+if (import.meta.env.DEV) {
+  console.log('JoinNow component - Data received:', data);
+  console.log('JoinNow component - Background:', background);
+}
+
+// Validación de datos
+if (!data) {
+  console.error('JoinNow component - No data received');
+  return null;
+}
+
+const bgClass = background === 'dark' ? 'bg-gray-900' : 'bg-[#f6f2e7]';
 ---
 
-<section class="bg-[#f6f2e7] min-h-screen flex flex-col items-center justify-center py-16">
+<section class={`${bgClass} min-h-screen flex flex-col items-center justify-center py-16`}>
   <div class="max-w-5xl w-full mx-auto flex flex-col items-center">
-    <h2 class="font-heading text-h2 sm:text-h2-desktop font-bold text-center mb-4">Join now</h2>
+    <h2 class="font-heading text-h2 sm:text-h2-desktop font-bold text-center mb-4">{data.title}</h2>
     <p class="font-body text-base text-center text-gray-600 mb-12 max-w-2xl">
-      Sign up to Little Emperors to start taking advantage of our preferential rates and complimentary benefits
+      {data.subtitle}
     </p>
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-y-12 gap-x-8 w-full mb-10">
-      <div class="flex flex-col items-center text-center px-4">
-        <div class="w-12 h-12 border-2 border-[#d6cdb7] rounded-lg flex items-center justify-center mb-4">
-          <div class="w-6 h-6 rounded-full border-2 border-[#d6cdb7]"></div>
+    <div class={`grid grid-cols-1 sm:grid-cols-${data.columns} gap-y-12 gap-x-8 w-full mb-10`}>
+      {data.items.map((item: any, index: number) => (
+        <div class="flex flex-col items-center text-center px-4">
+          <div class="w-12 h-12 border-2 border-[#d6cdb7] rounded-lg flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-primary text-xs">{item.icon}</span>
+          </div>
+          <h5 class="font-heading text-h5 sm:text-h5-desktop font-semibold mb-1">{item.title}</h5>
+          <p class="font-body text-sm text-gray-600">{item.description}</p>
         </div>
-        <h5 class="font-heading text-h5 sm:text-h5-desktop font-semibold mb-1">Lowest rates guaranteed</h5>
-        <p class="font-body text-sm text-gray-600">Guaranteed lowest rates, plus exclusive offers and preferential rates.</p>
-      </div>
-      <div class="flex flex-col items-center text-center px-4">
-        <div class="w-12 h-12 border-2 border-[#d6cdb7] rounded-lg flex items-center justify-center mb-4">
-          <div class="w-6 h-6 rounded-full border-2 border-[#d6cdb7]"></div>
-        </div>
-        <h5 class="font-heading text-h5 sm:text-h5-desktop font-semibold mb-1">Rates with complimentary benefits</h5>
-        <p class="font-body text-sm text-gray-600">Breakfast, hotel credits, spa treatments, experiences and more.</p>
-      </div>
-      <div class="flex flex-col items-center text-center px-4">
-        <div class="w-12 h-12 border-2 border-[#d6cdb7] rounded-lg flex items-center justify-center mb-4">
-          <div class="w-6 h-6 rounded-full border-2 border-[#d6cdb7]"></div>
-        </div>
-        <h5 class="font-heading text-h5 sm:text-h5-desktop font-semibold mb-1">Flexible rates</h5>
-        <p class="font-body text-sm text-gray-600">Same cancellation, payment, and loyalty point collection as when booking with the hotel directly.</p>
-      </div>
-      <div class="flex flex-col items-center text-center px-4">
-        <div class="w-12 h-12 border-2 border-[#d6cdb7] rounded-lg flex items-center justify-center mb-4">
-          <div class="w-6 h-6 rounded-full border-2 border-[#d6cdb7]"></div>
-        </div>
-        <h5 class="font-heading text-h5 sm:text-h5-desktop font-semibold mb-1">Lifestyle offers</h5>
-        <p class="font-body text-sm text-gray-600">Money off car hire, private jets, and more.</p>
-      </div>
-      <div class="flex flex-col items-center text-center px-4">
-        <div class="w-12 h-12 border-2 border-[#d6cdb7] rounded-lg flex items-center justify-center mb-4">
-          <div class="w-6 h-6 rounded-full border-2 border-[#d6cdb7]"></div>
-        </div>
-        <h5 class="font-heading text-h5 sm:text-h5-desktop font-semibold mb-1">Events</h5>
-        <p class="font-body text-sm text-gray-600">Access to exclusive tickets to some of the world's most sought-after events.</p>
-      </div>
-      <div class="flex flex-col items-center text-center px-4">
-        <div class="w-12 h-12 border-2 border-[#d6cdb7] rounded-lg flex items-center justify-center mb-4">
-          <div class="w-6 h-6 rounded-full border-2 border-[#d6cdb7]"></div>
-        </div>
-        <h5 class="font-heading text-h5 sm:text-h5-desktop font-semibold mb-1">24/7 real human support</h5>
-        <p class="font-body text-sm text-gray-600">Personalised assistance from a dedicated travel expert—anytime, anywhere.</p>
-      </div>
+      ))}
     </div>
-    <button class="mt-4 px-8 py-3 bg-black text-white font-body font-medium rounded hover:bg-gray-900 transition">Select membership</button>
+    <a href={data.cta.url} class="mt-4 px-8 py-3 bg-black text-white font-body font-medium rounded hover:bg-gray-900 transition">
+      {data.cta.label}
+    </a>  
   </div>
 </section> 

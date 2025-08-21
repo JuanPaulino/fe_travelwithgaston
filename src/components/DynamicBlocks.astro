@@ -4,6 +4,7 @@ import InspirationGrid from './InspirationGrid.astro';
 import FeaturedHotels from './FeaturedHotels.astro';
 import RichText from './RichText.astro';
 import FormBlock from './FormBlock.jsx';
+import JoinNow from './JoinNow.astro';
 
 export interface Props {
   blocks: any[];
@@ -32,6 +33,42 @@ const { blocks } = Astro.props;
     // Form Block
     if (block.collection === 'block_form') {
       return <FormBlock data={block.item} background={block.background} />;
+    }
+    
+    // JSON Block (para bloques dinámicos como JoinNow)
+    if (block.collection === 'block_json') {
+      // Debug: Log del bloque JSON
+      if (import.meta.env.DEV) {
+        console.log('DynamicBlocks - block_json detected:', block);
+        console.log('DynamicBlocks - block.item:', block.item);
+        console.log('DynamicBlocks - block.item.data:', block.item?.data);
+      }
+      
+      // Si es un bloque de tipo benefits_grid, renderizar JoinNow
+      if (block.item?.kind === 'benefits_grid') {
+        // Validación adicional antes de renderizar
+        if (!block.item.data) {
+          console.error('DynamicBlocks - block.item.data is null for benefits_grid');
+          return (
+            <div class="error-block p-4 bg-red-100 border border-red-300 rounded-lg mb-8">
+              <p class="text-red-700 font-medium">Error: Datos faltantes para benefits_grid</p>
+              <pre class="text-xs mt-2 text-red-500 overflow-auto">{JSON.stringify(block, null, 2)}</pre>
+            </div>
+          );
+        }
+        
+        return <JoinNow data={block.item.data} background={block.background} />;
+      }
+      
+      // Fallback para otros tipos de block_json
+      return (
+        <div class="json-block p-4 bg-gray-100 border border-gray-300 rounded-lg mb-8">
+          <p class="text-gray-700 font-medium">Bloque JSON: {block.item?.kind || 'Tipo no reconocido'}</p>
+          {import.meta.env.DEV && (
+            <pre class="text-xs mt-2 text-gray-500 overflow-auto">{JSON.stringify(block.item, null, 2)}</pre>
+          )}
+        </div>
+      );
     }
     
     // Content Block / Rich Text
@@ -110,6 +147,13 @@ const { blocks } = Astro.props;
     padding: 2rem;
     background: #f5f5f5;
     border: 1px solid #ddd;
+    margin: 1rem 0;
+  }
+  
+  .error-block {
+    padding: 2rem;
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
     margin: 1rem 0;
   }
 </style> 
