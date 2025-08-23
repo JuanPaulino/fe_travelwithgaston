@@ -4,7 +4,7 @@ import JoinUsForm from './JoinUsForm';
 import ChooseYourPlan from './ChooseYourPlan';
 
 const JoinUsSteps = ({ onSwitchToSignIn }) => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(2);
   const [userData, setUserData] = useState(null);
 
   const steps = [

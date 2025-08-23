@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import AccountManagement from '../components/AccountManagement.jsx';
+import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
+import Footer from '../components/Footer.astro';
+
+const title = 'Account Management';
+---
+
+<Layout title={title}>
+	<Header />
+	
+	<!-- Contenido principal -->
+	<main class="min-h-screen py-8">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+			<AccountManagement client:load />
+		</div>
+	</main>
+
+	<Footer />
+
+	<StoreDebuggerWrapper client:load />
+</Layout>

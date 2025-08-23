@@ -7,7 +7,15 @@ export const useAuth = () => {
   useEffect(() => {
     // Suscribirse a cambios en el store
     const unsubscribe = authStore.subscribe((state) => {
-      setAuthState(state);
+      // Asegurar que null values no sean strings
+      const cleanState = {
+        user: state.user === 'null' ? null : state.user,
+        token: state.token === 'null' ? null : state.token,
+        isAuthenticated: state.isAuthenticated === 'null' ? false : state.isAuthenticated,
+        loading: state.loading === 'null' ? false : state.loading,
+        error: state.error === 'null' ? null : state.error
+      };
+      setAuthState(cleanState);
     });
 
     return unsubscribe;

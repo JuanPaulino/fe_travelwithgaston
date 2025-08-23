@@ -1,5 +1,6 @@
 import { atom } from 'nanostores'
 import { authAPI, handleAPIError } from '../lib/http'
+import { persistentMap } from '@nanostores/persistent'
 
 // Estado inicial
 const initialState = {
@@ -10,8 +11,48 @@ const initialState = {
   error: null
 }
 
-// Store principal de autenticación
-export const authStore = atom(initialState)
+// Serializador personalizado para manejar null values correctamente
+const serializer = {
+  encode: (value) => {
+    // Convertir null a string especial para evitar "null" literal
+    if (value === null) return '__NULL__'
+    return JSON.stringify(value)
+  },
+  decode: (value) => {
+    // Convertir string especial de vuelta a null
+    if (value === '__NULL__') return null
+    if (value === 'null') return null
+    try {
+      return JSON.parse(value)
+    } catch {
+      return value
+    }
+  }
+}
+
+// Store principal de autenticación con serializador personalizado
+export const authStore = persistentMap('auth', initialState, serializer)
+
+// Getters para acceder al estado del store
+export const getAuthState = () => authStore.get()
+export const getToken = () => authStore.get().token
+export const getUser = () => authStore.get().user
+export const isAuthenticated = () => authStore.get().isAuthenticated
+
+// Helper para obtener refresh token (se mantiene separado por seguridad)
+export const getRefreshToken = () => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('refreshToken')
+  }
+  return null
+}
+
+// Helper para limpiar refresh token
+export const clearRefreshToken = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('refreshToken')
+  }
+}
 
 // Acciones para el store
 export const authActions = {
@@ -23,21 +64,21 @@ export const authActions = {
       const payload = await authAPI.login(credentials)
       
       if (payload.success && payload.data?.token) {
-        // Guardar token y refresh token en localStorage
-        localStorage.setItem('token', payload.data.token)
-        if (payload.data.refreshToken) {
-          localStorage.setItem('refreshToken', payload.data.refreshToken)
-        }
-        localStorage.setItem('user', JSON.stringify(payload.data.user))
-        
-        // Actualizar store
-        authStore.set({
+        // Actualizar store (el persistentMap se encarga del localStorage)
+        const newState = {
           user: payload.data.user,
           token: payload.data.token,
           isAuthenticated: true,
           loading: false,
           error: null
-        })
+        }
+        
+        authStore.set(newState)
+        
+        // Emitir evento para notificar a otros componentes
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:login', { detail: newState }))
+        }
         
         return { success: true, data: payload.data }
       } else {
@@ -66,21 +107,21 @@ export const authActions = {
     authStore.set({ ...authStore.get(), loading: true, error: null })
     
     try {
-      // Guardar token y refresh token en localStorage
-      localStorage.setItem('token', authData.token)
-      if (authData.refreshToken) {
-        localStorage.setItem('refreshToken', authData.refreshToken)
-      }
-      localStorage.setItem('user', JSON.stringify(authData.user))
-      
-      // Actualizar store
-      authStore.set({
+      // Actualizar store (el persistentMap se encarga del localStorage)
+      const newState = {
         user: authData.user,
         token: authData.token,
         isAuthenticated: true,
         loading: false,
         error: null
-      })
+      }
+      
+      authStore.set(newState)
+      
+      // Emitir evento para notificar a otros componentes
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:login', { detail: newState }))
+      }
       
       return { success: true, data: authData }
     } catch (error) {
@@ -97,33 +138,53 @@ export const authActions = {
 
   // Cerrar sesión
   logout: () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('user')
+    // Limpiar refresh token
+    clearRefreshToken()
     
+    // Limpiar store (el persistentMap se encarga del localStorage)
     authStore.set(initialState)
+    
+    // Emitir evento para notificar a otros componentes
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('auth:logout'))
+    }
+  },
+
+  // Actualizar token (para refresh)
+  updateToken: (newToken, newRefreshToken = null) => {
+    const currentState = authStore.get()
+    const updatedState = {
+      ...currentState,
+      token: newToken
+    }
+    
+    if (newRefreshToken) {
+      // Si tenemos refresh token, actualizarlo también
+      // Nota: refreshToken no está en el store principal, se maneja por separado
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('refreshToken', newRefreshToken)
+      }
+    }
+    
+    authStore.set(updatedState)
+    
+    // Emitir evento para notificar a otros componentes
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('auth:tokenUpdated', { detail: { token: newToken } }))
+    }
   },
 
   // Verificar si el usuario está autenticado al cargar la página
   checkAuth: () => {
-    const token = localStorage.getItem('token')
-    const user = localStorage.getItem('user')
+    const currentState = authStore.get()
     
-    if (token && user) {
-      try {
-        const userData = JSON.parse(user)
-        authStore.set({
-          user: userData,
-          token,
-          isAuthenticated: true,
-          loading: false,
-          error: null
-        })
-      } catch (error) {
-        console.error('Error parsing user data:', error)
-        authActions.logout()
-      }
+    // Si ya tenemos un token válido en el store, no hacer nada
+    if (currentState.token && currentState.user && currentState.isAuthenticated) {
+      return
     }
+    
+    // Si no hay datos de autenticación, el store ya está en estado inicial
+    // (persistentMap se encarga de cargar desde localStorage automáticamente)
   },
 
   // Limpiar errores
@@ -134,5 +195,34 @@ export const authActions = {
 
 // Inicializar estado al cargar
 if (typeof window !== 'undefined') {
-  authActions.checkAuth()
+  // Verificar si hay datos legacy para migrar
+  const legacyToken = localStorage.getItem('token')
+  const legacyUser = localStorage.getItem('user')
+  
+  if (legacyToken && legacyUser) {
+    // Si hay datos legacy, migrarlos al store
+    try {
+      const userData = JSON.parse(legacyUser)
+      authStore.set({
+        user: userData,
+        token: legacyToken,
+        isAuthenticated: true,
+        loading: false,
+        error: null
+      })
+      
+      // Limpiar datos legacy
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      console.log('Migrated legacy auth data to store')
+    } catch (error) {
+      console.error('Error migrating legacy auth data:', error)
+      // Limpiar datos corruptos
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+    }
+  } else {
+    // Si no hay datos legacy, solo verificar el estado actual
+    authActions.checkAuth()
+  }
 } 

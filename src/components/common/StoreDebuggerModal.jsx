@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useFiltersStore } from '../../stores/useFiltersStore.js';
 import { useSearchStore } from '../../stores/useSearchStore.js';
+import { authStore } from '../../stores/authStore.js';
 
 const StoreDebuggerModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [selectedStore, setSelectedStore] = useState('search'); // 'search' o 'filters'
+  const [selectedStore, setSelectedStore] = useState('search'); // 'search', 'filters', o 'auth'
   
-  // Usar ambos stores
+  // Usar todos los stores
   const { filters } = useFiltersStore();
   const { searchData } = useSearchStore();
+  const authData = authStore.get();
 
   // Cerrar modal con Escape
   useEffect(() => {
@@ -38,12 +40,30 @@ const StoreDebuggerModal = () => {
 
   // Obtener el store seleccionado
   const getSelectedStoreData = () => {
-    return selectedStore === 'search' ? searchData : filters;
+    switch (selectedStore) {
+      case 'search':
+        return searchData;
+      case 'filters':
+        return filters;
+      case 'auth':
+        return authData;
+      default:
+        return searchData;
+    }
   };
 
   // Obtener el nombre del store seleccionado
   const getSelectedStoreName = () => {
-    return selectedStore === 'search' ? 'Search Store' : 'Filters Store';
+    switch (selectedStore) {
+      case 'search':
+        return 'Search Store';
+      case 'filters':
+        return 'Filters Store';
+      case 'auth':
+        return 'Auth Store';
+      default:
+        return 'Search Store';
+    }
   };
 
   if (!isOpen) {
@@ -103,6 +123,7 @@ const StoreDebuggerModal = () => {
               >
                 <option value="search">🔍 Search Store</option>
                 <option value="filters">🎯 Filters Store</option>
+                <option value="auth">🔐 Auth Store</option>
               </select>
             </div>
             
