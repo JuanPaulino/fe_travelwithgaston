@@ -1,12 +1,14 @@
 import React from 'react'
 import ImageCarousel from './common/ImageCarousel.jsx'
+import { useSearchStore } from '../stores/useSearchStore.js'
 
-function HotelAvailabilityCard({ hotelData, rooms, calculatePrice }) {
+function HotelAvailabilityCard({ hotelData, rooms }) {
+  const { setSelectedDestination } = useSearchStore()
+
   // Logs de depuración
   console.log('🏨 HotelAvailabilityCard - Props recibidas:', {
     hotelData,
     rooms,
-    hasCalculatePrice: !!calculatePrice
   })
 
   // Extraer datos del objeto de disponibilidad
@@ -18,17 +20,22 @@ function HotelAvailabilityCard({ hotelData, rooms, calculatePrice }) {
     location: hotelData.hotel_info?.location || '',
     benefits: hotelData.hotel_info?.benefits || [],
     benefits_footnotes: hotelData.hotel_info?.benefits_footnotes || [],
-    coords: hotelData.hotel_info?.coords || []
+    coords: hotelData.hotel_info?.coords || [],
+    lowest_rate: hotelData.lowest_rate || null
   }
 
   console.log('🏨 HotelAvailabilityCard - Datos extraídos:', hotel)
 
   const isAvailable = hotelData.is_available
-  const roomTypes = hotelData.room_types || []
 
   // Función para navegar al hotel
   const handleViewHotel = () => {
-    // navigate(`/hotel/${hotel.id}`)
+    // TODO: necesitamos modificar el valor en el store de selectedDestinationType por hotel selectedDestinationId por el id del hotel
+    setSelectedDestination({
+      type: 'hotel',
+      id: hotel.id
+    })
+    window.location.href = `/hotels/${hotel.id}`
   }
 
   // Función para manejar clic en imagen
@@ -45,7 +52,7 @@ function HotelAvailabilityCard({ hotelData, rooms, calculatePrice }) {
         {!isAvailable && (
           <div className="absolute top-4 left-4 z-10">
             <span className="bg-neutral-lighter text-neutral-darkest text-xs font-medium px-2.5 py-0.5 rounded-full">
-              No disponible
+              Not available
             </span>
           </div>
         )}
@@ -103,17 +110,17 @@ function HotelAvailabilityCard({ hotelData, rooms, calculatePrice }) {
             <div className="flex flex-wrap gap-2 text-xs">
               {hotelData.is_under_refurbishment && (
                 <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                  En renovación
+                  Under renovation
                 </span>
               )}
               {hotelData.is_temporarily_closed && (
                 <span className="bg-red-100 text-red-800 px-2 py-1 rounded">
-                  Temporalmente cerrado
+                  Temporarily closed
                 </span>
               )}
               {hotelData.opened_at && (
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                  Abierto desde {new Date(hotelData.opened_at).getFullYear()}
+                <span className="bg-primary text-black px-2 py-1 rounded">
+                  Opened from {new Date(hotelData.opened_at).getFullYear()}
                 </span>
               )}
             </div>
@@ -122,37 +129,46 @@ function HotelAvailabilityCard({ hotelData, rooms, calculatePrice }) {
               {isAvailable ? (
                 <>
                   <div className="mb-4">
-                    <div className="text-3xl font-bold text-gray-900">
-                      €{calculatePrice(hotel.id)}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      Total para {rooms} {rooms === 1 ? 'habitación' : 'habitaciones'} con impuestos incluidos
-                    </div>
-                    <div className="text-sm text-gray-600 mt-1">
-                      Promedio por noche €{calculatePrice(hotel.id)}
-                    </div>
+                    {hotel.lowest_rate ? (
+                      <>
+                        <div className="text-3xl font-bold text-gray-900">
+                          €{hotel.lowest_rate.total_to_book_in_requested_currency}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Total for {rooms} {rooms === 1 ? 'room' : 'rooms'} {hotel.lowest_rate.is_tax_included ? 'with taxes included' : 'without taxes'}
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          Average per night €{hotel.lowest_rate.rate_in_requested_currency}
+                        </div>
+                        
+                      </>
+                    ) : (
+                      <div className="text-sm text-gray-500">
+                        Price not available
+                      </div>
+                    )}
                   </div>
                   
                   <button 
                     onClick={handleViewHotel}
-                    className="bg-black text-white px-6 py-2 font-medium transition-colors"
+                    className="bg-primary text-white px-6 py-2 font-medium transition-colors"
                   >
-                    Ver hotel
+                    View hotel
                   </button>
                 </>
               ) : (
                 <div className="mb-4">
                   <div className="text-lg font-medium text-gray-500 mb-2">
-                    No disponible
+                    Not available
                   </div>
                   <div className="text-sm text-gray-500 mb-4">
-                    Para las fechas seleccionadas
+                    For the selected dates
                   </div>
                   <button 
                     onClick={handleViewHotel}
-                    className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
+                    className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg font-medium transition-colors"
                   >
-                    Ver detalles
+                    View details
                   </button>
                 </div>
               )}

@@ -64,20 +64,12 @@ const SearchResults = ({ className = '' }) => {
     )
   }
 
-  // Función para calcular el precio (placeholder - ajustar según tu lógica)
-  const calculatePrice = (hotelId) => {
-    // Aquí implementarías la lógica real de cálculo de precios
-    // Por ahora retorno un precio falso para demostración
-    return Math.floor(Math.random() * 200) + 50
-  }
-
   return (
     <div className={className}>
       <HotelAvailabilityList
         hotels={hotels}
         loading={loading}
         rooms={lastSearch.rooms}
-        calculatePrice={calculatePrice}
       />
     </div>
   )

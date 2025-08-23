@@ -241,7 +241,6 @@ export const searchActions = {
       console.log('🏨 executeSearch - Parámetros de búsqueda:', searchParams)
       // Llamar a la API de disponibilidad
       const results = await hotelsApi.getAvailability(searchParams);
-      debugger
       console.log('🏨 executeSearch - Resultados recibidos:', results?.length || 0, 'hoteles')
       
       // Actualizar resultados

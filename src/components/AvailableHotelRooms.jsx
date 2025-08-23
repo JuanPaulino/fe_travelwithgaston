@@ -33,7 +33,8 @@ const AvailableHotelRooms = ({ }) => {
   }, [searchData?.selectedDestinationId, executeSearch]);
 
   const hotel = hotelData;
-  const roomTypes = hotel.room_types || [];
+  console.log(hotelData);
+  const roomTypes = hotel?.room_types || [];
   
   // Función para formatear el precio
   const formatPrice = (price) => {

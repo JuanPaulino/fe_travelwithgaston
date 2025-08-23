@@ -8,7 +8,6 @@ const HotelAvailabilityList = ({
   hotels = [], 
   loading = false, 
   rooms = 1, 
-  calculatePrice 
 }) => {
   
   // Validar que rooms sea un número
@@ -54,7 +53,6 @@ const HotelAvailabilityList = ({
           key={hotel.hotel_id}
           hotelData={hotel}
           rooms={validRooms}
-          calculatePrice={calculatePrice}
         />
       ))}
       
@@ -77,7 +75,6 @@ const HotelAvailabilityList = ({
           key={hotel.hotel_id}
           hotelData={hotel}
           rooms={validRooms}
-          calculatePrice={calculatePrice}
         />
       ))}
       
