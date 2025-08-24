@@ -38,7 +38,7 @@ try {
 }
 console.log(hotelData);
 
-const hotelImages = [];
+const hotelImages = hotelData.images || [];
 
 // Función helper para mapear títulos a iconos de Material Symbols
 const getIconForTitle = (title: string) => {

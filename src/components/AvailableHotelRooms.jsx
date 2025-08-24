@@ -90,9 +90,9 @@ const AvailableHotelRooms = ({ }) => {
       roomTypes.length > 0
         ? <>
             {roomTypes.map((room, index) => (
-              <div key={index} className={`flex flex-row gap-6 border-x border-t ${index === roomTypes.length - 1 ? 'border-b' : ''} border-neutral-lighter p-4`}>
+              <div key={index} className={`flex flex-col md:flex-row gap-6 border-x border-t ${index === roomTypes.length - 1 ? 'border-b' : ''} border-neutral-lighter p-4`}>
               {/* Panel izquierdo - Imagen y descripción */}
-                <div className="w-2/5">
+                <div className="w-full md:w-2/5">
                   {/* Título de la habitación */}
                   <h3 className="text-h5 sm:text-h5-desktop font-heading text-neutral-darkest">
                     {room.name}
@@ -131,11 +131,11 @@ const AvailableHotelRooms = ({ }) => {
                   </div>
                 </div>
                 {/* Panel derecho - Detalles y tarifas */}
-                <div className="w-3/5 border-l border-neutral-lighter">
+                <div className="w-full md:w-3/5 border-t md:border-l border-neutral-lighter">
                   {/* Sección de tarifas */}
                   {room.rates.map((rate, index) => <>
                     <div key={index} className="flex flex-row mb-8 p-6 border-neutral-lighter">
-                      <div className='w-4/5'>
+                      <div className='w-3/5 md:w-4/5'>
                           {/* Header de la tarifa */}
                           <div className="mb-4">
                             <h3 className="font-heading text-xl text-neutral-darkest mb-2">{rate.title}</h3>
@@ -239,7 +239,7 @@ const AvailableHotelRooms = ({ }) => {
                             <p>• Rate code: {rate.rate_index}</p>
                           </div>
                       </div>
-                      <div className='w-1/5 flex flex-col justify-end'>
+                      <div className='w-2/5 md:w-1/5 flex flex-col justify-end'>
                         {/* Precios destacados */}
                         <div className="p-3">
                           <p className="text-lg font-semibold text-neutral-darkest">

@@ -33,7 +33,9 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
     // TODO: necesitamos modificar el valor en el store de selectedDestinationType por hotel selectedDestinationId por el id del hotel
     setSelectedDestination({
       type: 'hotel',
-      id: hotel.id
+      id: hotel.id,
+      text: hotel.name,
+      location: hotel.location,
     })
     window.location.href = `/hotels/${hotel.id}`
   }
