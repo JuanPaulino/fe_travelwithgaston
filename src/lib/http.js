@@ -13,9 +13,9 @@ const http = axios.create({
 // Interceptor para agregar token de autenticación
 http.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authtoken');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token.replaceAll('"', '')}`;
     }
     return config;
   },
@@ -44,7 +44,7 @@ http.interceptors.response.use(
           });
 
           if (response.data.success) {
-            localStorage.setItem('token', response.data.data.token);
+            localStorage.setItem('authtoken', response.data.data.token);
             localStorage.setItem('refreshToken', response.data.data.refreshToken);
             
             // Reintentar la request original con el nuevo token
@@ -54,7 +54,7 @@ http.interceptors.response.use(
         }
       } catch (refreshError) {
         // Si falla el refresh, limpiar tokens y redirigir a login
-        localStorage.removeItem('token');
+        localStorage.removeItem('authtoken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
         
@@ -178,7 +178,29 @@ export const hotelsApi = {
     }
   },
 };
-"ReferenceError: localStorage is not defined\n    at eval (/Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/src/lib/http.js:22:19)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async Axios.request (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/axios/lib/core/Axios.js:40:14)\n    at async Object.getHotelById (/Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/src/lib/http.js:171:24)\n    at async eval (/Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/src/pages/hotels/[id_hotel].astro:37:17)\n    at async callComponentAsTemplateResultOrResponse (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/runtime/server/render/astro/render.js:91:25)\n    at async renderToAsyncIterable (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/runtime/server/render/astro/render.js:133:26)\n    at async renderPage (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/runtime/server/render/page.js:36:24)\n    at async lastNext (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/core/render-context.js:198:25)\n    at async callMiddleware (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/core/middleware/callMiddleware.js:11:10)\n    at async RenderContext.render (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/core/render-context.js:232:22)\n    at async handleRoute (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/vite-plugin-astro-server/route.js:178:16)\n    at async run (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/vite-plugin-astro-server/request.js:40:14)\n    at async runWithErrorHandling (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/vite-plugin-astro-server/controller.js:64:5)\n    at async handleRequest (file:///Users/juanfranciscopaulinoveras/Documents/projects/travelwithgaston/fe_traverwithgaston/node_modules/astro/dist/vite-plugin-astro-server/request.js:34:3)"// Función helper para manejar errores
+
+// API de usuarios
+export const userAPI = {
+  // Obtener perfil del usuario autenticado
+  getProfile: async () => {
+    const response = await http.get('/api/users/profile');
+    return response.data;
+  },
+
+  // Actualizar perfil del usuario autenticado
+  updateProfile: async (userData) => {
+    const response = await http.put('/api/users/profile', userData);
+    return response.data;
+  },
+
+  // Actualizar usuario por ID (solo admin)
+  updateUserById: async (userId, userData) => {
+    const response = await http.put(`/api/users/${userId}`, userData);
+    return response.data;
+  }
+};
+
+// Función helper para manejar errores
 export const handleAPIError = (error) => {
   if (error.response) {
     // Error de respuesta del servidor

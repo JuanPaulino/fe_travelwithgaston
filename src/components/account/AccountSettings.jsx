@@ -1,31 +1,56 @@
 import React from 'react';
 import PersonalDetailsForm from '../forms/PersonalDetailsForm';
 import ChangePasswordForm from '../forms/ChangePasswordForm';
+import { getUser, getToken } from '../../stores/authStore';
+import { userAPI } from '../../lib/http';
+import { showSuccess, showError, showInfo } from '../../stores/bannerStore';
 
 const AccountSettings = () => {
+  // Obtener datos del usuario desde el store de autenticación
+  const user = getUser();
+  const token = getToken();
+  
   // Datos iniciales para el formulario de datos personales
   const initialPersonalData = {
-    firstName: 'Javier',
-    lastName: 'Traveset',
-    email: 'hola@mail.com',
-    phone: '691515326',
-    countryCode: '+44',
-    address: '1 South Street, BRADFORD, BD52 3FD'
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phone: user?.phone || '', // Usar el teléfono del usuario si existe
+    countryCode: user?.countryCode || '+34', // Usar el código de país del usuario si existe
+    address: user?.city ? `${user.city}, España` : '' // Usar la ciudad del usuario
   };
 
   // Función para manejar la actualización de datos personales
   const handlePersonalDetailsUpdate = async (data) => {
     try {
-      // Aquí iría la lógica para enviar los datos al backend
-      console.log('Actualizando datos personales:', data);
+      // Verificar que el usuario esté autenticado
+      if (!token || !user) {
+        throw new Error('Usuario no autenticado');
+      }
+
+      // Preparar los datos para enviar al backend
+      const updateData = {
+        phone: data.phone,
+        countryCode: data.countryCode,
+        city: data.address.split(',')[0].trim() // Extraer solo la ciudad del campo address
+      };
+
+      // Llamar al endpoint de actualización de perfil
+      const response = await userAPI.updateProfile(updateData);
       
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mostrar mensaje de éxito (podrías usar un toast o notificación)
-      alert('Personal details updated successfully!');
+      if (response.success) {
+        // Mostrar mensaje de éxito
+        showSuccess('Datos personales actualizados exitosamente!', { autoHide: true });
+        
+        // Aquí podrías actualizar el store local si es necesario
+        // o recargar los datos del usuario
+        console.log('Datos actualizados:', response.data);
+      } else {
+        throw new Error(response.message || 'Error al actualizar los datos');
+      }
     } catch (error) {
       console.error('Error updating personal details:', error);
+      showError(`Error al actualizar los datos: ${error.message}`, { autoHide: true });
       throw error; // Re-lanzar el error para que el formulario lo maneje
     }
   };
@@ -40,7 +65,7 @@ const AccountSettings = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Mostrar mensaje de éxito
-      alert('Password changed successfully!');
+      showSuccess('Contraseña cambiada exitosamente!', { autoHide: true });
     } catch (error) {
       console.error('Error changing password:', error);
       throw error; // Re-lanzar el error para que el formulario lo maneje
@@ -52,6 +77,7 @@ const AccountSettings = () => {
     if (confirm('¿Estás seguro de que quieres eliminar tu cuenta? Esta acción no se puede deshacer.')) {
       // Aquí iría la lógica para eliminar la cuenta
       console.log('Eliminando cuenta...');
+      showInfo('Solicitud de eliminación enviada. Te contactaremos pronto.', { autoHide: true });
     }
   };
 

@@ -68,6 +68,7 @@ export const authActions = {
         const newState = {
           user: payload.data.user,
           token: payload.data.token,
+          refreshToken: payload.data.refreshToken,
           isAuthenticated: true,
           loading: false,
           error: null
@@ -111,6 +112,7 @@ export const authActions = {
       const newState = {
         user: authData.user,
         token: authData.token,
+        refreshToken: authData.refreshToken,
         isAuthenticated: true,
         loading: false,
         error: null
@@ -155,7 +157,8 @@ export const authActions = {
     const currentState = authStore.get()
     const updatedState = {
       ...currentState,
-      token: newToken
+      token: newToken,
+      refreshToken: newRefreshToken
     }
     
     if (newRefreshToken) {
