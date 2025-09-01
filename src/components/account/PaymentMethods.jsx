@@ -1,26 +1,11 @@
 import React from 'react';
+import http from '../../lib/http.js';
 
 const PaymentMethods = () => {
   const handleStripeRedirect = async () => {
     try {
-      // Aquí irías a tu backend para crear una sesión de Stripe
-      // Por ahora simulamos la redirección
-      console.log('Redirigiendo a Stripe billing...');
-      
-      // Simular llamada a API para obtener la URL de Stripe
-      // const response = await fetch('/api/stripe/create-billing-session', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ returnUrl: window.location.href })
-      // });
-      // const { url } = await response.json();
-      
-      // Redirigir al usuario a Stripe
-      // window.location.href = url;
-      
-      // Por ahora mostramos un mensaje informativo
-      alert('Redirigiendo a Stripe para gestionar tu suscripción y métodos de pago...');
-      
+      const response = await http.post('/api/stripe/billing-portal');
+      window.location.href = response.data.url;
     } catch (error) {
       console.error('Error redirecting to Stripe:', error);
       alert('Error al conectar con el sistema de pagos. Por favor, inténtalo de nuevo.');
