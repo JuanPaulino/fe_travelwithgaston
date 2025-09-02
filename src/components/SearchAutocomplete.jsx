@@ -214,7 +214,7 @@ function SearchAutocomplete({
   const { destinations, hotels } = getGroupedSuggestions()
 
   return (
-    <div className="relative">
+    <div className="relative flex-1">
       {/* Campo de entrada */}
       <div className="relative">
         <input

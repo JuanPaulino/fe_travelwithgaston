@@ -227,7 +227,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
             {/* Campo de destino */}
             <div className="flex-1 p-6">
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
-              <div className="flex flex-1 items-center gap-2">
+              <div className="flex items-center gap-2">
                 <SearchAutocomplete
                   value={searchData.searchText}
                   onChange={handleSearchTextChange}
