@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import http from '../lib/http.js';
+import { filtersApi } from '../lib/http.js';
 import { useFiltersStore } from '../stores/useFiltersStore.js';
 import { capitalize, replaceUnderscores } from '../lib/stringUtils.js';
 
@@ -24,7 +24,7 @@ const SearchFilters = () => {
   const fetchFilters = async () => {
     try {
       setLoading(true);
-      const response = await http.get('/api/hotels/filters');
+      const response = await filtersApi.getFilters();
       if (response.data.success) {
         setFilters(response.data.data);
         const initialExpanded = {};

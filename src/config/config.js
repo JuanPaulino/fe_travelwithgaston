@@ -1,8 +1,9 @@
 // Configuración de la aplicación
+console.log(import.meta.env.PUBLIC_API_URL);
 export const config = {
   // URLs de la API
   api: {
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+    baseURL: import.meta.env.PUBLIC_API_URL,
     timeout: 30000
   },
   

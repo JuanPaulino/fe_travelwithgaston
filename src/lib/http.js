@@ -200,6 +200,13 @@ export const userAPI = {
   }
 };
 
+// API de filtros
+export const filtersApi = {
+  getFilters: () => {
+    return http.get('/api/hotels/filters');
+  }
+};
+
 // Función helper para manejar errores
 export const handleAPIError = (error) => {
   if (error.response) {
