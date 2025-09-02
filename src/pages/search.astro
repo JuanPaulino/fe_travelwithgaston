@@ -11,6 +11,23 @@ import Footer from '../components/Footer.astro';
 import SearchForm from '../components/SearchForm.jsx';
 import SearchResults from '../components/SearchResults.jsx';
 
+// Obtener parámetros de la URL para pasarlos al componente
+const url = new URL(Astro.request.url);
+const searchParams = url.searchParams;
+
+// Construir objeto de datos iniciales desde los parámetros de URL
+const initialSearchData = {
+  destination: searchParams.get('destination') || '',
+  destinationId: searchParams.get('destinationId') || '',
+  destinationType: searchParams.get('destinationType') || '',
+  destinationLocation: searchParams.get('destinationLocation') || '',
+  checkIn: searchParams.get('checkIn') || '',
+  checkOut: searchParams.get('checkOut') || '',
+  adults: searchParams.get('adults') || '2',
+  children: searchParams.get('children') || '0',
+  rooms: searchParams.get('rooms') || '1',
+  childrenAges: searchParams.get('childrenAges') || ''
+};
 
 // Si hay un error, usar datos por defecto
 const title = 'Search';
@@ -21,7 +38,7 @@ const title = 'Search';
 	<!-- Contenido principal -->
 	<main class="container mx-auto px-4 py-8">
 		<div class="bg-neutral-darkest px-10 py-6 mb-8">
-			<SearchForm client:load initialData={{}} />
+			<SearchForm client:load initialData={initialSearchData} />
 		</div>
 		<div class="w-full h-[1px] bg-neutral-lighter mb-8"></div>
 		<div class="flex gap-6 mb-8">

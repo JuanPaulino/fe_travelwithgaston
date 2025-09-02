@@ -225,7 +225,7 @@ function SearchAutocomplete({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+          className={`w-full rounded-lg focus:border-transparent focus:ring-0 focus:outline-none ${className}`}
           autoComplete="off"
         />
         

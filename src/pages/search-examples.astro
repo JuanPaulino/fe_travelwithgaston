@@ -1,0 +1,120 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const title = 'Ejemplos de Búsqueda con Parámetros de URL';
+---
+
+<Layout title={title}>
+	<Header />
+	
+	<main class="container mx-auto px-4 py-8">
+		<div class="max-w-4xl mx-auto">
+			<h1 class="text-3xl font-bold text-gray-900 mb-8">Ejemplos de Búsqueda con Parámetros de URL</h1>
+			
+			<div class="space-y-8">
+				<!-- Búsqueda básica -->
+				<section class="bg-white rounded-lg shadow-md p-6">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">1. Búsqueda Básica con Destino</h2>
+					<p class="text-gray-600 mb-4">Búsqueda simple con solo destino seleccionado:</p>
+					<a 
+						href="/search?destination=Cancún&destinationId=123&destinationType=location" 
+						class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+					>
+						Buscar en Cancún
+					</a>
+					<div class="mt-3 p-3 bg-gray-100 rounded text-sm font-mono">
+						/search?destination=Cancún&destinationId=123&destinationType=location
+					</div>
+				</section>
+
+				<!-- Búsqueda con fechas -->
+				<section class="bg-white rounded-lg shadow-md p-6">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">2. Búsqueda con Fechas Específicas</h2>
+					<p class="text-gray-600 mb-4">Búsqueda para fechas específicas de Navidad:</p>
+					<a 
+						href="/search?destination=Playa%20del%20Carmen&destinationId=456&checkIn=2024-12-25&checkOut=2024-12-30" 
+						class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors"
+					>
+						Navidad en Playa del Carmen
+					</a>
+					<div class="mt-3 p-3 bg-gray-100 rounded text-sm font-mono">
+						/search?destination=Playa%20del%20Carmen&destinationId=456&checkIn=2024-12-25&checkOut=2024-12-30
+					</div>
+				</section>
+
+				<!-- Búsqueda completa -->
+				<section class="bg-white rounded-lg shadow-md p-6">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">3. Búsqueda Completa con Huéspedes</h2>
+					<p class="text-gray-600 mb-4">Búsqueda completa para familia con niños:</p>
+					<a 
+						href="/search?destination=Hotel%20Ritz&destinationId=789&destinationType=hotel&checkIn=2024-12-20&checkOut=2024-12-27&adults=2&children=2&rooms=1&childrenAges=8,10" 
+						class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
+					>
+						Familia en Hotel Ritz
+					</a>
+					<div class="mt-3 p-3 bg-gray-100 rounded text-sm font-mono">
+						/search?destination=Hotel%20Ritz&destinationId=789&destinationType=hotel&checkIn=2024-12-20&checkOut=2024-12-27&adults=2&children=2&rooms=1&childrenAges=8,10
+					</div>
+				</section>
+
+				<!-- Búsqueda de hotel específico -->
+				<section class="bg-white rounded-lg shadow-md p-6">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">4. Búsqueda de Hotel Específico</h2>
+					<p class="text-gray-600 mb-4">Búsqueda directa en un hotel específico:</p>
+					<a 
+						href="/search?destination=Grand%20Hyatt%20Cancún&destinationId=999&destinationType=hotel&checkIn=2024-12-15&checkOut=2024-12-22&adults=2&rooms=1" 
+						class="inline-block bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors"
+					>
+						Grand Hyatt Cancún
+					</a>
+					<div class="mt-3 p-3 bg-gray-100 rounded text-sm font-mono">
+						/search?destination=Grand%20Hyatt%20Cancún&destinationId=999&destinationType=hotel&checkIn=2024-12-15&checkOut=2024-12-22&adults=2&rooms=1
+					</div>
+				</section>
+
+				<!-- Información adicional -->
+				<section class="bg-blue-50 rounded-lg p-6">
+					<h2 class="text-xl font-semibold text-blue-800 mb-4">¿Cómo Funciona?</h2>
+					<div class="space-y-3 text-blue-700">
+						<p>• Al hacer clic en cualquiera de los enlaces de arriba, serás redirigido a la página de búsqueda</p>
+						<p>• El formulario se autocompletará automáticamente con los parámetros de la URL</p>
+						<p>• Puedes modificar cualquier campo y ejecutar la búsqueda</p>
+						<p>• La URL se actualizará automáticamente cuando ejecutes una nueva búsqueda</p>
+						<p>• Puedes compartir la URL resultante para que otros vean la misma búsqueda</p>
+					</div>
+				</section>
+
+				<!-- Parámetros disponibles -->
+				<section class="bg-gray-50 rounded-lg p-6">
+					<h2 class="text-xl font-semibold text-gray-800 mb-4">Parámetros Disponibles</h2>
+					<div class="grid md:grid-cols-2 gap-4">
+						<div>
+							<h3 class="font-medium text-gray-700 mb-2">Destino</h3>
+							<ul class="text-sm text-gray-600 space-y-1">
+								<li><code>destination</code> - Nombre del destino</li>
+								<li><code>destinationId</code> - ID único del destino</li>
+								<li><code>destinationType</code> - Tipo (hotel/location)</li>
+								<li><code>destinationLocation</code> - Ubicación</li>
+							</ul>
+						</div>
+						<div>
+							<h3 class="font-medium text-gray-700 mb-2">Fechas y Huéspedes</h3>
+							<ul class="text-sm text-gray-600 space-y-1">
+								<li><code>checkIn</code> - Fecha de llegada</li>
+								<li><code>checkOut</code> - Fecha de salida</li>
+								<li><code>adults</code> - Número de adultos</li>
+								<li><code>children</code> - Número de niños</li>
+								<li><code>rooms</code> - Número de habitaciones</li>
+								<li><code>childrenAges</code> - Edades de niños (8,10,12)</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+			</div>
+		</div>
+	</main>
+
+	<Footer />
+</Layout>

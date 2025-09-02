@@ -2,12 +2,14 @@ import { useState, useEffect, useRef } from 'react'
 import SearchAutocomplete from './SearchAutocomplete.jsx'
 import GuestSelector from './common/GuestSelector.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
+import { useUrlParams } from '../hooks/useUrlParams.js'
 
 function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   // Usar el store de búsqueda
   const { 
     searchData, 
     setSearchText, 
+    setSearchData,
     setSelectedDestination, 
     setCheckInDate, 
     setCheckOutDate, 
@@ -17,6 +19,9 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     setChildrenAges,
     executeSearch 
   } = useSearchStore()
+
+  // Hook para parámetros de URL
+  const { urlParams, updateUrl } = useUrlParams()
 
   // Estados locales para control de UI
   const [showAdditionalFields, setShowAdditionalFields] = useState(false)
@@ -44,6 +49,67 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
       setShowAdditionalFields(true)
     }
   }, [initialData, setShowAdditionalFields])
+
+  // Función para autocompletar el formulario con datos externos
+  const autocompleteForm = (sourceData) => {
+    console.log('🔗 Autocompletando formulario con datos:', sourceData);
+    
+    setSearchData({
+      searchText: sourceData.destination || '',
+      selectedDestinationId: sourceData.destinationId || '',
+      selectedDestinationText: sourceData.destination || '',
+      selectedDestinationType: sourceData.destinationType || 'hotel',
+      selectedDestinationLocation: sourceData.destinationLocation || '',
+      checkInDate: sourceData.checkIn || new Date().toISOString().split('T')[0],
+      checkOutDate: sourceData.checkOut || (() => {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return tomorrow.toISOString().split('T')[0];
+      })(),
+      rooms: parseInt(sourceData.rooms) || 1,
+      adults: parseInt(sourceData.adults) || 2,
+      children: parseInt(sourceData.children) || 0,
+      childrenAges: sourceData.childrenAges ? 
+        (typeof sourceData.childrenAges === 'string' ? 
+          sourceData.childrenAges.split(',').map(age => parseInt(age)) : 
+          sourceData.childrenAges) : []
+    });
+  };
+
+  // Función para ejecutar búsqueda automática
+  const executeAutoSearch = async () => {
+    console.log('🚀 Ejecutando búsqueda automática con parámetros de URL');
+    
+    setTimeout(async () => {
+      try {
+        await executeSearch();
+      } catch (error) {
+        console.error('❌ Error en búsqueda automática:', error);
+      }
+    }, 500);
+  };
+
+  // Función para verificar si se pueden ejecutar búsquedas automáticas
+  const canExecuteAutoSearch = (sourceData) => {
+    return sourceData.destinationId && sourceData.checkIn && sourceData.checkOut && sourceData.adults;
+  };
+
+  // Autocompletar formulario con parámetros de URL o initialData al cargar
+  useEffect(() => {
+    const sourceData = Object.keys(urlParams).length > 0 && urlParams.destinationId ? urlParams : initialData;
+    
+    if (sourceData.destinationId || sourceData.destination) {
+      autocompleteForm(sourceData);
+      
+      if (isMobile) {
+        setShowAdditionalFields(true);
+      }
+
+      if (canExecuteAutoSearch(sourceData)) {
+        executeAutoSearch();
+      }
+    }
+  }, [urlParams, initialData, isMobile]);
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
@@ -137,6 +203,9 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
       return
     }
     
+    // Actualizar la URL con los parámetros de búsqueda
+    updateUrl(searchData);
+    
     // Ejecutar búsqueda usando el store
     const response = await executeSearch()
     if (response.search_type === 'hotel') {
@@ -156,9 +225,9 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
         <div className="hidden lg:block bg-white rounded-lg shadow-lg">
           <div className="flex items-stretch divide-x divide-gray-200">
             {/* Campo de destino */}
-            <div className="flex-1 min-w-0 p-6">
+            <div className="flex-1 p-6">
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-1 items-center gap-2">
                 <SearchAutocomplete
                   value={searchData.searchText}
                   onChange={handleSearchTextChange}
@@ -182,7 +251,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
             </div>
 
             {/* Selector de fechas - Check In */}
-            <div className="p-6 flex-1 min-w-0">
+            <div className="p-6 flex-0">
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK IN</div>
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -205,7 +274,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
             </div>
 
             {/* Selector de fechas - Check Out */}
-            <div className="p-6 flex-1 min-w-0">
+            <div className="p-6 flex-0">
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK OUT</div>
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
