@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../lib/useAuth';
 import { authAPI, handleAPIError } from '../../lib/http';
 
-const JoinUsForm = ({ onSwitchToSignIn, onStepComplete }) => {
+const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess }) => {
   const [formData, setFormData] = useState({
     accountType: 'personal',
     firstName: '',
@@ -122,14 +122,13 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete }) => {
         // Actualizar el store de autenticación
         await register(authData);
         
-        // Continuar con el siguiente paso del proceso de registro
-        if (onStepComplete) {
-          onStepComplete({
-            step: 'details',
-            userData: data.data.user,
-            completed: true
-          });
+        // Cerrar el modal si existe la función
+        if (onRegistrationSuccess) {
+          onRegistrationSuccess();
         }
+        
+        // Redirigir a la página de checkout usando navegación nativa
+        window.location.href = '/checkout';
         
       } else {
         setErrors({ general: data.message || 'Error al crear la cuenta' });

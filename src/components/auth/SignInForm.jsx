@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../lib/useAuth';
 import { handleAPIError } from '../../lib/http';
 
-const SignInForm = ({ onSwitchToSignUp }) => {
+const SignInForm = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -66,8 +66,10 @@ const SignInForm = ({ onSwitchToSignUp }) => {
       
       if (result.success) {
         console.log('Sesión iniciada exitosamente');
-        // Aquí podrías redirigir al usuario o cerrar el modal
-        // window.location.href = '/dashboard';
+        // Cerrar el modal cuando el login sea exitoso
+        if (onLoginSuccess) {
+          onLoginSuccess();
+        }
       } else {
         setErrors({ general: result.error });
       }

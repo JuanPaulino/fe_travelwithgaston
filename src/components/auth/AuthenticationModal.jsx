@@ -88,9 +88,14 @@ const AuthenticationModal = ({ isOpen, onClose }) => {
         {/* Content */}
         <div className="p-8">
           {currentTab === 'signin' ? (
-            <SignInForm onSwitchToSignUp={() => switchTab('joinus')} />
+            <SignInForm 
+              onLoginSuccess={onClose}
+            />
           ) : (
-            <JoinUsSteps onSwitchToSignIn={() => switchTab('signin')} />
+            <JoinUsSteps 
+              onSwitchToSignIn={() => switchTab('signin')} 
+              onRegistrationSuccess={onClose}
+            />
           )}
         </div>
 
