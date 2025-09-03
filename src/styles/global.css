@@ -14,6 +14,9 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Roboto Serif', Georgia, serif;
   font-weight: 600;
+  line-height: 120%;
+  font-stretch: 100%;
+  font-variation-settings: 'GRAD' 0;
 }
 
 /* Aplicar Inter al body text */
