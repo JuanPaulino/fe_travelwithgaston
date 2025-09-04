@@ -21,7 +21,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   } = useSearchStore()
 
   // Hook para parámetros de URL
-  const { urlParams, updateUrl } = useUrlParams()
+  const { urlParams, updateUrl, buildSearchUrl } = useUrlParams()
 
   // Estados locales para control de UI
   const [showAdditionalFields, setShowAdditionalFields] = useState(false)
@@ -193,6 +193,11 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`
   }
 
+  // Función para verificar si estamos en la página home
+  const isOnHomePage = () => {
+    return window.location.pathname === '/' || window.location.pathname === '/index.html';
+  }
+
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -203,6 +208,14 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
       return
     }
     
+    // Si estamos en la página home, redireccionar a /search con los parámetros
+    if (isOnHomePage()) {
+      const searchUrl = `/search${buildSearchUrl(searchData)}`;
+      window.location.href = searchUrl;
+      return;
+    }
+    
+    // Si estamos en la página de búsqueda, ejecutar la búsqueda normalmente
     // Actualizar la URL con los parámetros de búsqueda
     updateUrl(searchData);
     
