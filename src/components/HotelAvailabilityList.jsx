@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react'
 
 import HotelAvailabilityCard from './HotelAvailabilityCard.jsx'
-import LoadingSpinner from './common/LoadingSpinner.jsx'
 import EmptyState from './common/EmptyState.jsx'
 
 const HotelAvailabilityList = ({ 
   hotels = [], 
-  loading = false, 
   rooms = 1, 
 }) => {
   
@@ -23,15 +21,6 @@ const HotelAvailabilityList = ({
     return result
   }, [hotels])
 
-  // Estado de carga
-  if (loading) {
-    return (
-      <LoadingSpinner 
-        text="Buscando hoteles..." 
-        size="md"
-      />
-    )
-  }
 
   // Sin resultados
   if (hotels.length === 0) {

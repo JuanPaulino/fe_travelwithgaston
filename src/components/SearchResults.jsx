@@ -2,6 +2,7 @@ import React from 'react'
 import { useSearchStore } from '../stores/useSearchStore.js'
 import HotelAvailabilityList from './HotelAvailabilityList.jsx'
 import ErrorMessage from './common/ErrorMessage.jsx'
+import LoadingSpinner from './common/LoadingSpinner.jsx'
 
 const SearchResults = ({ className = '' }) => {
   const { resultsData } = useSearchStore()
@@ -40,6 +41,18 @@ const SearchResults = ({ className = '' }) => {
     </div>
   )
 
+  // Si está cargando, mostrar spinner
+  if (loading) {
+    return (
+      <div className={className}>
+        <LoadingSpinner 
+          text="Buscando hoteles..." 
+          size="md"
+        />
+      </div>
+    )
+  }
+
   // Si no hay búsqueda previa, mostrar mensaje informativo
   if (!lastSearch) {
     return (
@@ -68,7 +81,6 @@ const SearchResults = ({ className = '' }) => {
     <div className={className}>
       <HotelAvailabilityList
         hotels={hotels}
-        loading={loading}
         rooms={lastSearch.rooms}
       />
     </div>
