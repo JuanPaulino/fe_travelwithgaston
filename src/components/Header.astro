@@ -2,6 +2,11 @@
 // Header.astro - Componente de navegación principal
 import AuthActions from './AuthActions.jsx';
 import AuthActionsMobile from './AuthActionsMobile.jsx';
+import { getNavigationData } from '../lib/directus.js';
+
+// Obtener datos de navegación
+const { data: navigationData, error } = await getNavigationData();
+const mainNavigation = navigationData?.find(nav => nav.id === 'main')?.items || [];
 ---
 
 <script>
@@ -124,8 +129,14 @@ import AuthActionsMobile from './AuthActionsMobile.jsx';
   <nav class="hidden md:flex justify-center gap-10 py-4">
     <a href="/" class="text-xl text-neutral hover:text-primary transition-colors">Home</a>
     <a href="/search" class="text-xl text-neutral hover:text-primary transition-colors">Search</a>
-    <a href="#" class="text-xl text-neutral hover:text-primary transition-colors">Custom Journeys & Honeymoons</a>
-    <a href="#" class="text-xl text-neutral hover:text-primary transition-colors">Corporate Services</a>
+    {mainNavigation.map((item) => (
+      <a 
+        href={item.url || `/${item.title.toLowerCase().replace(/\s+/g, '-')}`} 
+        class="text-xl text-neutral hover:text-primary transition-colors"
+      >
+        {item.title}
+      </a>
+    ))}
   </nav>
   
   <!-- Menú móvil desplegable -->
@@ -149,8 +160,14 @@ import AuthActionsMobile from './AuthActionsMobile.jsx';
     <div class="mt-12 space-y-4">
       <a href="/" class="mobile-nav-link block text-lg text-neutral hover:text-primary transition-all duration-200 hover:translate-x-2 py-2 px-3 rounded-lg hover:bg-neutral-50">Home</a>
       <a href="/search" class="mobile-nav-link block text-lg text-neutral hover:text-primary transition-all duration-200 hover:translate-x-2 py-2 px-3 rounded-lg hover:bg-neutral-50">Search</a>
-      <a href="#" class="mobile-nav-link block text-lg text-neutral hover:text-primary transition-all duration-200 hover:translate-x-2 py-2 px-3 rounded-lg hover:bg-neutral-50">Custom Journeys & Honeymoons</a>
-      <a href="#" class="mobile-nav-link block text-lg text-neutral hover:text-primary transition-all duration-200 hover:translate-x-2 py-2 px-3 rounded-lg hover:bg-neutral-50">Corporate Services</a>
+      {mainNavigation.map((item) => (
+        <a 
+          href={item.url || `/${item.title.toLowerCase().replace(/\s+/g, '-')}`} 
+          class="mobile-nav-link block text-lg text-neutral hover:text-primary transition-all duration-200 hover:translate-x-2 py-2 px-3 rounded-lg hover:bg-neutral-50"
+        >
+          {item.title}
+        </a>
+      ))}
     </div>
 
     <AuthActionsMobile client:load />

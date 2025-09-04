@@ -56,4 +56,36 @@ export async function getPageData(slug) {
   }
 }
 
+export async function getNavigationData() {
+  try {
+    const navigation = await client.request(
+      readItems("navigation", {
+        fields: [
+          "id",
+          "title", 
+          "is_active",
+          "items.*",
+          "items.children.*"
+        ],
+        filter: {
+          is_active: {
+            _eq: true
+          }
+        }
+      })
+    );
+
+    return {
+      data: navigation,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Failed to fetch navigation data:', error);
+    return {
+      data: null,
+      error: 'Failed to fetch navigation data. Please try again later.',
+    };
+  }
+}
+
 export default client;
