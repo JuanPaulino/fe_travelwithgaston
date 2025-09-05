@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 
 const ImageCarousel = ({ 
   images = [], 
@@ -13,6 +13,9 @@ const ImageCarousel = ({
   
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(autoPlay)
+  const [loadedImages, setLoadedImages] = useState(new Set())
+  const [isVisible, setIsVisible] = useState(false)
+  const carouselRef = useRef(null)
 
   // Función para ir a la siguiente imagen
   const nextImage = useCallback(() => {
@@ -33,13 +36,71 @@ const ImageCarousel = ({
     setCurrentIndex(index)
   }, [])
 
+  // Intersection Observer para detectar cuando el carrusel es visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+      },
+      { threshold: 0.1 }
+    )
+
+    if (carouselRef.current) {
+      observer.observe(carouselRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   // Auto-play con useEffect
   useEffect(() => {
-    if (!isAutoPlaying || limitedImages.length <= 1) return
+    if (!isAutoPlaying || limitedImages.length <= 1 || !isVisible) return
 
     const interval = setInterval(nextImage, autoPlayInterval)
     return () => clearInterval(interval)
-  }, [isAutoPlaying, autoPlayInterval, nextImage, limitedImages.length])
+  }, [isAutoPlaying, autoPlayInterval, nextImage, limitedImages.length, isVisible])
+
+  // Función para cargar imagen
+  const loadImage = useCallback((index) => {
+    if (loadedImages.has(index) || !limitedImages[index]) return
+    
+    const img = new Image()
+    const imageUrl = limitedImages[index].thumbnail_url || limitedImages[index].url || limitedImages[index]
+    
+    img.onload = () => {
+      setLoadedImages(prev => new Set([...prev, index]))
+    }
+    img.onerror = () => {
+      console.warn(`Error cargando imagen ${index}:`, imageUrl)
+    }
+    img.src = imageUrl
+  }, [limitedImages, loadedImages])
+
+  // Precargar las primeras 2 imágenes cuando el carrusel se vuelve visible por primera vez
+  useEffect(() => {
+    if (isVisible && limitedImages.length > 0) {
+      // Precargar las primeras 2 imágenes
+      loadImage(0)
+      if (limitedImages.length > 1) {
+        loadImage(1)
+      }
+    }
+  }, [isVisible, loadImage, limitedImages.length])
+
+  // Cargar imagen actual y precargar las siguientes 2 cuando cambia el índice
+  useEffect(() => {
+    if (isVisible && limitedImages.length > 0) {
+      // Cargar imagen actual
+      loadImage(currentIndex)
+      
+      // Precargar las siguientes 2 imágenes
+      const nextIndex1 = (currentIndex + 1) % limitedImages.length
+      const nextIndex2 = (currentIndex + 2) % limitedImages.length
+      
+      loadImage(nextIndex1)
+      loadImage(nextIndex2)
+    }
+  }, [currentIndex, loadImage, limitedImages.length, isVisible])
 
   // Pausar auto-play al hacer hover
   const handleMouseEnter = () => setIsAutoPlaying(false)
@@ -60,21 +121,31 @@ const ImageCarousel = ({
   // Si solo hay una imagen, mostrarla sin controles
   if (limitedImages.length === 1) {
     return (
-      <div className={`relative overflow-hidden ${className}`}>
-        <img
-          src={limitedImages[0].thumbnail_url || limitedImages[0].url || limitedImages[0]}
-          alt={limitedImages[0].alt || 'Imagen del hotel'}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.target.src = 'https://d13bre0qp8legl.cloudfront.net/hotels/11644/6emR1CkEqarvtZ8jH79PEavjtTMNxyy4iS1rUDNO.jpg'
-          }}
-        />
+      <div ref={carouselRef} className={`relative overflow-hidden ${className}`}>
+        {isVisible && loadedImages.has(0) ? (
+          <img
+            src={limitedImages[0].thumbnail_url || limitedImages[0].url || limitedImages[0]}
+            alt={limitedImages[0].alt || 'Imagen del hotel'}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.src = 'https://d13bre0qp8legl.cloudfront.net/hotels/11644/6emR1CkEqarvtZ8jH79PEavjtTMNxyy4iS1rUDNO.jpg'
+            }}
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <div className="text-gray-500 text-center p-8">
+              <div className="text-4xl mb-2">🏨</div>
+              <p>Cargando imagen...</p>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
 
   return (
     <div 
+      ref={carouselRef}
       className={`relative overflow-hidden ${className}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -82,12 +153,21 @@ const ImageCarousel = ({
       
       {/* Imagen principal */}
       <div className="relative flex items-center justify-center">
-        <img
-          src={limitedImages[currentIndex].thumbnail_url || limitedImages[currentIndex].url || limitedImages[currentIndex]}
-          alt={limitedImages[currentIndex].alt || `Imagen ${currentIndex + 1} del hotel`}
-          className="w-full h-full transition-opacity duration-300 object-cover aspect-[3/2]"
-          onClick={() => onImageClick?.(currentIndex)}
-        />
+        {isVisible && loadedImages.has(currentIndex) ? (
+          <img
+            src={limitedImages[currentIndex].thumbnail_url || limitedImages[currentIndex].url || limitedImages[currentIndex]}
+            alt={limitedImages[currentIndex].alt || `Imagen ${currentIndex + 1} del hotel`}
+            className="w-full h-full transition-opacity duration-300 object-cover aspect-[3/2]"
+            onClick={() => onImageClick?.(currentIndex)}
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center aspect-[3/2]">
+            <div className="text-gray-500 text-center p-8">
+              <div className="text-4xl mb-2">🏨</div>
+              <p>Cargando imagen...</p>
+            </div>
+          </div>
+        )}
       </div>
         {/* Botones de navegación */}
         <button

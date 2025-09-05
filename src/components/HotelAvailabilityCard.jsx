@@ -1,15 +1,33 @@
-import React from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 
 function HotelAvailabilityCard({ hotelData, rooms }) {
   const { setSelectedDestination } = useSearchStore()
+  const [isVisible, setIsVisible] = useState(false)
+  const cardRef = useRef(null)
 
   // Logs de depuración
   console.log('🏨 HotelAvailabilityCard - Props recibidas:', {
     hotelData,
     rooms,
   })
+
+  // Intersection Observer para detectar cuando la tarjeta es visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting)
+      },
+      { threshold: 0.1 }
+    )
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
 
   // Extraer datos del objeto de disponibilidad
   const hotel = {
@@ -49,7 +67,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
   console.log('🏨 HotelAvailabilityCard - Renderizando hotel:', hotel.name, 'Disponible:', isAvailable)
 
   return (
-    <div className="overflow-hidden min-w-80 relative">
+    <div ref={cardRef} className="overflow-hidden min-w-80 relative">
       {/* Badge de disponibilidad */}
         {!isAvailable && (
           <div className="absolute top-4 left-4 z-10">
@@ -62,14 +80,23 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
         <div className='flex flex-row flex-grow gap-4'>
           {/* carrusel 4 of 12 */}
           <div className='w-4/12'>
-            <ImageCarousel
-              images={hotel.images}
-              autoPlay={false}
-              autoPlayInterval={0}
-              showThumbnails={false}
-              onImageClick={handleImageClick}
-              className={`${!isAvailable ? 'opacity-60' : ''}`}
-            />
+            {isVisible ? (
+              <ImageCarousel
+                images={hotel.images}
+                autoPlay={false}
+                autoPlayInterval={0}
+                showThumbnails={false}
+                onImageClick={handleImageClick}
+                className={`${!isAvailable ? 'opacity-60' : ''}`}
+              />
+            ) : (
+              <div className={`w-full h-full bg-gray-200 flex items-center justify-center aspect-[3/2] ${!isAvailable ? 'opacity-60' : ''}`}>
+                <div className="text-gray-500 text-center p-8">
+                  <div className="text-4xl mb-2">🏨</div>
+                  <p>Cargando...</p>
+                </div>
+              </div>
+            )}
           </div>
           {/* information 8 of 12 */}
           <div className='w-5/12'>
