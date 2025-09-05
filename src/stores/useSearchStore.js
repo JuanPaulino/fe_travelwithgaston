@@ -196,10 +196,21 @@ export const searchActions = {
       };
       
       const destinationId = selectedDestination.id;
-      const destinationKey = selectedDestination.type === 'location' ? 'location_id' : 'hotel_id';
+      let destinationKey;
 
-      console.log('🏨 executeSearch - Destino seleccionado:', selectedDestination)
-      console.log('🏨 executeSearch - Location ID:', destinationId)
+      switch (selectedDestination.type) {
+        case 'location':
+          destinationKey = 'location_id';
+          break;
+        case 'inspiration':
+          destinationKey = 'inspiration_id';
+          break;
+        case 'hotel':
+          destinationKey = 'hotel_id';
+          break;
+        default:
+          destinationKey = 'unknown';
+      }
 
       if (!destinationId) {
         throw new Error('No se pudo obtener el ID de ubicación del destino seleccionado');
