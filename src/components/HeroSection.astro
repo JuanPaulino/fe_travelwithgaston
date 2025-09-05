@@ -13,7 +13,7 @@ const image = data?.image;
 const backgroundImage = image ? `${import.meta.env.DIRECTUS_URL}/assets/${image}` : null;
 ---
 
-<section class={`hero-section relative flex items-center justify-center overflow-hidden ${!backgroundImage ? 'hero-fallback' : ''}`}>
+<section class={`hero-section relative flex items-center justify-center ${!backgroundImage ? 'hero-fallback' : ''}`}>
   {backgroundImage && (
     <div class="absolute inset-0 z-0">
       <img
@@ -40,7 +40,7 @@ const backgroundImage = image ? `${import.meta.env.DIRECTUS_URL}/assets/${image}
     </p>
 
     <!-- Formulario de búsqueda -->
-    <div class="hero-search-form">
+    <div class="hero-search-form z-10">
       <SearchForm client:load />
     </div>
   </div>

@@ -15,7 +15,7 @@ function SearchAutocomplete({
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [loading, setLoading] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
-  const [selectedColumn, setSelectedColumn] = useState('destinations') // 'destinations' o 'hotels'
+  const [selectedColumn, setSelectedColumn] = useState('destinations') // 'destinations', 'hotels' o 'inspirations'
   const [isMobile, setIsMobile] = useState(false)
   
   // Referencias
@@ -50,7 +50,15 @@ function SearchAutocomplete({
       setSuggestions(results || [])
       setShowSuggestions(true)
       setSelectedIndex(-1)
-      setSelectedColumn('destinations')
+      // Establecer la primera columna visible como seleccionada
+      const resultsArray = results || []
+      const destinations = resultsArray.filter(s => s.type === 'location')
+      const hotels = resultsArray.filter(s => s.type === 'hotel')
+      const inspirations = resultsArray.filter(s => s.type === 'inspiration')
+      const firstVisibleColumn = destinations.length > 0 ? 'destinations' : 
+                                hotels.length > 0 ? 'hotels' : 
+                                inspirations.length > 0 ? 'inspirations' : 'destinations'
+      setSelectedColumn(firstVisibleColumn)
     } catch (error) {
       console.error('Error fetching suggestions:', error)
       setSuggestions([])
@@ -63,7 +71,8 @@ function SearchAutocomplete({
   const getGroupedSuggestions = () => {
     const destinations = suggestions.filter(s => s.type === 'location')
     const hotels = suggestions.filter(s => s.type === 'hotel')
-    return { destinations, hotels }
+    const inspirations = suggestions.filter(s => s.type === 'inspiration')
+    return { destinations, hotels, inspirations }
   }
   
   // Manejar cambios en el input con debounce
@@ -103,8 +112,10 @@ function SearchAutocomplete({
   const handleKeyDown = (e) => {
     if (!showSuggestions || suggestions.length === 0) return
     
-    const { destinations, hotels } = getGroupedSuggestions()
-    const currentList = selectedColumn === 'destinations' ? destinations : hotels
+    const { destinations, hotels, inspirations } = getGroupedSuggestions()
+    const visibleCols = getVisibleColumns()
+    const currentList = selectedColumn === 'destinations' ? destinations : 
+                      selectedColumn === 'hotels' ? hotels : inspirations
     
     switch (e.key) {
       case 'ArrowDown':
@@ -127,16 +138,18 @@ function SearchAutocomplete({
         
       case 'ArrowRight':
         e.preventDefault()
-        if (selectedColumn === 'destinations' && hotels.length > 0) {
-          setSelectedColumn('hotels')
+        const currentIndex = visibleCols.indexOf(selectedColumn)
+        if (currentIndex < visibleCols.length - 1) {
+          setSelectedColumn(visibleCols[currentIndex + 1])
           setSelectedIndex(0)
         }
         break
         
       case 'ArrowLeft':
         e.preventDefault()
-        if (selectedColumn === 'hotels' && destinations.length > 0) {
-          setSelectedColumn('destinations')
+        const currentIndexLeft = visibleCols.indexOf(selectedColumn)
+        if (currentIndexLeft > 0) {
+          setSelectedColumn(visibleCols[currentIndexLeft - 1])
           setSelectedIndex(0)
         }
         break
@@ -211,7 +224,20 @@ function SearchAutocomplete({
     setSelectedIndex(-1)
   }
 
-  const { destinations, hotels } = getGroupedSuggestions()
+  const { destinations, hotels, inspirations } = getGroupedSuggestions()
+  
+  // Determinar qué columnas mostrar
+  const getVisibleColumns = () => {
+    const visibleColumns = []
+    if (destinations.length > 0) visibleColumns.push('destinations')
+    if (hotels.length > 0) visibleColumns.push('hotels')
+    if (inspirations.length > 0) visibleColumns.push('inspirations')
+    return visibleColumns
+  }
+  
+  const visibleColumns = getVisibleColumns()
+  const gridCols = visibleColumns.length === 1 ? 'grid-cols-1' : 
+                   visibleColumns.length === 2 ? 'grid-cols-2' : 'grid-cols-3'
 
   return (
     <div className="relative flex-1">
@@ -254,7 +280,7 @@ function SearchAutocomplete({
       </div>
       
       {/* Modal Full-Screen para Mobile/Tablet */}
-      {isMobile && showSuggestions && (destinations.length > 0 || hotels.length > 0) && (
+      {isMobile && showSuggestions && (destinations.length > 0 || hotels.length > 0 || inspirations.length > 0) && (
         <div className="fixed inset-0 z-50 bg-white">
           {/* Header del modal */}
           <div className="sticky top-0 bg-white border-b border-gray-200 p-4">
@@ -284,13 +310,13 @@ function SearchAutocomplete({
 
           {/* Contenido del modal */}
           <div className="flex-1 overflow-hidden">
-            <div className="grid grid-cols-2 divide-x divide-gray-200 h-full">
+            <div className={`grid ${gridCols} divide-x divide-gray-200 h-full`}>
               {/* Columna de Destinos */}
-              <div className="overflow-y-auto">
-                <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700">Destinations</h3>
-                </div>
-                {destinations.length > 0 ? (
+              {visibleColumns.includes('destinations') && (
+                <div className="overflow-y-auto">
+                  <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-700">Destinations</h3>
+                  </div>
                   <div className="divide-y divide-gray-100">
                     {destinations.map((suggestion, index) => (
                       <button
@@ -298,12 +324,7 @@ function SearchAutocomplete({
                         type="button"
                         onClick={() => handleSuggestionClick(suggestion)}
                         className="w-full px-4 py-4 min-h-[56px] text-left hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                      >
-                        {/* Icono de ubicación */}
-                        <span className="text-gray-400 flex-shrink-0 text-lg">
-                          📍
-                        </span>
-                        
+                      > 
                         {/* Contenido de la sugerencia */}
                         <div className="flex-1 min-w-0">
                           <div className="font-medium truncate text-base">
@@ -318,20 +339,15 @@ function SearchAutocomplete({
                       </button>
                     ))}
                   </div>
-                ) : (
-                  <div className="px-4 py-12 text-center text-gray-500">
-                    <div className="text-2xl mb-2">📍</div>
-                    <div className="text-sm">No destinations found</div>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Columna de Hoteles */}
-              <div className="overflow-y-auto">
-                <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-700">Hotels</h3>
-                </div>
-                {hotels.length > 0 ? (
+              {visibleColumns.includes('hotels') && (
+                <div className="overflow-y-auto">
+                  <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-700">Hotels</h3>
+                  </div>
                   <div className="divide-y divide-gray-100">
                     {hotels.map((suggestion, index) => (
                       <button
@@ -339,12 +355,7 @@ function SearchAutocomplete({
                         type="button"
                         onClick={() => handleSuggestionClick(suggestion)}
                         className="w-full px-4 py-4 min-h-[56px] text-left hover:bg-gray-50 flex items-center gap-3 transition-colors"
-                      >
-                        {/* Icono de hotel */}
-                        <span className="text-gray-400 flex-shrink-0 text-lg">
-                          🏨
-                        </span>
-                        
+                      > 
                         {/* Contenido de la sugerencia */}
                         <div className="flex-1 min-w-0">
                           <div className="font-medium truncate text-base">
@@ -359,13 +370,39 @@ function SearchAutocomplete({
                       </button>
                     ))}
                   </div>
-                ) : (
-                  <div className="px-4 py-12 text-center text-gray-500">
-                    <div className="text-2xl mb-2">🏨</div>
-                    <div className="text-sm">No hotels found</div>
+                </div>
+              )}
+
+              {/* Columna de Inspiraciones */}
+              {visibleColumns.includes('inspirations') && (
+                <div className="overflow-y-auto">
+                  <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-700">Inspiration</h3>
                   </div>
-                )}
-              </div>
+                  <div className="divide-y divide-gray-100">
+                    {inspirations.map((suggestion, index) => (
+                      <button
+                        key={`insp-${suggestion.id}-${index}`}
+                        type="button"
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        className="w-full px-4 py-4 min-h-[56px] text-left hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                      >
+                        {/* Contenido de la sugerencia */}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium truncate text-base">
+                            {highlightMatch(suggestion.text, value)}
+                          </div>
+                          {suggestion.location && (
+                            <div className="text-sm text-gray-500 truncate">
+                              {suggestion.location}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -377,20 +414,20 @@ function SearchAutocomplete({
           )}
         </div>
       )}
-      
+
       {/* Dropdown Desktop (mantener original) */}
-      {!isMobile && showSuggestions && (destinations.length > 0 || hotels.length > 0) && (
+      {!isMobile && showSuggestions && (destinations.length > 0 || hotels.length > 0 || inspirations.length > 0) && (
         <div 
           ref={suggestionsRef}
-          className="absolute z-50 w-full min-w-[600px] mt-2 bg-white border border-gray-200 rounded-lg shadow-xl max-h-[400px] overflow-hidden"
+          className="absolute z-50 w-full min-w-[900px] mt-2 bg-white border border-gray-200 rounded-lg shadow-xl max-h-[400px] overflow-hidden"
         >
-          <div className="grid grid-cols-2 divide-x divide-gray-200">
+          <div className={`grid ${gridCols} divide-x divide-gray-200`}>
             {/* Columna de Destinos */}
-            <div className="overflow-y-auto max-h-[400px]">
-              <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">Destinations</h3>
-              </div>
-              {destinations.length > 0 ? (
+            {visibleColumns.includes('destinations') && (
+              <div className="overflow-y-auto max-h-[400px]">
+                <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700">Destinations</h3>
+                </div>
                 <div className="divide-y divide-gray-100">
                   {destinations.map((suggestion, index) => (
                     <button
@@ -426,19 +463,15 @@ function SearchAutocomplete({
                     </button>
                   ))}
                 </div>
-              ) : (
-                <div className="px-4 py-8 text-center text-gray-500 text-sm">
-                  No hay destinos
-                </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Columna de Hoteles */}
-            <div className="overflow-y-auto max-h-[400px]">
-              <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700">Hotels</h3>
-              </div>
-              {hotels.length > 0 ? (
+            {visibleColumns.includes('hotels') && (
+              <div className="overflow-y-auto max-h-[400px]">
+                <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700">Hotels</h3>
+                </div>
                 <div className="divide-y divide-gray-100">
                   {hotels.map((suggestion, index) => (
                     <button
@@ -474,12 +507,52 @@ function SearchAutocomplete({
                     </button>
                   ))}
                 </div>
-              ) : (
-                <div className="px-4 py-8 text-center text-gray-500 text-sm">
-                  No hay hoteles
+              </div>
+            )}
+
+            {/* Columna de Inspiraciones */}
+            {visibleColumns.includes('inspirations') && (
+              <div className="overflow-y-auto max-h-[400px]">
+                <div className="sticky top-0 bg-gray-50 px-4 py-3 border-b border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-700">Inspiration</h3>
                 </div>
-              )}
-            </div>
+                <div className="divide-y divide-gray-100">
+                  {inspirations.map((suggestion, index) => (
+                    <button
+                      key={`insp-${suggestion.id}-${index}`}
+                      type="button"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className={`w-full px-4 py-3 min-h-[48px] text-left hover:bg-gray-50 flex items-center gap-3 transition-colors ${
+                        selectedColumn === 'inspirations' && index === selectedIndex 
+                          ? 'bg-blue-50 text-blue-700' 
+                          : 'text-gray-700'
+                      }`}
+                      onMouseEnter={() => {
+                        setSelectedColumn('inspirations')
+                        setSelectedIndex(index)
+                      }}
+                    >
+                      {/* Icono de inspiración */}
+                      <span className="text-gray-400 flex-shrink-0">
+                        ✨
+                      </span>
+                      
+                      {/* Contenido de la sugerencia */}
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium truncate text-sm">
+                          {highlightMatch(suggestion.text, value)}
+                        </div>
+                        {suggestion.location && (
+                          <div className="text-xs text-gray-500 truncate">
+                            {suggestion.location}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
