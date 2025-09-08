@@ -6,6 +6,7 @@ const { data } = Astro.props;
 const title = data?.headline;
 const description = data?.tagline;
 const items = data?.items || [];
+const show_button = data?.show_button;
 
 // Construir la URL de Directus para las imágenes
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
@@ -15,7 +16,8 @@ const gridItems = items.map(item => ({
   id: item.id,
   title: item.title,
   description: item.short_description,
-  image: item.image?.id ? `${DIRECTUS_URL}/assets/${item.image.id}` : null
+  image: item.image?.id ? `${DIRECTUS_URL}/assets/${item.image.id}` : null,
+  slug: item.slug,
 }));
 ---
 
@@ -34,7 +36,7 @@ const gridItems = items.map(item => ({
   <div class="max-w-7xl mx-auto">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
       {gridItems.map((item) => (
-        <div class="inspiration-card group cursor-pointer">
+        <a href={`${item.slug}`} class="inspiration-card group cursor-pointer block">
           <!-- Imagen -->
           <div class="relative overflow-hidden rounded-lg mb-4 aspect-[4/3]">
             {item.image ? (
@@ -61,19 +63,21 @@ const gridItems = items.map(item => ({
               {item.description}
             </p>
           )}
-        </div>
+        </a>
       ))}
     </div>
 
     <!-- Botón CTA -->
-    <div class="text-center">
-      <a 
-        href="#"
-        class="inline-block px-8 py-3 border border-black text-black font-medium rounded-md hover:bg-black hover:text-white transition-all duration-200"
-      >
-        View all inspiration
-      </a>
-    </div>
+    {show_button && (
+      <div class="text-center">
+        <a 
+          href="#"
+          class="inline-block px-8 py-3 border border-black text-black font-medium rounded-md hover:bg-black hover:text-white transition-all duration-200"
+        >
+          View all inspiration
+        </a>
+      </div>
+    )}
   </div>
 </section>
 

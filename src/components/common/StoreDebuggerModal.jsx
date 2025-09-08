@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useFiltersStore } from '../../stores/useFiltersStore.js';
 import { useSearchStore } from '../../stores/useSearchStore.js';
+import { useBookingStore } from '../../stores/useBookingStore.js';
 import { authStore } from '../../stores/authStore.js';
 
 const StoreDebuggerModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [selectedStore, setSelectedStore] = useState('search'); // 'search', 'filters', o 'auth'
+  const [selectedStore, setSelectedStore] = useState('search'); // 'search', 'filters', 'booking', o 'auth'
   
   // Usar todos los stores
   const { filters } = useFiltersStore();
   const { searchData } = useSearchStore();
+  const { bookingData } = useBookingStore();
   const authData = authStore.get();
 
   // Cerrar modal con Escape
@@ -45,6 +47,8 @@ const StoreDebuggerModal = () => {
         return searchData;
       case 'filters':
         return filters;
+      case 'booking':
+        return bookingData;
       case 'auth':
         return authData;
       default:
@@ -59,13 +63,15 @@ const StoreDebuggerModal = () => {
         return 'Search Store';
       case 'filters':
         return 'Filters Store';
+      case 'booking':
+        return 'Booking Store';
       case 'auth':
         return 'Auth Store';
       default:
         return 'Search Store';
     }
   };
-
+  return null;
   if (!isOpen) {
     return (
       <div className="fixed bottom-4 right-4 z-50">
@@ -123,6 +129,7 @@ const StoreDebuggerModal = () => {
               >
                 <option value="search">🔍 Search Store</option>
                 <option value="filters">🎯 Filters Store</option>
+                <option value="booking">🏨 Booking Store</option>
                 <option value="auth">🔐 Auth Store</option>
               </select>
             </div>

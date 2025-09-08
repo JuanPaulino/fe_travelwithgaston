@@ -22,18 +22,12 @@ export async function getPageData(slug) {
           // Evitar la relación circular: NO incluir "blocks.item.items.block_inspiration"
         ],
         filter: {
-          _and: [
-            {
-              permalink: {
-                _eq: slug,
-              },
-            },
-            {
-              status: {
-                _eq: "published",
-              },
-            },
-          ],
+          permalink: {
+            _eq: slug,
+          },
+          status: {
+            _eq: "published",
+          },
         },
         limit: 1, // Fetch only one page
       })

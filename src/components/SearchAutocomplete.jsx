@@ -5,6 +5,7 @@ function SearchAutocomplete({
   value, 
   onChange,
   onSelectionChange,
+  onClear,
   placeholder,
   className = "",
   disabled = false 
@@ -251,7 +252,7 @@ function SearchAutocomplete({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full rounded-lg focus:border-transparent focus:ring-0 focus:outline-none ${className}`}
+          className={`w-full rounded-lg focus:border-transparent focus:ring-0 focus:outline-none ${className} remove-clear`}
           autoComplete="off"
         />
         
@@ -264,6 +265,10 @@ function SearchAutocomplete({
               setSuggestions([])
               setShowSuggestions(false)
               inputRef.current?.focus()
+              // Llamar al callback del componente padre si está disponible
+              if (onClear) {
+                onClear()
+              }
             }}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors w-5 h-5 flex items-center justify-center"
           >

@@ -195,7 +195,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
 
   // Función para verificar si estamos en la página home
   const isOnHomePage = () => {
-    return window.location.pathname === '/' || window.location.pathname === '/index.html';
+    return typeof window !== 'undefined' && (window.location.pathname === '/' || window.location.pathname === '/index.html');
   }
 
   // Manejar envío del formulario
@@ -235,7 +235,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     <div className={className}>
       <form onSubmit={handleSubmit}>
         {/* Diseño Desktop - Horizontal exacto como la imagen */}
-        <div className="hidden lg:block bg-white rounded-lg shadow-lg">
+        <div className={`hidden lg:block ${isOnHomePage() ? 'bg-white/85 hover:bg-white' : 'bg-white'} rounded-lg shadow-lg`}>
           <div className="flex items-stretch divide-x divide-gray-200">
             {/* Campo de destino */}
             <div className="flex-1 p-6">
@@ -245,21 +245,13 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                   value={searchData.searchText}
                   onChange={handleSearchTextChange}
                   onSelectionChange={handleDestinationSelection}
+                  onClear={() => {
+                    setSearchText('')
+                    setSelectedDestination(null)
+                  }}
                   disabled={disabled}
                   className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 placeholder-gray-400"
                 />
-                {searchData.selectedDestinationId && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSearchText('')
-                      setSelectedDestination(null)
-                    }}
-                    className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-300 transition-colors"
-                  >
-                    <span className="text-xs">×</span>
-                  </button>
-                )}
               </div>
             </div>
 
