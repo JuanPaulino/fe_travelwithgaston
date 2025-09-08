@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
+import { useBookingStore } from '../stores/useBookingStore.js'
+import { useAuthStore } from '../stores/useAuthStore.js'
 
 const AvailableHotelRooms = ({ }) => {
   const { searchData, executeSearch } = useSearchStore();
+  const { processBooking } = useBookingStore();
+  const { user } = useAuthStore();
   const [hotelData, setHotelData] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -33,9 +37,21 @@ const AvailableHotelRooms = ({ }) => {
   }, [searchData?.selectedDestinationId, executeSearch]);
 
   const hotel = hotelData;
-  console.log(hotelData);
+  const session_id = hotel?.session_id;
   const roomTypes = hotel?.room_types || [];
-  
+  console.log(roomTypes);
+
+  // Función para manejar el clic en "Book now"
+  const handleBookNow = (room) => {
+    // Obtener datos del usuario (esto debería venir de un store de auth o similar)
+    const userData = {
+      name: user.firstName + ' ' + user.lastName,
+      email: user.email,
+    };
+
+    // Procesar la reserva con todos los datos
+    processBooking(hotel, room, searchData, userData);
+  };
   // Función para formatear el precio
   const formatPrice = (price) => {
     if (!price) return "N/A";
@@ -251,7 +267,10 @@ const AvailableHotelRooms = ({ }) => {
                         </div>
                         {/* Botón de reserva */}
                         <div className="mt-6">
-                          <button className="w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors">
+                          <button 
+                            onClick={() => handleBookNow(room)}
+                            className="w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors"
+                          >
                             Book now
                           </button>
                         </div>

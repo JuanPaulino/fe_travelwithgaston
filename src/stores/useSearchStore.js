@@ -289,31 +289,20 @@ export const useSearchStore = () => {
   const [searchData, setSearchData] = useState(searchStore.get());
   const [resultsData, setResultsData] = useState(resultsStore.get());
 
-  useEffect(() => {
-    console.log('🔄 useSearchStore - Configurando suscripciones...')
-    
+  useEffect(() => {    
     const unsubscribeSearch = searchStore.subscribe((newSearchData) => {
-      console.log('🔄 useSearchStore - Search data actualizado:', newSearchData)
       setSearchData(newSearchData)
     });
     
     const unsubscribeResults = resultsStore.subscribe((newResultsData) => {
-      console.log('🔄 useSearchStore - Results data actualizado:', newResultsData)
       setResultsData(newResultsData)
     });
     
     return () => {
-      console.log('🔄 useSearchStore - Limpiando suscripciones...')
       unsubscribeSearch();
       unsubscribeResults();
     };
   }, []);
-
-  console.log('🔄 useSearchStore - Hook ejecutado, datos actuales:', {
-    searchData: !!searchData,
-    resultsData: !!resultsData,
-    hotelsCount: resultsData?.hotels?.length || 0
-  })
 
   return {
     searchData,
