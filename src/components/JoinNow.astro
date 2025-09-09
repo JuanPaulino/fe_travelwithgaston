@@ -20,12 +20,6 @@ export interface Props {
 
 const { data, background = 'light' } = Astro.props;
 
-// Debug: Log de los datos recibidos
-if (import.meta.env.DEV) {
-  console.log('JoinNow component - Data received:', data);
-  console.log('JoinNow component - Background:', background);
-}
-
 // Validación de datos
 if (!data) {
   console.error('JoinNow component - No data received');

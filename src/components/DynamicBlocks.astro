@@ -43,12 +43,6 @@ const { blocks } = Astro.props;
     
     // JSON Block (para bloques dinámicos como JoinNow)
     if (block.collection === 'block_json') {
-      // Debug: Log del bloque JSON
-      if (import.meta.env.DEV) {
-        console.log('DynamicBlocks - block_json detected:', block);
-        console.log('DynamicBlocks - block.item:', block.item);
-        console.log('DynamicBlocks - block.item.data:', block.item?.data);
-      }
       
       // Si es un bloque de tipo benefits_grid, renderizar JoinNow
       if (block.item?.kind === 'benefits_grid') {
