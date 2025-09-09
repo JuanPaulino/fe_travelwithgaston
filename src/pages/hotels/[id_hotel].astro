@@ -225,7 +225,7 @@ const title = `Hotel ${hotelData.name}`;
            }
          </div>
       </div>
-			<AvailableHotelRooms client:load />
+			<AvailableHotelRooms client:load parentHotelData={hotelData} />
       <div class="flex flex-col">
         <HotelMap 
           client:load 

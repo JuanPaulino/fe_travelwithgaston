@@ -207,6 +207,34 @@ export const filtersApi = {
   }
 };
 
+// API de bookings
+export const bookingAPI = {
+  // Crear una nueva reserva
+  createBooking: async (bookingData) => {
+    const response = await http.post('/api/bookings', bookingData);
+    return response.data;
+  },
+
+  // Obtener reservas del usuario
+  getBookings: async (params = {}) => {
+    const queryParams = new URLSearchParams(params);
+    const response = await http.get(`/api/bookings?${queryParams}`);
+    return response.data;
+  },
+
+  // Obtener reserva por ID
+  getBookingById: async (id) => {
+    const response = await http.get(`/api/bookings/${id}`);
+    return response.data;
+  },
+
+  // Cancelar reserva
+  cancelBooking: async (id) => {
+    const response = await http.put(`/api/bookings/${id}/cancel`);
+    return response.data;
+  }
+};
+
 // Función helper para manejar errores
 export const handleAPIError = (error) => {
   if (error.response) {

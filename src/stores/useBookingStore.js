@@ -1,4 +1,4 @@
-import { atom } from 'nanostores';
+import { persistentMap } from '@nanostores/persistent'
 import { useState, useEffect } from 'react';
 
 // Estado inicial del booking
@@ -6,82 +6,74 @@ const initialBookingData = {
   hotel_name: '',
   session_id: '',
   hotel_id: '',
-  selected_room: null,
+  selected_room: null, // Se almacenará como string JSON
   start_date: '',
   end_date: '',
+  adults: 2,
+  children: 0,
   guest_name: '',
-  guest_email: ''
+  guest_email: '',
+  credit_card: null // Se almacenará como string JSON
 };
 
 // Store de booking
-export const bookingStore = atom(initialBookingData);
+export const bookingStore = persistentMap('bookingStore', initialBookingData);
 
 // Acciones para manipular el booking
 export const bookingActions = {
-  // Establecer información del hotel
-  setHotelInfo: (hotelInfo) => {
-    bookingStore.set({
-      ...bookingStore.get(),
-      hotel_name: hotelInfo.hotel_name || '',
-      session_id: hotelInfo.session_id || '',
-      hotel_id: hotelInfo.hotel_id || ''
-    });
-  },
-
-  // Establecer habitación seleccionada
-  setSelectedRoom: (room) => {
-    bookingStore.set({
-      ...bookingStore.get(),
-      // Asegurar que selected_room se serialice correctamente
-      selected_room: room ? JSON.parse(JSON.stringify(room)) : null
-    });
-  },
-
-  // Establecer toda la información de booking
-  setBookingData: (bookingData) => {
-    bookingStore.set({
-      ...bookingStore.get(),
-      ...bookingData,
-      // Asegurar que selected_room se serialice correctamente
-      selected_room: bookingData.selected_room ? JSON.parse(JSON.stringify(bookingData.selected_room)) : null
-    });
-  },
-
-  // Limpiar datos de booking
-  clearBooking: () => {
-    bookingStore.set(initialBookingData);
-  },
-
-  // Obtener datos de booking actuales
-  getBookingData: () => {
-    return bookingStore.get();
-  },
-
   // Función para procesar reserva completa
   processBooking: (hotel, room, searchData, userData) => {
     const bookingData = {
-      hotel_name: hotel.name,
+      hotel_name: hotel.hotel_name,
       session_id: hotel.session_id,
       hotel_id: hotel.hotel_id,
-      selected_room: room ? JSON.parse(JSON.stringify(room)) : null,
+      selected_room: room ? JSON.stringify(room) : null, // Almacenar como string JSON
       start_date: searchData.checkInDate,
       end_date: searchData.checkOutDate,
+      adults: searchData.adults || 2,
+      children: searchData.children || 0,
       guest_name: userData?.name || '',
-      guest_email: userData?.email || ''
+      guest_email: userData?.email || '',
+      credit_card: null
     };
-    
     bookingStore.set(bookingData);
     return bookingData;
+  },
+
+  // Función para actualizar datos de tarjeta de crédito
+  updateCreditCard: (creditCardData) => {
+    const currentData = bookingStore.get();
+    const updatedData = {
+      ...currentData,
+      credit_card: creditCardData ? JSON.stringify(creditCardData) : null
+    };
+    bookingStore.set(updatedData);
+    return updatedData;
   }
 };
 
 // Hook personalizado para usar el store en componentes React
 export const useBookingStore = () => {
-  const [bookingData, setBookingData] = useState(bookingStore.get());
+  // Función para parsear selected_room y credit_card si son strings
+  const parseBookingData = (data) => {
+    if (!data) return data;
+    
+    return {
+      ...data,
+      selected_room: data.selected_room && typeof data.selected_room === 'string' 
+        ? JSON.parse(data.selected_room) 
+        : data.selected_room,
+      credit_card: data.credit_card && typeof data.credit_card === 'string' 
+        ? JSON.parse(data.credit_card) 
+        : data.credit_card
+    };
+  };
+
+  const [bookingData, setBookingData] = useState(parseBookingData(bookingStore.get()));
 
   useEffect(() => {
     const unsubscribe = bookingStore.subscribe((newBookingData) => {
-      setBookingData(newBookingData);
+      setBookingData(parseBookingData(newBookingData));
     });
     
     return () => {

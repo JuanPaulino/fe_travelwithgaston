@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 import { useBookingStore } from '../stores/useBookingStore.js'
-import { useAuthStore } from '../stores/useAuthStore.js'
+import { authStore } from '../stores/authStore.js'
 
-const AvailableHotelRooms = ({ }) => {
+const AvailableHotelRooms = ({ parentHotelData }) => {
   const { searchData, executeSearch } = useSearchStore();
   const { processBooking } = useBookingStore();
-  const { user } = useAuthStore();
+  const { user } = authStore.get();
   const [hotelData, setHotelData] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -48,9 +48,10 @@ const AvailableHotelRooms = ({ }) => {
       name: user.firstName + ' ' + user.lastName,
       email: user.email,
     };
-
+    hotelData.hotel_address = parentHotelData.address;
     // Procesar la reserva con todos los datos
-    processBooking(hotel, room, searchData, userData);
+    processBooking(hotelData, room, searchData, userData);
+    window.location.href = '/booking';
   };
   // Función para formatear el precio
   const formatPrice = (price) => {
@@ -269,7 +270,7 @@ const AvailableHotelRooms = ({ }) => {
                         <div className="mt-6">
                           <button 
                             onClick={() => handleBookNow(room)}
-                            className="w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors"
+                            className="w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors cursor-pointer"
                           >
                             Book now
                           </button>
