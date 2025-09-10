@@ -1,0 +1,137 @@
+---
+export interface Props {
+  data: {
+    id: number;
+    heading: string;
+    image: string;
+    content: string;
+    tagline?: string;
+    layout: string;
+    btn_link: string;
+    btn_cta: string;
+  };
+  background?: string;
+}
+
+const { data, background = 'light' } = Astro.props;
+---
+{data.layout === 'horizontal' && (
+<div class={`card-block bg-${background} mb-8 flex flex-col md:flex-row justify-between items-center`}>
+  {data.image && (
+    <div class="card-image mb-10 w-full">
+      <img 
+        src={`${import.meta.env.DIRECTUS_URL}/assets/${data.image}`}
+        alt={data.heading || 'Imagen de tarjeta'}
+        class="w-full max-h-[430px] object-cover rounded-[2px]"
+      />
+    </div>
+  )}
+  
+  <div class="flex flex-col items-center w-full p-6">
+    {data.tagline && (
+      <p class="text-sm text-black mb-6 font-semibold text-left w-full">{data.tagline}</p>
+    )}
+    
+    <h2 class="card-heading text-left text-2xl font-bold mb-6 w-full">
+      {data.heading}
+    </h2>
+    
+    {data.content && (
+      <div class="prose max-w-none mb-6 text-left w-full custom-list" set:html={data.content} />
+    )}
+
+    {data.btn_link && (
+      <a href={data.btn_link} class="font-base font-family-body text-neutral-dark border-2 border-neutral-lighter px-6 py-3 hover:bg-neutral-lighter">{data.btn_cta}</a>
+    )}
+  </div>
+</div>
+)}
+
+{data.layout === 'vertical' && (
+<div class={`card-block bg-${background} p-6 mb-8 flex flex-col items-center`}>
+  {data.image && (
+    <div class="card-image mb-10 w-full">
+      <img 
+        src={`${import.meta.env.DIRECTUS_URL}/assets/${data.image}`}
+        alt={data.heading || 'Imagen de tarjeta'}
+        class="w-full max-h-[430px] object-cover rounded-[2px]"
+      />
+    </div>
+  )}
+
+  <div class="flex flex-col items-center w-[80%]">
+    {data.tagline && (
+      <p class="text-sm text-gray-600 mb-6 font-medium text-center">{data.tagline}</p>
+    )}
+  </div>
+
+  <div class="flex flex-col items-center w-full">
+    {data.content && (
+      <div class="prose max-w-none mb-6 text-center" set:html={data.content} />
+    )}
+  </div>
+
+  {data.btn_link && (
+    <a href={data.btn_link} class="font-base font-family-body text-neutral-dark border-2 border-neutral-lighter px-6 py-3 hover:bg-neutral-lighter">{data.btn_cta}</a>
+  )}
+
+</div>
+)}
+
+<style is:global>
+  .card-block {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .card-block:hover {
+    transform: translateY(-2px);
+  }
+  
+  .card-image img {
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .card-block:hover .card-image img {
+    transform: scale(1.02);
+  }
+  
+  .prose {
+    color: #000;
+    font-family: Inter;
+    font-size: var(--Text-Sizes-Text-Regular, 16px);
+    font-style: normal;
+    font-weight: 400;
+    line-height: 150%; /* 24px */
+  }
+  
+  .prose p {
+    margin-bottom: 1rem;
+  }
+  
+  .prose p:last-child {
+    margin-bottom: 0;
+  }
+  
+  .card-heading {
+    font-variation-settings: 'GRAD' 0, 'opsz' 40;
+  }
+  .custom-list {
+    list-style: none;
+    padding-left: 0;
+  }
+  .custom-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+   .custom-list li::before {
+     content: "✓" !important;
+     position: absolute;
+     left: 0;
+     top: 0;
+     color: var(--color-primary);
+     font-weight: 900 !important;
+     font-size: 1em;
+     font-family: Arial, sans-serif;
+   }
+</style>

@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import { getPageData } from '../lib/directus.js';
 import DynamicBlocks from '../components/DynamicBlocks.astro';
 import DebugInfo from '../components/DebugInfo.jsx';
+import Header from '../components/Header.astro';
 
 // Obtener el slug de los parámetros de la URL
 export async function getStaticPaths() {
@@ -32,7 +33,9 @@ const { permalink, title, content, blocks } = pageData;
 ---
 
 <Layout title={title || 'Página Dinámica'}>
-  <main class="mx-auto px-8 md:px-28 py-8">
+	<Header />
+  
+  <main class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
     <div class="mx-auto">
       <!-- Contenido de la página -->
       {content && (

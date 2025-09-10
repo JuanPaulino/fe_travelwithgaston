@@ -2,10 +2,9 @@
 import HeroSection from './HeroSection.astro';
 import InspirationGrid from './InspirationGrid.astro';
 import FeaturedHotels from './FeaturedHotels.astro';
-import RichText from './RichText.astro';
 import FormBlock from './FormBlock.jsx';
 import JoinNow from './JoinNow.astro';
-import BlockRichText from './BlockRichText.astro';
+import CardBlock from './CardBlock.astro';
 
 export interface Props {
   blocks: any[];
@@ -30,10 +29,10 @@ const { blocks } = Astro.props;
     if (block.collection === 'block_featured_hotels') {
       return <FeaturedHotels data={block.item} />;
     }
-    
-    // Rich Text Block
-    if (block.collection === 'block_richtext') {
-      return <BlockRichText data={block.item} background={block.background} />;
+
+    // Card Block
+    if (block.collection === 'block_card') {
+      return <CardBlock data={block.item} background={block.background} />;
     }
     
     // Form Block
