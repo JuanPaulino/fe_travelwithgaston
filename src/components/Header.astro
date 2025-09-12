@@ -7,6 +7,7 @@ import { getNavigationData } from '../lib/directus.js';
 // Obtener datos de navegación
 const { data: navigationData, error } = await getNavigationData();
 const mainNavigation = navigationData?.find(nav => nav.id === 'main')?.items || [];
+console.log(mainNavigation);
 ---
 
 <script>
@@ -129,9 +130,9 @@ const mainNavigation = navigationData?.find(nav => nav.id === 'main')?.items || 
   <nav class="hidden md:flex justify-center gap-10 py-4">
     <a href="/" class="text-xl text-neutral hover:text-primary transition-colors">Get Inspired</a>
     <a href="/search" class="text-xl text-neutral hover:text-primary transition-colors">Find a Hotel</a>
-    {mainNavigation.map((item) => (
+    {mainNavigation.map((item: any) => (
       <a 
-        href={item.url || `/${item.title.toLowerCase().replace(/\s+/g, '-')}`} 
+        href={item.page.permalink}
         class="text-xl text-neutral hover:text-primary transition-colors"
       >
         {item.title}
@@ -168,6 +169,7 @@ const mainNavigation = navigationData?.find(nav => nav.id === 'main')?.items || 
           {item.title}
         </a>
       ))}
+      {JSON.stringify(mainNavigation)}
     </div>
 
     <AuthActionsMobile client:load />

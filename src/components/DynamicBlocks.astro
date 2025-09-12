@@ -5,6 +5,7 @@ import FeaturedHotels from './FeaturedHotels.astro';
 import FormBlock from './FormBlock.jsx';
 import JoinNow from './JoinNow.astro';
 import CardBlock from './CardBlock.astro';
+import ProcessTimeline from './ProcessTimeline.astro';
 
 export interface Props {
   blocks: any[];
@@ -37,7 +38,7 @@ const { blocks } = Astro.props;
     
     // Form Block
     if (block.collection === 'block_form') {
-      return <FormBlock data={block.item} background={block.background} />;
+      return <FormBlock data={block.item} background={block.background} client:visible />;
     }
     
     // JSON Block (para bloques dinámicos como JoinNow)
@@ -57,6 +58,11 @@ const { blocks } = Astro.props;
         }
         
         return <JoinNow data={block.item.data} background={block.background} />;
+      }
+
+      // Si es un bloque de tipo process_timeline, renderizar ProcessTimeline
+      if (block.item?.kind === 'process_timeline') {
+        return <ProcessTimeline data={block.item.data} />;
       }
       
       // Fallback para otros tipos de block_json

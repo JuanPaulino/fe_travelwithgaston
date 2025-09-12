@@ -1,0 +1,186 @@
+---
+/** ProcessTimeline.astro */
+export interface Props {
+  data: {
+    title: string;
+    intro?: string | null;
+    alignment?: 'center' | 'left';
+    primary_color?: string;
+    line_color?: string;
+    text_color?: string;
+    background_color?: string;
+    max_width?: 'sm' | 'md' | 'lg' | 'xl';
+    spacing_top?: 'none' | 'sm' | 'md' | 'lg';
+    spacing_bottom?: 'none' | 'sm' | 'md' | 'lg';
+    cta_label?: string | null;
+    cta_url?: string | null;
+    cta_variant?: 'filled' | 'outline' | 'link';
+    cta_aria_label?: string | null;
+    steps: Array<{
+      title?: string | null;
+      description: string;
+      badge_text?: string | null;
+      icon?: string | null;
+      override_badge_color?: string | null;
+    }>;
+  };
+}
+
+const { data } = Astro.props;
+
+if (!data) {
+  console.error('ProcessTimeline - No data received');
+  return null;
+}
+
+const {
+  title,
+  intro,
+  alignment = 'center',
+  primary_color = '#C6A058',
+  line_color = '#E9E2D7',
+  text_color = '#2B2B2B',
+  background_color = '#FBF7F1',
+  max_width = 'md',
+  spacing_top = 'lg',
+  spacing_bottom = 'lg',
+  cta_label,
+  cta_url,
+  cta_variant = 'outline',
+  cta_aria_label
+} = data;
+
+const maxWidthClass =
+  max_width === 'sm' ? 'max-w-2xl' :
+  max_width === 'md' ? 'max-w-4xl' :
+  max_width === 'lg' ? 'max-w-6xl' : 'max-w-7xl';
+
+const alignClass = alignment === 'center' ? 'text-center items-center' : 'text-left items-start';
+
+const spaceTopPx =
+  spacing_top === 'sm' ? 24 :
+  spacing_top === 'md' ? 48 :
+  spacing_top === 'lg' ? 80 : 0;
+
+const spaceBottomPx =
+  spacing_bottom === 'sm' ? 24 :
+  spacing_bottom === 'md' ? 48 :
+  spacing_bottom === 'lg' ? 80 : 0;
+
+function ctaClasses(variant: 'filled' | 'outline' | 'link') {
+  if (variant === 'filled') return 'text-white shadow-lg';
+  if (variant === 'link') return 'bg-transparent border-0 text-current';
+  return 'bg-transparent border border-gray-300 text-current';
+}
+---
+<section
+  class="w-full"
+  style={`background-color:${background_color}; color:${text_color}; padding-top:${spaceTopPx}px; padding-bottom:${spaceBottomPx}px;`}
+  aria-labelledby="process-title"
+>
+  <div class={`w-full mx-auto ${maxWidthClass} px-6 flex flex-col ${alignClass}`}>
+    <!-- Título principal -->
+    <h2 id="process-title" class="font-serif text-4xl md:text-5xl font-bold text-center mb-8 ">
+      {title}
+    </h2>
+
+    {intro && (
+      <p class="font-sans text-lg opacity-85 mb-12 max-w-3xl mx-auto text-center leading-relaxed">{intro}</p>
+    )}
+
+    <!-- Timeline -->
+    <div class="relative w-full">
+      <!-- Pasos del proceso -->
+      <div class="">
+        {
+          data.steps?.map((step, idx) => (
+            <div class="relative flex flex-col items-center gap-4 mb-8">
+              <!-- Círculo numerado -->
+              <div class="relative z-10 flex items-center justify-center rounded-full font-bold text-lg shadow-sm"
+                   style={`width:48px;height:48px;background-color:${step.override_badge_color ?? primary_color}; color:#fff;`}>
+                {step.badge_text ?? String(idx + 1)}
+              </div>
+
+              <!-- Contenido del paso -->
+              <div class="m-0 px-6 max-w-2xl text-center">
+                {step.title && (
+                  <h3 class="font-semibold text-lg mb-3 text-gray-800">{step.title}</h3>
+                )}
+                <p class="font-sans text-base leading-relaxed text-gray-700 m-0">
+                  {step.description}
+                </p>
+              </div>
+
+              <!-- Línea vertical después de cada descripción (excepto la última) -->
+              {idx < data.steps.length - 1 && (
+                <div aria-hidden="true"
+                     class="m-0 w-[2px] h-8 bg-neutral-lighter" />
+              )}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <!-- CTA -->
+    {
+      cta_label && cta_url && (
+        <div class="mt-8 text-center">
+          <a
+            href={cta_url}
+            aria-label={cta_aria_label || cta_label}
+            class={`cta-btn inline-block rounded-full px-8 py-3 font-medium text-base transition-all duration-200 ${ctaClasses(cta_variant)}`}
+            style={cta_variant === 'filled'
+              ? `background:${primary_color}; color:white;`
+              : cta_variant === 'outline'
+                ? `border-color: rgba(0,0,0,.2); color:${text_color};`
+                : `color:${primary_color};`
+            }
+          >
+            {cta_label}
+          </a>
+        </div>
+      )
+    }
+  </div>
+
+  <style>
+    .cta-btn:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .cta-btn:focus { 
+      outline: 3px solid rgba(0,0,0,.25); 
+      outline-offset: 2px; 
+    }
+    .cta-btn:active {
+      transform: translateY(0);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cta-btn { 
+        transition: none; 
+      }
+    }
+    
+    /* Mejoras adicionales para el timeline */
+    .timeline-step {
+      position: relative;
+    }
+    
+    .timeline-step::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 1px;
+      height: 100%;
+      background: #E9E2D7;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+    
+    .timeline-step:last-child::before {
+      display: none;
+    }
+  </style>
+</section>

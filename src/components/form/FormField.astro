@@ -1,0 +1,172 @@
+---
+// FormField.astro - Componente wrapper para campos de formulario
+export interface Props {
+  field: any;
+  value?: any;
+  error?: string;
+  onChange?: string; // JavaScript function as string
+}
+
+const { field, value = '', error, onChange = '() => {}' } = Astro.props;
+---
+
+<div class="form-field">
+  <div class="field-wrapper">
+    <!-- Label -->
+    {field.label && field.type !== 'checkbox' && (
+      <label for={`field-${field.id}`} class="block text-sm font-medium mb-2">
+        {field.label}
+        {field.required && <span class="text-red-500 ml-1">*</span>}
+      </label>
+    )}
+
+    <!-- Campo específico basado en el tipo -->
+    {field.type === 'text' && (
+      <input
+        type="text"
+        id={`field-${field.id}`}
+        name={field.name}
+        value={value}
+        placeholder={field.placeholder}
+        required={field.required}
+        class={`w-full p-3 border border-gray-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error ? `${field.name}-error` : undefined}
+      />
+    )}
+
+    {field.type === 'email' && (
+      <input
+        type="email"
+        id={`field-${field.id}`}
+        name={field.name}
+        value={value}
+        placeholder={field.placeholder}
+        required={field.required}
+        class={`w-full p-3 border border-gray-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error ? `${field.name}-error` : undefined}
+      />
+    )}
+
+    {field.type === 'tel' && (
+      <input
+        type="tel"
+        id={`field-${field.id}`}
+        name={field.name}
+        value={value}
+        placeholder={field.placeholder}
+        class={`w-full p-3 border border-gray-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error ? `${field.name}-error` : undefined}
+      />
+    )}
+
+    {field.type === 'select' && (
+      <select
+        id={`field-${field.id}`}
+        name={field.name}
+        required={field.required}
+        class={`w-full p-3 border border-gray-300 rounded bg-white text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error ? `${field.name}-error` : undefined}
+      >
+        {field.choices?.map((choice: any) => (
+          <option value={choice.value} selected={value === choice.value}>
+            {choice.text}
+          </option>
+        ))}
+      </select>
+    )}
+
+    {field.type === 'textarea' && (
+      <textarea
+        id={`field-${field.id}`}
+        name={field.name}
+        value={value}
+        placeholder={field.placeholder}
+        required={field.required}
+        rows={field.rows || 4}
+        class={`w-full p-3 border border-gray-300 rounded bg-white text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error ? `${field.name}-error` : undefined}
+      ></textarea>
+    )}
+
+    {field.type === 'date' && (
+      <input
+        type="date"
+        id={`field-${field.id}`}
+        name={field.name}
+        value={value}
+        required={field.required}
+        class={`w-full p-3 border border-gray-300 rounded bg-white text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+          error ? 'border-red-500' : 'border-gray-300'
+        }`}
+        aria-invalid={error ? 'true' : 'false'}
+        aria-describedby={error ? `${field.name}-error` : undefined}
+      />
+    )}
+
+    {field.type === 'checkbox' && (
+      <label class="flex items-start gap-3">
+        <input
+          type="checkbox"
+          id={`field-${field.id}`}
+          name={field.name}
+          checked={value === 'true' || value === true}
+          required={field.required}
+          class="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          aria-invalid={error ? 'true' : 'false'}
+          aria-describedby={error ? `${field.name}-error` : undefined}
+        />
+        <span class="text-sm text-gray-700">{field.label}</span>
+      </label>
+    )}
+
+    {field.type === 'button_group' && (
+      <div class="space-y-2">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+          {field.choices?.map((choice: any) => (
+            <button
+              type="button"
+              name={field.name}
+              value={choice.value}
+              class={`px-4 py-2 border border-gray-300 rounded bg-white text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 trip-type-btn ${
+                value && value.includes(choice.value) 
+                  ? 'bg-blue-500 text-white border-blue-500' 
+                  : 'text-gray-700'
+              }`}
+            >
+              {choice.text}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Texto de ayuda -->
+    {field.help && (
+      <p class="text-xs text-gray-500 mt-1">
+        {field.help}
+      </p>
+    )}
+
+    <!-- Mensaje de error -->
+    {error && (
+      <p id={`${field.name}-error`} class="text-xs text-red-600 mt-1">
+        {error}
+      </p>
+    )}
+  </div>
+</div>
