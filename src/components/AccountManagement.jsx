@@ -6,7 +6,7 @@ import PaymentMethods from './account/PaymentMethods';
 import UserPreferences from './account/UserPreferences';
 
 const AccountManagement = () => {
-  const [activeTab, setActiveTab] = useState('manage-account');
+  const [activeTab, setActiveTab] = useState('bookings');
 
   const tabs = [
     { key: 'bookings', label: 'Bookings' },

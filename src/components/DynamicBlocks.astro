@@ -6,6 +6,7 @@ import FormBlock from './FormBlock.jsx';
 import JoinNow from './JoinNow.astro';
 import CardBlock from './CardBlock.astro';
 import ProcessTimeline from './ProcessTimeline.astro';
+import TripInquiryForm from './TripInquiryForm.astro';
 
 export interface Props {
   blocks: any[];
@@ -23,22 +24,30 @@ const { blocks } = Astro.props;
     
     // Inspiration Grid
     if (block.collection === 'block_inspiration_grid' || block.collection === 'inspiration_grid') {
-      return <InspirationGrid data={block.item} />;
+      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+        <InspirationGrid data={block.item} />
+      </div>;
     }
     
     // Featured Hotels
     if (block.collection === 'block_featured_hotels') {
-      return <FeaturedHotels data={block.item} />;
+      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+        <FeaturedHotels data={block.item} />
+      </div>;
     }
 
     // Card Block
     if (block.collection === 'block_card') {
-      return <CardBlock data={block.item} background={block.background} />;
+      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+        <CardBlock data={block.item} background={block.background} />
+      </div>;
     }
     
     // Form Block
     if (block.collection === 'block_form') {
-      return <FormBlock data={block.item} background={block.background} client:visible />;
+      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+        <FormBlock data={block.item} background={block.background} client:visible />
+      </div>;
     }
     
     // JSON Block (para bloques dinámicos como JoinNow)
@@ -62,7 +71,14 @@ const { blocks } = Astro.props;
 
       // Si es un bloque de tipo process_timeline, renderizar ProcessTimeline
       if (block.item?.kind === 'process_timeline') {
-        return <ProcessTimeline data={block.item.data} />;
+        return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+          <ProcessTimeline data={block.item.data} />
+        </div>;
+      }
+
+      // Si es un bloque de tipo trip_inquiry_form, renderizar TripInquiryForm
+      if (block.item?.kind === 'trip_inquiry_form') {
+        return <TripInquiryForm data={block.item.data} />;
       }
       
       // Fallback para otros tipos de block_json

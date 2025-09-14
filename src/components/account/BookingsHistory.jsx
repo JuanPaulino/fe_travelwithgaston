@@ -46,7 +46,6 @@ const BookingsHistory = () => {
       </div>
     );
   }
-
   return (
     <div className="py-12">
       <h3 className="text-lg font-medium text-gray-900 mb-6">Bookings</h3>
@@ -56,11 +55,12 @@ const BookingsHistory = () => {
         <div className="mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {bookings.data.bookings.map((booking) => (
+              booking.providerData && (
               <div key={booking.id} className="w-full md:w-96 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
                 {/* Imagen del hotel */}
-                <div className="h-64 bg-gray-200 relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                    <img src="https://cache.marriott.com/is/image/marriotts7prod/eb-madeb-superior-one-bed-34067-27775:Classic-Hor?wid=1140&fit=constrain" alt="" srcset="" />
+                <div className="h-64 relative">
+                  <div className="absolute inset-0 object-cover flex items-center justify-center">
+                    <img src={booking.providerData.image.url} alt={booking.hotelName} />
                   </div>
                 </div>
                 
@@ -97,8 +97,8 @@ const BookingsHistory = () => {
                   
                   {/* Información de la reserva */}
                   <div className="mb-4">
-                    <p className="text-base font-semibold text-neutral-darker">Booking name</p>
-                    <p className="text-base font-thin text-neutral-darker">Traveller Name</p>
+                    <p className="text-base font-semibold text-neutral-darker">{booking.guestName}</p>
+                    <p className="text-base font-thin text-neutral-darker">{booking.guestEmail}</p>
                   </div>
                   
                   {/* Precio total */}
@@ -116,7 +116,7 @@ const BookingsHistory = () => {
                   </div>
                   
                   {/* Botón View */}
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                  <button className="w-full bg-black border border-black text-white px-6 py-2 rounded-md hover:bg-gray-50 hover:text-black transition-colors duration-200">
                     View
                   </button>
                   
@@ -134,7 +134,7 @@ const BookingsHistory = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
           
           {/* Información de paginación */}

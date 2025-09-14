@@ -206,112 +206,112 @@ const formFields = {
   }
 };
 ---
-
-<div class="max-w-4xl mx-auto bg-amber-50 border-2 border-dashed border-blue-400 p-6 rounded-lg">
-  <form id="trip-inquiry-form" class="space-y-8">
-    <!-- About the Trip Section -->
-    <div>
-      <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">About the Trip</h2>
-      
-      <!-- Destination Selection -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <FormField field={formFields.destination} />
-        <FormField field={formFields.secondaryDestination} />
-      </div>
-
-      <!-- Trip Type Selection -->
-      <div class="mb-6">
-        <FormField field={formFields.tripType} />
-      </div>
-
-      <!-- Travel Details -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <FormField field={formFields.travelDates} />
-        <div>
-          <label class="block text-sm text-gray-700 mb-2">In case you know dates, please let us know here</label>
-          <div class="grid grid-cols-2 gap-2">
-            <FormField field={formFields.startDate} />
-            <FormField field={formFields.returnDate} />
+<div class="w-full bg-primary-lighter py-8">
+  <div class="max-w-6xl mx-auto px-4">
+    <form id="trip-inquiry-form" class="space-y-8">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">About the Trip</h2>
+        
+        <!-- Destination Selection -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField field={formFields.destination} />
+          <FormField field={formFields.secondaryDestination} />
+        </div>
+  
+        <!-- Trip Type Selection -->
+        <div class="mb-6">
+          <FormField field={formFields.tripType} />
+        </div>
+  
+        <!-- Travel Details -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField field={formFields.travelDates} />
+          <div>
+            <label class="block text-sm text-gray-700 mb-2">In case you know dates, please let us know here</label>
+            <div class="grid grid-cols-2 gap-2">
+              <FormField field={formFields.startDate} />
+              <FormField field={formFields.returnDate} />
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <FormField field={formFields.weddingDay} />
-        <div>
-          <label class="block text-sm text-gray-700 mb-2">What is the estimated budget per person for the trip?</label>
-          <div class="grid grid-cols-2 gap-2">
-            <FormField field={formFields.currency} />
-            <FormField field={formFields.budgetAmount} />
+  
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField field={formFields.weddingDay} />
+          <div>
+            <label class="block text-sm text-gray-700 mb-2">What is the estimated budget per person for the trip?</label>
+            <div class="grid grid-cols-2 gap-2">
+              <FormField field={formFields.currency} />
+              <FormField field={formFields.budgetAmount} />
+            </div>
           </div>
         </div>
+  
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField field={formFields.nights} />
+          <FormField field={formFields.registry} />
+        </div>
+  
+        <!-- Additional Trip Information -->
+        <div class="mb-6">
+          <FormField field={formFields.tripDetails} />
+        </div>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <FormField field={formFields.nights} />
-        <FormField field={formFields.registry} />
+  
+      <!-- Personal Information Section -->
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">Personal Information</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <FormField field={formFields.name} />
+          <FormField field={formFields.surname} />
+        </div>
+  
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <FormField field={formFields.email} />
+          <FormField field={formFields.phone} />
+        </div>
+  
+        <div class="mb-4">
+          <FormField field={formFields.address} />
+        </div>
+  
+        <div class="mb-4">
+          <FormField field={formFields.city} />
+        </div>
+  
+        <div class="mb-4">
+          <FormField field={formFields.zip} />
+        </div>
+  
+        <div class="mb-6">
+          <FormField field={formFields.country} />
+        </div>
+  
+        <!-- Additional Information -->
+        <div class="mb-6">
+          <FormField field={formFields.additionalInfo} />
+        </div>
+  
+        <!-- Checkboxes -->
+        <div class="space-y-3 mb-6">
+          <FormField field={formFields.newsletter} />
+          <FormField field={formFields.privacy} />
+        </div>
+  
+        <!-- Submit Button -->
+        <button 
+          type="button" 
+          id="submit-btn"
+          class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        >
+          Send
+        </button>
       </div>
-
-      <!-- Additional Trip Information -->
-      <div class="mb-6">
-        <FormField field={formFields.tripDetails} />
-      </div>
-    </div>
-
-    <!-- Personal Information Section -->
-    <div>
-      <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">Personal Information</h2>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <FormField field={formFields.name} />
-        <FormField field={formFields.surname} />
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <FormField field={formFields.email} />
-        <FormField field={formFields.phone} />
-      </div>
-
-      <div class="mb-4">
-        <FormField field={formFields.address} />
-      </div>
-
-      <div class="mb-4">
-        <FormField field={formFields.city} />
-      </div>
-
-      <div class="mb-4">
-        <FormField field={formFields.zip} />
-      </div>
-
-      <div class="mb-6">
-        <FormField field={formFields.country} />
-      </div>
-
-      <!-- Additional Information -->
-      <div class="mb-6">
-        <FormField field={formFields.additionalInfo} />
-      </div>
-
-      <!-- Checkboxes -->
-      <div class="space-y-3 mb-6">
-        <FormField field={formFields.newsletter} />
-        <FormField field={formFields.privacy} />
-      </div>
-
-      <!-- Submit Button -->
-      <button 
-        type="button" 
-        id="submit-btn"
-        class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-      >
-        Send
-      </button>
-    </div>
-
-    <!-- Mensaje de estado -->
-    <div id="status-message" class="hidden mt-4 p-4 rounded-md"></div>
-  </form>
+  
+      <!-- Mensaje de estado -->
+      <div id="status-message" class="hidden mt-4 p-4 rounded-md"></div>
+    </form>
+  </div>
 </div>
 
 <script>
