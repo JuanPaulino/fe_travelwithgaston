@@ -1,6 +1,8 @@
 const StepProgress = ({ currentStep = 1, steps = [], className = '' }) => {
+  const justifyClass = steps.length === 2 ? 'justify-center' : 'justify-between';
+  
   return (
-    <div className={`flex items-center justify-between mb-8 ${className}`}>
+    <div className={`flex items-center ${justifyClass} mb-8 ${className}`}>
       {steps.map((step, index) => (
         <div key={index} className="flex items-center">
           <div

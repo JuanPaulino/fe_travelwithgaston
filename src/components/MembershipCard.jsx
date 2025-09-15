@@ -1,7 +1,38 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { getUser, isAuthenticated as checkIsAuthenticated } from '../stores/authStore'
 
 const MembershipCard = () => {
   const membershipCardImage = "/images/membership_card.png";
+  const [user, setUser] = useState(null);
+  const [authStatus, setAuthStatus] = useState(false);
+
+  // Verificar estado de autenticación
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const currentUser = getUser();
+      const currentAuthStatus = checkIsAuthenticated();
+      setUser(currentUser);
+      setAuthStatus(currentAuthStatus);
+    };
+
+    // Verificar estado inicial
+    checkAuthStatus();
+
+    // Escuchar cambios en el estado de autenticación
+    const handleAuthChange = () => {
+      checkAuthStatus();
+    };
+
+    window.addEventListener('auth:login', handleAuthChange);
+    window.addEventListener('auth:logout', handleAuthChange);
+    window.addEventListener('auth:tokenUpdated', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('auth:login', handleAuthChange);
+      window.removeEventListener('auth:logout', handleAuthChange);
+      window.removeEventListener('auth:tokenUpdated', handleAuthChange);
+    };
+  }, []);
 
   const handleSeeMore = () => {
     console.log('See more details clicked');
@@ -9,13 +40,22 @@ const MembershipCard = () => {
   };
 
   const handleSignIn = () => {
-    console.log('Sign in clicked');
-    // Add your sign in logic here
+    // Disparar evento para abrir modal de autenticación
+    window.dispatchEvent(new CustomEvent('openAuthModal', { 
+      detail: { initialTab: 'signin' } 
+    }));
   };
 
   const handleBecomeMember = () => {
-    console.log('Become a member clicked');
-    // Add your membership logic here
+    if (authStatus && user?.role === 'basic') {
+      // Redirigir a checkout si está autenticado y tiene rol basic
+      window.location.href = '/checkout';
+    } else {
+      // Disparar evento para abrir modal de autenticación con tab de registro
+      window.dispatchEvent(new CustomEvent('openAuthModal', { 
+        detail: { initialTab: 'join' } 
+      }));
+    }
   };
 
   return (
@@ -45,30 +85,38 @@ const MembershipCard = () => {
               Select a membership plan to enhance every aspect of your travel.
             </p>
 
-            <button 
-              className="text-primary text-sm font-medium hover:text-primary-dark transition-colors mb-4"
-              onClick={handleSeeMore}
-            >
-              See more details
-            </button>
-
-            <div className="flex flex-col sm:flex-row items-center justify-end gap-4">
-              <p className="text-neutral-DEFAULT text-xs">
-                Already a member? 
-                <button 
-                  className="ml-1 text-neutral-darkest font-medium hover:text-neutral-dark transition-colors underline"
-                  onClick={handleSignIn}
-                >
-                  Sign In
-                </button>
-              </p>
-
+            {/* Botón See more details - oculto por ahora */}
+            {false && (
               <button 
-                className="bg-neutral-darkest hover:bg-neutral-dark text-white px-8 py-3 text-base font-medium rounded-lg transition-colors"
-                onClick={handleBecomeMember}
+                className="text-primary text-sm font-medium hover:text-primary-dark transition-colors"
+                onClick={handleSeeMore}
               >
-                Become a member
+                See more details
               </button>
+            )}
+
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4">
+              {/* Solo mostrar "Already a member? Sign In" si NO está autenticado */}
+              {!authStatus && (
+                <p className="text-neutral-DEFAULT text-xs">
+                  Already a member? 
+                  <button 
+                    className="ml-1 text-neutral-darkest font-medium hover:text-neutral-dark transition-colors underline"
+                    onClick={handleSignIn}
+                  >
+                    Sign In
+                  </button>
+                </p>
+              )}
+
+              {
+              authStatus && user?.role === 'basic' && (
+                <button 
+                  className="bg-neutral-darkest hover:bg-neutral-dark text-white px-8 py-3 text-base font-medium transition-colors"
+                  onClick={handleBecomeMember}>
+                  Become a member
+                </button>
+              )}
             </div>
           </div>
         </div>

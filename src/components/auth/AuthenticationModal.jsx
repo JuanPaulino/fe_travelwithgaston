@@ -2,8 +2,13 @@ import { useState, useEffect } from 'react';
 import SignInForm from './SignInForm';
 import JoinUsSteps from './JoinUsSteps';
 
-const AuthenticationModal = ({ isOpen, onClose }) => {
-  const [currentTab, setCurrentTab] = useState('signin');
+const AuthenticationModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
+  const [currentTab, setCurrentTab] = useState(initialTab);
+
+  // Actualizar el tab cuando cambie la prop initialTab
+  useEffect(() => {
+    setCurrentTab(initialTab);
+  }, [initialTab]);
 
   // Cerrar modal con Escape
   useEffect(() => {
@@ -45,7 +50,7 @@ const AuthenticationModal = ({ isOpen, onClose }) => {
     >
       <div className="bg-white rounded-lg shadow-xl max-w-[900px] w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="relative p-8 border-b border-gray-200">
+        <div className="relative p-8">
           <button
             onClick={onClose}
             className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
@@ -86,7 +91,7 @@ const AuthenticationModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Content */}
-        <div className="p-8">
+        <div className="pb-8 px-8">
           {currentTab === 'signin' ? (
             <SignInForm 
               onLoginSuccess={onClose}

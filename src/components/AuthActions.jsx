@@ -29,7 +29,9 @@ const AuthActions = ({ className = '', onButtonClick = null }) => {
       onButtonClick(action);
     } else {
       // Fallback: dispatch the same event that the original code was using
-      window.dispatchEvent(new CustomEvent('openAuthModal'));
+      window.dispatchEvent(new CustomEvent('openAuthModal', { 
+        detail: { initialTab: action } 
+      }));
     }
   };
 

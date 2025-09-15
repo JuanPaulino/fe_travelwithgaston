@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect, useState } from 'react'
+import { getUser, isAuthenticated as checkIsAuthenticated } from '../stores/authStore'
 
 import HotelAvailabilityCard from './HotelAvailabilityCard.jsx'
 import EmptyState from './common/EmptyState.jsx'
@@ -9,9 +10,42 @@ const HotelAvailabilityList = ({
   rooms = 1,
   isAuthenticated = false,
 }) => {
-  
+  const [user, setUser] = useState(null);
+  const [authStatus, setAuthStatus] = useState(false);
+
   // Validar que rooms sea un número
   const validRooms = typeof rooms === 'number' ? rooms : 1
+
+  // Verificar estado de autenticación y rol
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const currentUser = getUser();
+      const currentAuthStatus = checkIsAuthenticated();
+      setUser(currentUser);
+      setAuthStatus(currentAuthStatus);
+    };
+
+    // Verificar estado inicial
+    checkAuthStatus();
+
+    // Escuchar cambios en el estado de autenticación
+    const handleAuthChange = () => {
+      checkAuthStatus();
+    };
+
+    window.addEventListener('auth:login', handleAuthChange);
+    window.addEventListener('auth:logout', handleAuthChange);
+    window.addEventListener('auth:tokenUpdated', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('auth:login', handleAuthChange);
+      window.removeEventListener('auth:logout', handleAuthChange);
+      window.removeEventListener('auth:tokenUpdated', handleAuthChange);
+    };
+  }, []);
+
+  // Verificar si el usuario está autenticado y tiene rol "basic" para mostrar MembershipCard
+  const shouldShowMembershipCard = authStatus && user?.role === 'basic';
   
   // Memoizar la separación de hoteles para optimizar rendimiento
   const { availableHotels, unavailableHotels } = useMemo(() => {
@@ -45,8 +79,8 @@ const HotelAvailabilityList = ({
             hotelData={hotel}
             rooms={validRooms}
           />
-          {/* Mostrar MembershipCard en la segunda posición si no está autenticado */}
-          {!isAuthenticated && index === 0 && (
+          {/* Mostrar MembershipCard en la segunda posición si tiene rol "basic" */}
+          {shouldShowMembershipCard && index === 0 && (
             <div className="my-8">
               <MembershipCard />
             </div>
