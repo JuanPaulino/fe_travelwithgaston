@@ -61,10 +61,9 @@ const HotelAvailabilityList = ({
   // Sin resultados
   if (hotels.length === 0) {
     return (
-      <EmptyState 
-        icon="🏨"
-        title="No se encontraron resultados"
-        message="Intenta ajustar tus filtros o fechas de búsqueda."
+      <EmptyState
+        title="No results found"
+        message="Try adjusting your filters or dates."
       />
     )
   }
@@ -85,6 +84,7 @@ const HotelAvailabilityList = ({
               <MembershipCard />
             </div>
           )}
+          <div className='w-[80%] h-[1px] bg-neutral-300 mx-auto'></div>
         </React.Fragment>
       ))}
       
@@ -94,7 +94,7 @@ const HotelAvailabilityList = ({
           <div className="flex items-center">
             <div className="flex-1 border-t border-gray-300"></div>
             <div className="px-4 text-sm text-gray-500 bg-gray-50">
-              Hoteles no disponibles para las fechas seleccionadas
+              Hotels not available for the selected dates
             </div>
             <div className="flex-1 border-t border-gray-300"></div>
           </div>
@@ -115,16 +115,16 @@ const HotelAvailabilityList = ({
         <div className="text-center py-4 text-sm text-gray-500 border-t">
           {availableHotels.length > 0 && (
             <p>
-              {availableHotels.length} {availableHotels.length === 1 ? 'hotel disponible' : 'hoteles disponibles'}
+              {availableHotels.length} {availableHotels.length === 1 ? 'hotel available' : 'hotels available'}
               {unavailableHotels.length > 0 && (
-                <span> • {unavailableHotels.length} no {unavailableHotels.length === 1 ? 'disponible' : 'disponibles'}</span>
+                <span> • {unavailableHotels.length} no {unavailableHotels.length === 1 ? 'available' : 'available'}</span>
               )}
             </p>
           )}
           {availableHotels.length === 0 && unavailableHotels.length > 0 && (
             <p>
-              {unavailableHotels.length} {unavailableHotels.length === 1 ? 'hotel encontrado' : 'hoteles encontrados'}, 
-              pero ninguno disponible para las fechas seleccionadas
+              {unavailableHotels.length} {unavailableHotels.length === 1 ? 'hotel found' : 'hotels found'}, 
+              but none available for the selected dates
             </p>
           )}
         </div>

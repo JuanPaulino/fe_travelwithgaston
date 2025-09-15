@@ -23,9 +23,9 @@ const SearchResults = ({ className = '' }) => {
       <h3 className="font-bold mb-2">🔍 Debug Info:</h3>
       <div className="space-y-1">
         <div>Hotels: {hotels?.length || 0}</div>
-        <div>Loading: {loading ? 'Sí' : 'No'}</div>
-        <div>Error: {error || 'Ninguno'}</div>
-        <div>LastSearch: {lastSearch ? 'Sí' : 'No'}</div>
+        <div>Loading: {loading ? 'Yes' : 'No'}</div>
+        <div>Error: {error || 'None'}</div>
+        <div>LastSearch: {lastSearch ? 'Yes' : 'No'}</div>
         {lastSearch && (
           <div className="mt-2 p-2 bg-white rounded text-xs">
             <pre>{JSON.stringify(lastSearch, null, 2)}</pre>
@@ -46,7 +46,7 @@ const SearchResults = ({ className = '' }) => {
     return (
       <div className={className}>
         <LoadingSpinner 
-          text="Buscando hoteles..." 
+          text="Checking you into luxury, one search at a time..." 
           size="md"
         />
       </div>
@@ -58,8 +58,8 @@ const SearchResults = ({ className = '' }) => {
     return (
       <div className={`${className} text-center py-12`}>
         <div className="text-gray-500">
-          <p className="text-lg mb-2">👋 ¡Bienvenido a la búsqueda de hoteles!</p>
-          <p className="text-sm">Usa el formulario de arriba para buscar hoteles disponibles.</p>
+          <p className="text-lg mb-2">Your digital concierge is ready, let's find your perfect room.</p>
+          <p className="text-sm">Use the search bar above to find your perfect stay.</p>
         </div>
       </div>
     )

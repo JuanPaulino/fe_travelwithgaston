@@ -24,28 +24,28 @@ const { blocks } = Astro.props;
     
     // Inspiration Grid
     if (block.collection === 'block_inspiration_grid' || block.collection === 'inspiration_grid') {
-      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-4">
         <InspirationGrid data={block.item} />
       </div>;
     }
     
     // Featured Hotels
     if (block.collection === 'block_featured_hotels') {
-      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl">
         <FeaturedHotels data={block.item} />
       </div>;
     }
 
     // Card Block
     if (block.collection === 'block_card') {
-      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-4">
         <CardBlock data={block.item} background={block.background} />
       </div>;
     }
     
     // Form Block
     if (block.collection === 'block_form') {
-      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-4">
         <FormBlock data={block.item} background={block.background} client:visible />
       </div>;
     }
@@ -71,7 +71,7 @@ const { blocks } = Astro.props;
 
       // Si es un bloque de tipo process_timeline, renderizar ProcessTimeline
       if (block.item?.kind === 'process_timeline') {
-        return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
+        return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-4">
           <ProcessTimeline data={block.item.data} />
         </div>;
       }
@@ -83,7 +83,7 @@ const { blocks } = Astro.props;
       
       // Fallback para otros tipos de block_json
       return (
-        <div class="json-block p-4 bg-gray-100 border border-gray-300 rounded-lg mb-8">
+        <div class="json-block p-4 bg-gray-100 border border-gray-300 rounded-lg mb-4">
           <p class="text-gray-700 font-medium">Bloque JSON: {block.item?.kind || 'Tipo no reconocido'}</p>
           {import.meta.env.DEV && (
             <pre class="text-xs mt-2 text-gray-500 overflow-auto">{JSON.stringify(block.item, null, 2)}</pre>
@@ -95,7 +95,7 @@ const { blocks } = Astro.props;
     // Content Block / Rich Text
     if (block.collection === 'content_block' || block.collection === 'block_content') {
       return (
-        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md mb-4">
           <h3 class="text-3xl font-semibold mb-4">
             {block.item?.title || 'Bloque de Contenido'}
           </h3>
@@ -123,7 +123,7 @@ const { blocks } = Astro.props;
     // Inspiration Grid (fallback para el formato anterior)
     if (block.collection === 'inspiration_grid') {
       return (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
           {block.item?.items?.map((item: any, itemIndex: number) => (
             <div class="bg-white rounded-lg shadow-md overflow-hidden">
               {item.image && (

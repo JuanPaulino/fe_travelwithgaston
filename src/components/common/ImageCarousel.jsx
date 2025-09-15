@@ -111,8 +111,7 @@ const ImageCarousel = ({
     return (
       <div className={`bg-gray-200 flex items-center justify-center ${className}`}>
         <div className="text-gray-500 text-center p-8">
-          <div className="text-4xl mb-2">🏨</div>
-          <p>No hay imágenes disponibles</p>
+          <p>Images coming soon</p>
         </div>
       </div>
     )
@@ -125,7 +124,7 @@ const ImageCarousel = ({
         {isVisible && loadedImages.has(0) ? (
           <img
             src={limitedImages[0].thumbnail_url || limitedImages[0].url || limitedImages[0]}
-            alt={limitedImages[0].alt || 'Imagen del hotel'}
+            alt={limitedImages[0].alt || 'Hotel image'}
             className="w-full h-full object-cover"
             onError={(e) => {
               e.target.src = 'https://d13bre0qp8legl.cloudfront.net/hotels/11644/6emR1CkEqarvtZ8jH79PEavjtTMNxyy4iS1rUDNO.jpg'
@@ -134,8 +133,7 @@ const ImageCarousel = ({
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center">
             <div className="text-gray-500 text-center p-8">
-              <div className="text-4xl mb-2">🏨</div>
-              <p>Cargando imagen...</p>
+              <p>Loading image...</p>
             </div>
           </div>
         )}
@@ -156,15 +154,14 @@ const ImageCarousel = ({
         {isVisible && loadedImages.has(currentIndex) ? (
           <img
             src={limitedImages[currentIndex].thumbnail_url || limitedImages[currentIndex].url || limitedImages[currentIndex]}
-            alt={limitedImages[currentIndex].alt || `Imagen ${currentIndex + 1} del hotel`}
+            alt={limitedImages[currentIndex].alt || `Image ${currentIndex + 1} of the hotel`}
             className="w-full h-full transition-opacity duration-300 object-cover aspect-[3/2]"
             onClick={() => onImageClick?.(currentIndex)}
           />
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center aspect-[3/2]">
             <div className="text-gray-500 text-center p-8">
-              <div className="text-4xl mb-2">🏨</div>
-              <p>Cargando imagen...</p>
+              <p>Loading image...</p>
             </div>
           </div>
         )}
@@ -173,7 +170,7 @@ const ImageCarousel = ({
         <button
           onClick={prevImage}
           className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
-          aria-label="Imagen anterior"
+          aria-label="Previous image"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -183,7 +180,7 @@ const ImageCarousel = ({
         <button
           onClick={nextImage}
           className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-gray-800 p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110"
-          aria-label="Siguiente imagen"
+          aria-label="Next image"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -201,7 +198,7 @@ const ImageCarousel = ({
                   ? 'bg-white scale-125' 
                   : 'bg-white/50 hover:bg-white/75'
               }`}
-              aria-label={`Ir a imagen ${index + 1}`}
+              aria-label={`Go to image ${index + 1}`}
             />
           ))}
         </div>

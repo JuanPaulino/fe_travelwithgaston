@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { authStore } from '../stores/authStore';
 import { useBookingStore } from '../stores/useBookingStore';
 import { bookingAPI, handleAPIError } from '../lib/http';
+import { showSuccess } from '../stores/bannerStore';
 import CreditCardForm from './CreditCardForm';
 
 const Booking = ({ className = '' }) => {
@@ -140,10 +141,13 @@ const Booking = ({ className = '' }) => {
       const response = await bookingAPI.createBooking(bookingPayload);
 
       if (response.success) {
-        // Éxito - mostrar mensaje y redirigir
-        alert('¡Reserva creada exitosamente!');
-        // Aquí podrías redirigir a una página de confirmación
-        // window.location.href = '/booking-confirmation';
+        // Éxito - mostrar banner de éxito y redirigir
+        showSuccess('¡Reserva creada exitosamente!', { autoHide: true });
+        
+        // Redirigir a la página de cuenta después de un breve delay
+        setTimeout(() => {
+          window.location.href = '/account';
+        }, 1500);
       } else {
         setBookingError(response.message || 'Error al procesar la reserva');
       }

@@ -58,14 +58,14 @@ const maxWidthClass =
 const alignClass = alignment === 'center' ? 'text-center items-center' : 'text-left items-start';
 
 const spaceTopPx =
-  spacing_top === 'sm' ? 24 :
-  spacing_top === 'md' ? 48 :
-  spacing_top === 'lg' ? 80 : 0;
+  spacing_top === 'sm' ? 10 :
+  spacing_top === 'md' ? 20 :
+  spacing_top === 'lg' ? 40 : 0;
 
 const spaceBottomPx =
-  spacing_bottom === 'sm' ? 24 :
-  spacing_bottom === 'md' ? 48 :
-  spacing_bottom === 'lg' ? 80 : 0;
+  spacing_bottom === 'sm' ? 10 :
+  spacing_bottom === 'md' ? 20 :
+  spacing_bottom === 'lg' ? 40 : 0;
 
 function ctaClasses(variant: 'filled' | 'outline' | 'link') {
   if (variant === 'filled') return 'text-white shadow-lg';

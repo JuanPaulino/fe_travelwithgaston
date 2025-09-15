@@ -16,7 +16,7 @@ const footerNavigation = navigationData?.find(nav => nav.id === 'footer')?.items
       
       {footerNavigation.map((item) => (
         <div class="space-y-4">
-          <Heading level={5} className="text-white font-semibold">{item.title}</Heading>
+          <Heading level={5} className="text-white font-semibold">Pages</Heading>
           <ul class="space-y-2">
             {item.children && item.children.length > 0 ? (
               item.children.map((child) => (
@@ -42,7 +42,6 @@ const footerNavigation = navigationData?.find(nav => nav.id === 'footer')?.items
           </ul>
         </div>
       ))}
-
     </div>
   </div>
 
@@ -53,7 +52,7 @@ const footerNavigation = navigationData?.find(nav => nav.id === 'footer')?.items
         
         <!-- Lado izquierdo: Branding -->
         <div class="space-y-1">
-          <Heading level={3} className="text-amber-400 font-bold">Travel with Gastón</Heading>
+          <img src="/logo_x2.png" alt="Travel with Gastón" class="w-50 md:w-auto md:h-5 lg:h-8">
           <Text size="sm" className="text-gray-400">Powered by Little Emperors</Text>
         </div>
 

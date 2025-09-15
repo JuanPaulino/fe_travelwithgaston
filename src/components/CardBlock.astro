@@ -47,6 +47,37 @@ const { data, background = 'light' } = Astro.props;
 </div>
 )}
 
+{data.layout === 'horizontal_right' && (
+<div class={`card-block bg-${background} mb-8 flex flex-col md:flex-row justify-between items-center`}>
+  <div class="flex flex-col items-center w-full p-6">
+    {data.tagline && (
+      <p class="text-sm text-black mb-6 font-semibold text-left w-full">{data.tagline}</p>
+    )}
+    
+    <h2 class="card-heading text-left text-2xl font-bold mb-6 w-full">
+      {data.heading}
+    </h2>
+    
+    {data.content && (
+      <div class="prose max-w-none mb-6 text-left w-full custom-list" set:html={data.content} />
+    )}
+
+    {data.btn_link && (
+      <a href={data.btn_link} class="font-base font-family-body text-neutral-dark border-2 border-neutral-lighter px-6 py-3 hover:bg-neutral-lighter">{data.btn_cta}</a>
+    )}
+  </div>
+  {data.image && (
+    <div class="card-image mb-10 w-full">
+      <img 
+        src={`${import.meta.env.DIRECTUS_URL}/assets/${data.image}`}
+        alt={data.heading || 'Imagen de tarjeta'}
+        class="w-full max-h-[430px] object-cover rounded-[2px]"
+      />
+    </div>
+  )}
+</div>
+)}
+
 {data.layout === 'vertical' && (
 <div class={`card-block bg-${background} p-6 mb-8 flex flex-col items-center`}>
   {data.image && (

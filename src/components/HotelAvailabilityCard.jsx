@@ -116,7 +116,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
               {hotel.benefits && hotel.benefits.length > 0 && (
                 <div className="space-y-1 mb-4">
                   {hotel.benefits.map((benefit, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm text-neutral-darker">
+                    <div key={index} className="flex items-center gap-2 text-xs text-neutral-darker">
                       <span className="text-neutral-dark">✓</span>
                       {benefit}
                     </div>
