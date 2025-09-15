@@ -12,11 +12,15 @@ const initialSearchData = {
   selectedDestinationText: '',
   selectedDestinationType: null,
   selectedDestinationLocation: '',
-  checkInDate: new Date().toISOString().split('T')[0],
-  checkOutDate: (() => {
+  checkInDate: (() => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return tomorrow.toISOString().split('T')[0];
+  })(),
+  checkOutDate: (() => {
+    const dayAfterTomorrow = new Date();
+    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+    return dayAfterTomorrow.toISOString().split('T')[0];
   })(),
   rooms: 1,
   adults: 2,

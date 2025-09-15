@@ -5,7 +5,6 @@ import { useSearchStore } from '../stores/useSearchStore.js'
 import { useUrlParams } from '../hooks/useUrlParams.js'
 
 function SearchForm({ initialData = {}, disabled = false, className = "" }) {
-  // Usar el store de búsqueda
   const { 
     searchData, 
     setSearchText, 
@@ -27,9 +26,8 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   const [showAdditionalFields, setShowAdditionalFields] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [showGuestsDropdown, setShowGuestsDropdown] = useState(false)
+  const [minCheckOutDate, setMinCheckOutDate] = useState('')
   const dropdownRef = useRef(null)
-  
-
 
   // Detectar si es dispositivo móvil/tablet
   useEffect(() => {
@@ -60,11 +58,15 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
       selectedDestinationText: sourceData.destination || '',
       selectedDestinationType: sourceData.destinationType || 'hotel',
       selectedDestinationLocation: sourceData.destinationLocation || '',
-      checkInDate: sourceData.checkIn || new Date().toISOString().split('T')[0],
-      checkOutDate: sourceData.checkOut || (() => {
+      checkInDate: sourceData.checkIn || (() => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         return tomorrow.toISOString().split('T')[0];
+      })(),
+      checkOutDate: sourceData.checkOut || (() => {
+        const dayAfterTomorrow = new Date();
+        dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+        return dayAfterTomorrow.toISOString().split('T')[0];
       })(),
       rooms: parseInt(sourceData.rooms) || 1,
       adults: parseInt(sourceData.adults) || 2,
@@ -122,6 +124,29 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // Actualizar fecha mínima de check-out cuando cambia check-in
+  useEffect(() => {
+    if (searchData.checkInDate) {
+      const checkInDate = new Date(searchData.checkInDate);
+      const nextDay = new Date(checkInDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      const minDate = nextDay.toISOString().split('T')[0];
+      
+      setMinCheckOutDate(minDate);
+      
+      // Si check-out actual es anterior o igual al check-in, actualizarlo
+      const checkOutDate = new Date(searchData.checkOutDate);
+      if (checkOutDate <= checkInDate) {
+        setCheckOutDate(minDate);
+      }
+    } else {
+      // Si no hay check-in, usar mañana como mínimo
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      setMinCheckOutDate(tomorrow.toISOString().split('T')[0]);
+    }
+  }, [searchData.checkInDate, searchData.checkOutDate, setCheckOutDate])
 
   // Manejar selección de destino desde el autocompletado
   const handleDestinationSelection = (suggestion) => {
@@ -268,7 +293,11 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                   onChange={(e) => setCheckInDate(e.target.value)}
                   disabled={disabled}
                   className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 bg-transparent cursor-pointer"
-                  min={new Date().toISOString().split('T')[0]}
+                  min={(() => {
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    return tomorrow.toISOString().split('T')[0];
+                  })()}
                 />
               </div>
             </div>
@@ -286,7 +315,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                   onChange={(e) => setCheckOutDate(e.target.value)}
                   disabled={disabled}
                   className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 bg-transparent cursor-pointer"
-                  min={searchData.checkInDate}
+                  min={minCheckOutDate}
                 />
               </div>
             </div>
@@ -390,7 +419,11 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                     onChange={(e) => setCheckInDate(e.target.value)}
                     disabled={disabled}
                     className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
-                    min={new Date().toISOString().split('T')[0]}
+                    min={(() => {
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      return tomorrow.toISOString().split('T')[0];
+                    })()}
                   />
                 </div>
               </div>
@@ -408,7 +441,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                     onChange={(e) => setCheckOutDate(e.target.value)}
                     disabled={disabled}
                     className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
-                    min={searchData.checkInDate}
+                    min={minCheckOutDate}
                   />
                 </div>
               </div>
@@ -524,7 +557,11 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                       onChange={(e) => setCheckInDate(e.target.value)}
                       disabled={disabled}
                       className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      min={new Date().toISOString().split('T')[0]}
+                      min={(() => {
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        return tomorrow.toISOString().split('T')[0];
+                      })()}
                     />
                     <div className="text-sm text-gray-400 mt-1">Check-in</div>
                   </div>
@@ -535,7 +572,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                       onChange={(e) => setCheckOutDate(e.target.value)}
                       disabled={disabled}
                       className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      min={searchData.checkInDate}
+                      min={minCheckOutDate}
                     />
                     <div className="text-sm text-gray-400 mt-1">Check-out</div>
                   </div>
