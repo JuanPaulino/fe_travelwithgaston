@@ -34,6 +34,31 @@ http.interceptors.response.use(
 
     // Si el error es 401 y no hemos intentado refrescar el token
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Verificar si el error es específicamente "Token expirado"
+      const errorMessage = error.response?.data?.message;
+      const isTokenExpired = errorMessage === 'Token expirado';
+      
+      // Si es token expirado, no intentar refresh y cerrar sesión directamente
+      if (isTokenExpired) {
+        console.log('Token expirado detectado, cerrando sesión...');
+        
+        // Limpiar todos los tokens y datos de autenticación
+        localStorage.removeItem('authtoken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        
+        // Emitir evento para notificar al store de auth
+        window.dispatchEvent(new CustomEvent('auth:logout'));
+        
+        // Redirigir a la página principal si no estamos ya ahí
+        if (window.location.pathname !== '/') {
+          window.location.href = '/';
+        }
+        
+        return Promise.reject(error);
+      }
+
+      // Para otros errores 401, intentar refresh del token
       originalRequest._retry = true;
 
       try {
@@ -47,6 +72,14 @@ http.interceptors.response.use(
             localStorage.setItem('authtoken', response.data.data.token);
             localStorage.setItem('refreshToken', response.data.data.refreshToken);
             
+            // Emitir evento para notificar al store de auth sobre la actualización del token
+            window.dispatchEvent(new CustomEvent('auth:tokenUpdated', { 
+              detail: { 
+                token: response.data.data.token,
+                refreshToken: response.data.data.refreshToken 
+              } 
+            }));
+            
             // Reintentar la request original con el nuevo token
             originalRequest.headers.Authorization = `Bearer ${response.data.data.token}`;
             return http(originalRequest);
@@ -58,8 +91,13 @@ http.interceptors.response.use(
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
         
-        // Aquí podrías emitir un evento para notificar al store de auth
+        // Emitir evento para notificar al store de auth
         window.dispatchEvent(new CustomEvent('auth:logout'));
+        
+        // Redirigir a la página principal si no estamos ya ahí
+        if (window.location.pathname !== '/') {
+          window.location.href = '/';
+        }
       }
     }
 

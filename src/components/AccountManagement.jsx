@@ -4,9 +4,16 @@ import AccountSettings from './account/AccountSettings';
 import BookingsHistory from './account/BookingsHistory';
 import PaymentMethods from './account/PaymentMethods';
 import UserPreferences from './account/UserPreferences';
+import AuthGuard from './AuthGuard';
+import { useStore } from '@nanostores/react';
+import { authStore } from '../stores/authStore';
 
 const AccountManagement = () => {
   const [activeTab, setActiveTab] = useState('bookings');
+  
+  // Obtener datos del usuario del store
+  const authState = useStore(authStore);
+  const { user } = authState;
 
   const tabs = [
     { key: 'bookings', label: 'Bookings' },
@@ -36,21 +43,25 @@ const AccountManagement = () => {
   };
 
   return (
-    <div>
-      {/* Header */}
-      <div className="px-6 py-6">
-        <h1 className="text-2xl font-bold text-gray-900">Hello, User</h1>
-      </div>
+    <AuthGuard redirectTo="/" requireAuth={true}>
+      <div>
+        {/* Header */}
+        <div className="px-6 py-6">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Hola, {user?.firstName || user?.name || 'Usuario'}
+          </h1>
+        </div>
 
-      {/* Tabs Component */}
-      <Tabs 
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-      >
-        {renderTabContent()}
-      </Tabs>
-    </div>
+        {/* Tabs Component */}
+        <Tabs 
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        >
+          {renderTabContent()}
+        </Tabs>
+      </div>
+    </AuthGuard>
   );
 };
 
