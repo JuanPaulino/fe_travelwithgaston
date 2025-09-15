@@ -253,7 +253,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                             {rate.requires_cvc && (
                               <p>• CVC code required</p>
                             )}
-                            <p>• Rate code: {rate.rate_index}</p>
+                            {/*<p>• Rate code: {rate.rate_index}</p>*/}
                           </div>
                       </div>
                       <div className='w-2/5 md:w-1/5 flex flex-col justify-end'>
@@ -262,9 +262,6 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                           <p className="text-lg font-semibold text-neutral-darkest">
                             {formatPrice(rate.total_to_book)}
                           </p>
-                          {rate.is_tax_included && (
-                            <p className='text-xs text-neutral-light'>• Taxes included</p>
-                          )}
                         </div>
                         {/* Botón de reserva */}
                         <div className="mt-6">

@@ -2,10 +2,12 @@ import React, { useMemo } from 'react'
 
 import HotelAvailabilityCard from './HotelAvailabilityCard.jsx'
 import EmptyState from './common/EmptyState.jsx'
+import MembershipCard from './MembershipCard.jsx'
 
 const HotelAvailabilityList = ({ 
   hotels = [], 
-  rooms = 1, 
+  rooms = 1,
+  isAuthenticated = false,
 }) => {
   
   // Validar que rooms sea un número
@@ -37,12 +39,19 @@ const HotelAvailabilityList = ({
   return (
     <div className="space-y-6">
       {/* Hoteles disponibles primero */}
-      {availableHotels.map((hotel) => (
-        <HotelAvailabilityCard
-          key={hotel.hotel_id}
-          hotelData={hotel}
-          rooms={validRooms}
-        />
+      {availableHotels.map((hotel, index) => (
+        <React.Fragment key={hotel.hotel_id}>
+          <HotelAvailabilityCard
+            hotelData={hotel}
+            rooms={validRooms}
+          />
+          {/* Mostrar MembershipCard en la segunda posición si no está autenticado */}
+          {!isAuthenticated && index === 0 && (
+            <div className="my-8">
+              <MembershipCard />
+            </div>
+          )}
+        </React.Fragment>
       ))}
       
       {/* Separador si hay hoteles no disponibles */}

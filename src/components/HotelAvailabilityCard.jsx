@@ -157,7 +157,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
             <div className="ml-6">
               {isAvailable ? (
                 <>
-                  <div className="mb-4">
+                  <div className="mb-4 p-4">
                     {hotel.lowest_rate ? (
                       <>
                         <div className="text-3xl font-bold text-gray-900">
@@ -172,9 +172,17 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
                         
                       </>
                     ) : (
-                      <div className="text-sm text-gray-500">
-                        Price not available
-                      </div>
+                      <>
+                        <div className="text-3xl font-bold text-gray-900 blur-sm select-none">
+                          0000
+                        </div>
+                        <div className="text-sm text-gray-600 blur-xs select-none">
+                          Total for {rooms} {rooms === 1 ? 'room' : 'rooms'} with taxes included
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1 blur-xs select-none">
+                          Average per night 0000
+                        </div>
+                      </>
                     )}
                   </div>
                   

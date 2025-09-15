@@ -1,0 +1,96 @@
+---
+// Astro component frontmatter - JavaScript runs on the server
+const membershipCardImage = "/images/membership_card.png";
+---
+
+<div class="min-h-screen bg-[#f5ecda] flex items-center justify-center p-6">
+  <div class="max-w-6xl w-full bg-[#ffffff] rounded-2xl shadow-lg overflow-hidden">
+    <div class="flex flex-col lg:flex-row">
+      <!-- Left side - Membership Card -->
+      <div class="lg:w-1/3 p-8 lg:p-12 flex items-center justify-center">
+        <img
+          src={membershipCardImage || "/placeholder.svg"}
+          alt="Travel with Gaston Membership Card"
+          class="w-full max-w-sm rounded-2xl shadow-lg"
+        />
+      </div>
+
+      <!-- Right side - Content -->
+      <div class="lg:w-2/3 p-8 lg:p-12 flex flex-col justify-center">
+        <div class="max-w-2xl">
+          <h1 class="text-3xl lg:text-4xl xl:text-5xl font-bold text-[#000000] mb-6 leading-tight">
+            Unlock Your Journey: Choose Your Membership
+          </h1>
+
+          <p class="text-lg lg:text-xl text-[#666666] mb-4 leading-relaxed">
+            Gain access to exclusive member-only rates, priority upgrades, and flexible booking options.
+          </p>
+
+          <p class="text-lg lg:text-xl text-[#666666] mb-8 leading-relaxed">
+            Select a membership plan to enhance every aspect of your travel.
+          </p>
+
+          <button 
+            class="text-[#cea346] text-lg font-medium hover:text-[#a48238] transition-colors mb-12 lg:mb-16 underline"
+            id="see-more-btn"
+          >
+            See more details
+          </button>
+
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <p class="text-[#666666] text-lg">
+              Already a member? 
+              <button 
+                class="text-[#000000] font-medium hover:text-[#666666] transition-colors underline"
+                id="sign-in-btn"
+              >
+                Sign In
+              </button>
+            </p>
+
+            <button 
+              class="bg-[#000000] hover:bg-[#666666] text-white px-8 py-3 text-lg font-medium rounded-lg transition-colors"
+              id="become-member-btn"
+            >
+              Become a member
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Client-side JavaScript for interactivity
+  document.addEventListener('DOMContentLoaded', function() {
+    const seeMoreBtn = document.getElementById('see-more-btn');
+    const signInBtn = document.getElementById('sign-in-btn');
+    const becomeMemberBtn = document.getElementById('become-member-btn');
+
+    if (seeMoreBtn) {
+      seeMoreBtn.addEventListener('click', function() {
+        console.log('See more details clicked');
+        // Add your logic here
+      });
+    }
+
+    if (signInBtn) {
+      signInBtn.addEventListener('click', function() {
+        console.log('Sign in clicked');
+        // Add your sign in logic here
+      });
+    }
+
+    if (becomeMemberBtn) {
+      becomeMemberBtn.addEventListener('click', function() {
+        console.log('Become a member clicked');
+        // Add your membership logic here
+      });
+    }
+  });
+</script>
+
+<style>
+  /* Additional custom styles if needed */
+</style>
