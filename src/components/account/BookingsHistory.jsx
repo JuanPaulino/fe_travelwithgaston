@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { bookingAPI } from '../../lib/http.js';
+import BookingDetail from './BookingDetail.jsx';
 
 const BookingsHistory = () => {
   const [bookings, setBookings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -23,6 +25,19 @@ const BookingsHistory = () => {
 
     fetchBookings();
   }, []);
+
+  const handleViewBooking = (booking) => {
+    setSelectedBooking(booking);
+  };
+
+  const handleBackToList = () => {
+    setSelectedBooking(null);
+  };
+
+  // Si hay una reserva seleccionada, mostrar el detalle
+  if (selectedBooking) {
+    return <BookingDetail booking={selectedBooking} onBack={handleBackToList} />;
+  }
 
   if (loading) {
     return (
@@ -116,8 +131,11 @@ const BookingsHistory = () => {
                   </div>
                   
                   {/* Botón View */}
-                  <button className="w-full bg-black border border-black text-white px-6 py-2 rounded-md hover:bg-gray-50 hover:text-black transition-colors duration-200">
-                    View
+                  <button 
+                    onClick={() => handleViewBooking(booking)}
+                    className="w-full bg-black border border-black text-white px-6 py-2 rounded-md hover:bg-gray-50 hover:text-black transition-colors duration-200"
+                  >
+                    View details
                   </button>
                   
                   {/* Estado de la reserva */}
@@ -153,14 +171,6 @@ const BookingsHistory = () => {
           <p className="text-gray-600">No tienes reservas registradas.</p>
         </div>
       )}
-
-            {/* Mostrar el JSON completo de la respuesta */}
-            <div className="bg-gray-50 rounded-lg p-6">
-        <h4 className="text-md font-medium text-gray-800 mb-4">Respuesta del API (JSON):</h4>
-        <pre className="bg-white p-4 rounded border overflow-auto text-sm text-gray-700 whitespace-pre-wrap">
-          {JSON.stringify(bookings, null, 2)}
-        </pre>
-      </div>
     </div>
   );
 };
