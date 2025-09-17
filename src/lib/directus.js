@@ -93,6 +93,40 @@ export async function getNavigationData() {
   }
 }
 
+export async function getFooterNavigation() {
+  try {
+    const navigation = await client.request(
+      readItems("navigation", {
+        fields: [
+          "id",
+          "title", 
+          "is_active",
+          "items.*"
+        ],
+        filter: {
+          is_active: {
+            _eq: true
+          },
+          id: {
+            _starts_with: "footer"
+          }
+        }
+      })
+    );
+
+    return {
+      data: navigation,
+      error: null,
+    };
+  } catch (error) {
+    console.error('Failed to fetch footer navigation data:', error);
+    return {
+      data: null,
+      error: 'Failed to fetch footer navigation data. Please try again later.',
+    };
+  }
+}
+
 /**
  * Envía un formulario a Directus creando una submission y sus valores
  * @param {string} formId - ID del formulario

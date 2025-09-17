@@ -2,11 +2,10 @@
 // Footer.astro - Componente de pie de página
 import Heading from './common/Heading.jsx';
 import Text from './common/Text.jsx';
-import { getNavigationData } from '../lib/directus.js';
+import { getFooterNavigation } from '../lib/directus.js';
 
-// Obtener datos de navegación
-const { data: navigationData, error } = await getNavigationData();
-const footerNavigation = navigationData?.find(nav => nav.id === 'footer')?.items || [];
+// Obtener datos de navegación del footer
+const { data: footerNavigationData, error } = await getFooterNavigation();
 ---
 
 <footer class="bg-black text-white">
@@ -14,31 +13,20 @@ const footerNavigation = navigationData?.find(nav => nav.id === 'footer')?.items
   <div class="container mx-auto px-6 py-12">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
       
-      {footerNavigation.map((item) => (
+      {footerNavigationData && footerNavigationData.map((section: any) => (
         <div class="space-y-4">
-          <Heading level={5} className="text-white font-semibold">Pages</Heading>
+          <Heading level={5} className="text-white font-semibold">{section.title}</Heading>
           <ul class="space-y-2">
-            {item.children && item.children.length > 0 ? (
-              item.children.map((child) => (
-                <li>
-                  <a 
-                    href={child.url || `/${child.title.toLowerCase().replace(/\s+/g, '-')}`} 
-                    class="font-body text-base text-gray-300 hover:text-white transition-colors"
-                  >
-                    {child.title}
-                  </a>
-                </li>
-              ))
-            ) : (
+            {section.items && section.items.map((item: any) => (
               <li>
                 <a 
-                  href={item.url || `/${item.title.toLowerCase().replace(/\s+/g, '-')}`} 
+                  href={item.url || (item.page ? `/${item.page.permalink || item.title.toLowerCase().replace(/\s+/g, '-')}` : `/${item.title.toLowerCase().replace(/\s+/g, '-')}`)} 
                   class="font-body text-base text-gray-300 hover:text-white transition-colors"
                 >
                   {item.title}
                 </a>
               </li>
-            )}
+            ))}
           </ul>
         </div>
       ))}
