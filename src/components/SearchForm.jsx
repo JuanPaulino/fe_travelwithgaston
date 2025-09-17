@@ -25,7 +25,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   // Estados locales para control de UI
   const [showAdditionalFields, setShowAdditionalFields] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [showGuestsDropdown, setShowGuestsDropdown] = useState(true)
+  const [showGuestsDropdown, setShowGuestsDropdown] = useState(false)
   const [minCheckOutDate, setMinCheckOutDate] = useState('')
   const dropdownRef = useRef(null)
 
