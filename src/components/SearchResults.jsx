@@ -8,15 +8,6 @@ const SearchResults = ({ className = '' }) => {
   const { resultsData } = useSearchStore()
   const { hotels, loading, error, lastSearch } = resultsData
 
-  // Logs de depuración
-  console.log('🔍 SearchResults - Datos recibidos:', {
-    hotels: hotels?.length || 0,
-    loading,
-    error,
-    lastSearch: !!lastSearch,
-    resultsData
-  })
-
   // Componente de debug para mostrar el estado del store
   const DebugInfo = () => (
     <div className="bg-gray-100 p-4 rounded-lg mb-4 text-sm">
@@ -47,7 +38,7 @@ const SearchResults = ({ className = '' }) => {
       <div className={className}>
         <LoadingSpinner 
           text="Checking you into luxury, one search at a time..." 
-          size="md"
+          size="xl"
         />
       </div>
     )

@@ -2,15 +2,19 @@ import React from 'react'
 
 const LoadingSpinner = ({ text = 'Cargando...', size = 'md', className = '' }) => {
   const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8',
-    xl: 'w-12 h-12'
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12',
+    lg: 'w-16 h-16',
+    xl: 'w-20 h-20'
   }
 
   return (
     <div className={`flex flex-col items-center justify-center gap-3 p-6 ${className}`}>
-      <div className={`${sizeClasses[size]} animate-spin rounded-full border-2 border-gray-300 border-t-amber-600`}></div>
+      <img 
+        src="/spinner.gif" 
+        alt="Loading..." 
+        className={`${sizeClasses[size]} object-contain`}
+      />
       {text && (
         <p className="text-sm text-gray-600 text-center">{text}</p>
       )}
