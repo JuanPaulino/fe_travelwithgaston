@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
 import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
-import SearchFilters from '../components/SearchFilters.jsx';
+import SearchFiltersWrapper from '../components/SearchFiltersWrapper.jsx';
 import SearchForm from '../components/SearchForm.jsx';
 import SearchResults from '../components/SearchResults.jsx';
 
@@ -37,11 +37,9 @@ const title = 'Search';
 			<SearchForm client:load initialData={initialSearchData} />
 		</div>
 		<div class="w-full h-[1px] bg-neutral-lighter mb-8"></div>
-		<div class="flex gap-6 mb-8">
-			<!-- Sidebar izquierdo -->
-			<aside class="w-52 flex-shrink-0">
-				<SearchFilters client:load />
-			</aside>
+		<div class="flex flex-col md:flex-row gap-6 mb-8">
+			<!-- Componente wrapper que maneja filtros para móvil y desktop -->
+			<SearchFiltersWrapper client:load />
 			
 			<!-- Contenedor principal con resultados de búsqueda -->
 			<div class="flex-1">

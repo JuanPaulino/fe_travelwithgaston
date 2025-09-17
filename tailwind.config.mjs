@@ -89,6 +89,9 @@ export default {
       screens: {
         // Breakpoints para aplicar tamaños desktop en sm y superiores
         sm: '640px',
+      },
+      scale: {
+        '98': '0.98',
       }
     },
   },
