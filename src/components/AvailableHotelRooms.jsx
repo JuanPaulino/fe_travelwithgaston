@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 import { useBookingStore } from '../stores/useBookingStore.js'
-import { authStore } from '../stores/authStore.js'
+import { useAuth } from '../lib/useAuth.js'
 
 const AvailableHotelRooms = ({ parentHotelData }) => {
   const { searchData, executeSearch } = useSearchStore();
   const { processBooking } = useBookingStore();
-  const { user } = authStore.get();
+  const { user, isAuthenticated } = useAuth();
   const [hotelData, setHotelData] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -53,9 +53,37 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
     processBooking(hotelData, room, searchData, userData);
     window.location.href = '/booking';
   };
+
+  // Función para manejar el clic en "Subscribe now"
+  const handleSubscribeNow = () => {
+    window.location.href = '/checkout';
+  };
+
+  // Función para determinar qué botón mostrar
+  const getButtonConfig = () => {
+    if (!isAuthenticated || !user) {
+      return null; // No mostrar botón si no está autenticado
+    }
+    
+    if (user.role === 'basic') {
+      return {
+        text: 'Subscribe now',
+        onClick: handleSubscribeNow,
+        className: 'w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors cursor-pointer'
+      };
+    }
+    
+    // Para otros roles (premium, admin, etc.)
+    return {
+      text: 'Book now',
+      onClick: (room) => handleBookNow(room),
+      className: 'w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors cursor-pointer'
+    };
+  };
+
   // Función para formatear el precio
   const formatPrice = (price) => {
-    if (!price) return "N/A";
+    if (!price) return null;
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
       currency: hotel.default_currency || 'EUR',
@@ -263,14 +291,23 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                             {formatPrice(rate.total_to_book)}
                           </p>
                         </div>
-                        {/* Botón de reserva */}
+                        {/* Botón de reserva/suscripción */}
                         <div className="mt-6">
-                          <button 
-                            onClick={() => handleBookNow(room)}
-                            className="w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors cursor-pointer"
-                          >
-                            Book now
-                          </button>
+                          {(() => {
+                            const buttonConfig = getButtonConfig();
+                            if (!buttonConfig) {
+                              return null; // No mostrar botón si no está autenticado
+                            }
+                            
+                            return (
+                              <button 
+                                onClick={() => buttonConfig.onClick(room)}
+                                className={buttonConfig.className}
+                              >
+                                {buttonConfig.text}
+                              </button>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>

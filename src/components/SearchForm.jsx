@@ -25,7 +25,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   // Estados locales para control de UI
   const [showAdditionalFields, setShowAdditionalFields] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const [showGuestsDropdown, setShowGuestsDropdown] = useState(false)
+  const [showGuestsDropdown, setShowGuestsDropdown] = useState(true)
   const [minCheckOutDate, setMinCheckOutDate] = useState('')
   const dropdownRef = useRef(null)
 
@@ -116,14 +116,41 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowGuestsDropdown(false)
+      // Solo cerrar si el dropdown está abierto
+      if (!showGuestsDropdown) return
+      
+      // Verificar si el click fue dentro del dropdown usando múltiples métodos
+      const clickedElement = event.target
+      
+      // Método 1: contains() directo
+      if (dropdownRef.current && dropdownRef.current.contains(clickedElement)) {
+        return // Click dentro del dropdown, no cerrar
       }
+      
+      // Método 2: closest() para elementos dinámicos
+      if (clickedElement.closest && clickedElement.closest('[data-dropdown="guests"]')) {
+        return // Click dentro del dropdown, no cerrar
+      }
+      
+      // Método 3: Verificación manual del árbol DOM
+      let parent = clickedElement.parentElement
+      while (parent && parent !== document.body) {
+        if (parent === dropdownRef.current) {
+          return // Click dentro del dropdown, no cerrar
+        }
+        parent = parent.parentElement
+      }
+      
+      // Si llegamos aquí, el click fue fuera del dropdown
+      setShowGuestsDropdown(false)
     }
     
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    // Solo agregar el listener si el dropdown está abierto
+    if (showGuestsDropdown) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showGuestsDropdown])
 
   // Actualizar fecha mínima de check-out cuando cambia check-in
   useEffect(() => {
@@ -321,7 +348,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
             </div>
 
             {/* Selector de huéspedes */}
-            <div className="relative p-6" ref={dropdownRef}>
+            <div className="relative p-6" ref={dropdownRef} data-dropdown="guests">
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
               <button
                 type="button"
@@ -334,7 +361,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
 
               {/* Dropdown de huéspedes */}
               {showGuestsDropdown && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 md:w-auto md:min-w-[600px] bg-white rounded-lg shadow-xl border z-50 p-4">
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 md:w-auto md:min-w-[600px] bg-white rounded-lg shadow-xl border z-[99999] p-4 pointer-events-auto" data-dropdown="guests">
                   <h3 className="font-medium text-gray-900 mb-4">Configure guests</h3>
                   
                   <GuestSelector
@@ -448,7 +475,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
             </div>
 
             {/* Selector de huéspedes - 100% */}
-            <div className="w-full relative" ref={dropdownRef}>
+            <div className="w-full relative" ref={dropdownRef} data-dropdown="guests">
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
               <button
                 type="button"
@@ -464,7 +491,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
 
               {/* Dropdown de huéspedes para móvil */}
               {showGuestsDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-50 p-4">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-50 p-4" data-dropdown="guests">
                   <h3 className="font-medium text-gray-900 mb-4">Configure guests</h3>
                   
                   <GuestSelector

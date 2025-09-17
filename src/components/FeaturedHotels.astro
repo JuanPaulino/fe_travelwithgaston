@@ -11,12 +11,13 @@ const items = data?.items || [];
 const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
 
 // Procesar los items para extraer solo los datos necesarios
-const hotelItems = items.map(item => ({
+const hotelItems = items.map((item: any) => ({
   id: item.id,
   hotelName: item.hotel_name,
   location: item.location,
   description: item.description,
-  image: item.image?.id ? `${DIRECTUS_URL}/assets/${item.image.id}` : null
+  image: item.image?.id ? `${DIRECTUS_URL}/assets/${item.image.id}` : null,
+  link: item.link,
 }));
 ---
 
@@ -57,8 +58,13 @@ const hotelItems = items.map(item => ({
     <!-- Contenedor de hoteles con scroll horizontal -->
     <div class="hotels-container relative">
       <div class="hotels-scroll flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
-        {hotelItems.map((hotel) => (
-          <div class="hotel-card flex-shrink-0 w-full h-80 md:w-[900px] md:h-[500px]">
+        {hotelItems.map((hotel: any) => (
+          <a 
+            href={hotel.link || '#'} 
+            class="hotel-card flex-shrink-0 w-full h-80 md:w-[900px] md:h-[500px] block cursor-pointer"
+            target={hotel.link ? "_blank" : undefined}
+            rel={hotel.link ? "noopener noreferrer" : undefined}
+          >
             <div class="relative w-full h-full overflow-hidden">
               {hotel.image ? (
                 <img
@@ -76,8 +82,8 @@ const hotelItems = items.map(item => ({
               <div class="image-overlay absolute inset-0"></div>
               
               <!-- Overlay flotante con efecto glass blur -->
-              <div class="glass-overlay absolute bottom-6 left-6 max-w-md rounded-lg p-6 shadow-lg md:bottom-6 md:left-6 md:max-w-md bottom-4 left-4 right-4 max-w-none">
-                <h3 class="text-white font-bold text-xl mb-1 md:text-xl text-lg">
+              <div class="glass-overlay absolute bottom-4 left-4 right-4 max-w-none rounded-lg p-6 shadow-lg md:bottom-6 md:left-6 md:right-auto md:max-w-md">
+                <h3 class="text-white font-bold text-xl mb-1 md:text-xl">
                   {hotel.hotelName}
                 </h3>
                 <p class="text-white text-sm mb-3">
@@ -88,7 +94,7 @@ const hotelItems = items.map(item => ({
                 </p>
               </div>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </div>
@@ -102,10 +108,19 @@ const hotelItems = items.map(item => ({
   
   .hotel-card {
     transition: transform 0.3s ease;
+    text-decoration: none;
+    color: inherit;
   }
   
   .hotel-card:hover {
     transform: translateY(-4px);
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .hotel-card:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
   }
   
   /* Ocultar scrollbar pero mantener funcionalidad */

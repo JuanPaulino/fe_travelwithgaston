@@ -35,7 +35,7 @@ const bgClass = background === 'dark' ? 'bg-gray-900' : 'bg-[#f6f2e7]';
     <p class="font-body text-base text-center text-gray-600 mb-12 max-w-2xl">
       {data.subtitle}
     </p>
-    <div class={`grid grid-cols-1 sm:grid-cols-${data.columns} gap-y-12 gap-x-8 w-full mb-10`}>
+    <div class={`grid grid-cols-2 sm:grid-cols-${data.columns} gap-y-12 gap-x-8 w-full mb-10`}>
       {data.items.map((item: any, index: number) => (
         <div class="flex flex-col items-center text-center px-4">
           <div class="w-12 h-12 border-2 border-[#d6cdb7] rounded-lg flex items-center justify-center mb-4">
@@ -46,8 +46,10 @@ const bgClass = background === 'dark' ? 'bg-gray-900' : 'bg-[#f6f2e7]';
         </div>
       ))}
     </div>
-    <a href={data.cta.url} class="mt-4 px-8 py-3 bg-black text-white font-body font-medium rounded hover:bg-gray-900 transition">
-      {data.cta.label}
-    </a>  
+    {data.cta && (
+      <a href={data.cta.url} class="mt-4 px-8 py-3 bg-black text-white font-body font-medium rounded hover:bg-gray-900 transition">
+        {data.cta.label}
+      </a>
+    )}
   </div>
 </section> 
