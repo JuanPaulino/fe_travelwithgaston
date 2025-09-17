@@ -16,9 +16,9 @@ export interface Props {
 const { data, background = 'light' } = Astro.props;
 ---
 {data.layout === 'horizontal' && (
-<div class={`card-block bg-${background} mb-8 flex flex-col md:flex-row justify-between items-center`}>
+<div class={`card-block bg-${background} mb-8 flex flex-col-reverse md:flex-row justify-between items-center`}>
   {data.image && (
-    <div class="card-image mb-10 w-full">
+    <div class="card-image mb-10 md:mb-0 w-full">
       <img 
         src={`${import.meta.env.DIRECTUS_URL}/assets/${data.image}`}
         alt={data.heading || 'Imagen de tarjeta'}
