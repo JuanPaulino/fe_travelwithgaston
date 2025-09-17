@@ -5,8 +5,6 @@ import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
 import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
 import { getPageData } from '../lib/directus.js';
 import DynamicBlocks from '../components/DynamicBlocks.astro';
-import JoinNow from '../components/JoinNow.astro';
-import Footer from '../components/Footer.astro';
 
 // Obtener datos de la página de inicio desde Directus
 const { data: pageData, error } = await getPageData('/');
@@ -34,9 +32,7 @@ const title = pageData?.title || 'TravelWithGaston - Inicio';
 		{blocks && blocks.length > 0 && (
 			<DynamicBlocks blocks={blocks} />
 		)}
-		<Footer />
 	</main>
-
 	<AuthModalWrapper client:load />
 	<StoreDebuggerWrapper client:load />
 </Layout>

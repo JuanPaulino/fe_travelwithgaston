@@ -3,7 +3,6 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
 import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
-import Footer from '../components/Footer.astro';
 import CheckoutComponent from '../components/checkoutcomponent.jsx';
 
 // Si hay un error, usar datos por defecto
@@ -18,7 +17,6 @@ const title = 'Checkout';
 	<main class="container mx-auto px-4 py-8">
 		<CheckoutComponent client:load />
 	</main>
-	<Footer />
 
 	<AuthModalWrapper client:load />
 	<StoreDebuggerWrapper client:load />

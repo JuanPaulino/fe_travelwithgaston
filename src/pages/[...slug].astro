@@ -4,6 +4,7 @@ import { getPageData } from '../lib/directus.js';
 import DynamicBlocks from '../components/DynamicBlocks.astro';
 import DebugInfo from '../components/DebugInfo.jsx';
 import Header from '../components/Header.astro';
+import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
 
 // Obtener el slug de los parámetros de la URL
 export async function getStaticPaths() {
@@ -50,7 +51,9 @@ const { permalink, title, content, blocks } = pageData;
       )}
 
       <!-- Información de debug (solo en desarrollo) -->
-      <DebugInfo pageData={pageData} slug={slug} client:load />
+      {/* <DebugInfo pageData={pageData} slug={slug} client:load /> */}
     </div>
   </main>
+
+	<AuthModalWrapper client:load />
 </Layout> 

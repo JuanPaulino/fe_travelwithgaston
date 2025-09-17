@@ -3,7 +3,6 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import AuthModalWrapper from '../../components/auth/AuthModalWrapper.jsx';
 import StoreDebuggerWrapper from '../../components/StoreDebuggerWrapper.jsx';
-import Footer from '../../components/Footer.astro';
 import SearchForm from '../../components/SearchForm.jsx';
 import AvailableHotelRooms from '../../components/AvailableHotelRooms.jsx';
 import HotelImageGallery from '../../components/HotelImageGallery.astro';
@@ -235,9 +234,8 @@ const title = `Hotel ${hotelData.name}`;
         />
       </div>
 		</div>
-    <pre>{JSON.stringify(hotelData, null, 2)}</pre>
+    <!-- <pre>{JSON.stringify(hotelData, null, 2)}</pre> -->
 	</main>
-	<Footer />
 
 	<AuthModalWrapper client:load />
 	<StoreDebuggerWrapper client:load />
