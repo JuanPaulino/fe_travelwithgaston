@@ -256,7 +256,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     
     // Validación: si hay niños, solo permitir 1 habitación
     if (searchData.children > 0 && searchData.rooms > 1) {
-      alert('Si incluye niños, solo se puede reservar una habitación a la vez.')
+      alert('If you include children, only one room can be booked at a time.')
       return
     }
 
@@ -380,7 +380,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                   {shouldForceSingleRoom() && (
                     <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                       <p className="text-sm text-orange-800">
-                        <span className="font-medium">Nota:</span> Al incluir niños en la reserva, solo se puede reservar una habitación a la vez.
+                        <span className="font-medium">Note:</span> When including children in the reservation, only one room can be booked at a time.
                       </p>
                     </div>
                   )}
@@ -510,7 +510,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                   {shouldForceSingleRoom() && (
                     <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                       <p className="text-sm text-orange-800">
-                        <span className="font-medium">Nota:</span> Al incluir niños en la reserva, solo se puede reservar una habitación a la vez.
+                        <span className="font-medium">Note:</span> When including children in the reservation, only one room can be booked at a time.
                       </p>
                     </div>
                   )}

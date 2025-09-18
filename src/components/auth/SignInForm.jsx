@@ -34,13 +34,13 @@ const SignInForm = ({ onLoginSuccess }) => {
     const newErrors = {};
     
     if (!formData.email.trim()) {
-      newErrors.email = 'El email es requerido';
+      newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El email no es válido';
+      newErrors.email = 'Email is not valid';
     }
     
     if (!formData.password.trim()) {
-      newErrors.password = 'La contraseña es requerida';
+      newErrors.password = 'Password is required';
     }
     
     setErrors(newErrors);
@@ -135,7 +135,7 @@ const SignInForm = ({ onLoginSuccess }) => {
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
           >
-            {showPassword ? 'Ocultar' : 'Mostrar'}
+            {showPassword ? 'Hide' : 'Show'}
           </button>
         </div>
         {errors.password && (
@@ -166,7 +166,7 @@ const SignInForm = ({ onLoginSuccess }) => {
         disabled={loading}
         className="w-full bg-black text-white py-4 px-6 rounded-md hover:bg-gray-800 transition-colors font-medium text-base disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? 'Iniciando sesión...' : 'Sign in'}
+        {loading ? 'Signing in...' : 'Sign in'}
       </button>
     </form>
   );

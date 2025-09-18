@@ -11,7 +11,7 @@ const { data: pageData, error } = await getPageData('/');
 
 // Si hay un error, usar datos por defecto
 const blocks = pageData?.blocks || [];
-const title = pageData?.title || 'TravelWithGaston - Inicio';
+const title = pageData?.title || 'TravelWithGaston - Home';
 ---
 
 <Layout title={title}>

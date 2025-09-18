@@ -1,74 +1,74 @@
 // Datos de destinos para el formulario de consulta de viajes
 export const destinations = [
-  { text: 'Seleccionar destino...', value: '' },
-  { text: 'Japón', value: 'japan' },
-  { text: 'Tailandia', value: 'thailand' },
-  { text: 'Corea del Sur', value: 'south-korea' },
-  { text: 'Singapur', value: 'singapore' },
-  { text: 'Malasia', value: 'malaysia' },
+  { text: 'Select destination...', value: '' },
+  { text: 'Japan', value: 'japan' },
+  { text: 'Thailand', value: 'thailand' },
+  { text: 'South Korea', value: 'south-korea' },
+  { text: 'Singapore', value: 'singapore' },
+  { text: 'Malaysia', value: 'malaysia' },
   { text: 'Vietnam', value: 'vietnam' },
   { text: 'Indonesia', value: 'indonesia' },
-  { text: 'Filipinas', value: 'philippines' },
+  { text: 'Philippines', value: 'philippines' },
   { text: 'Hong Kong', value: 'hong-kong' },
-  { text: 'Taiwán', value: 'taiwan' },
+  { text: 'Taiwan', value: 'taiwan' },
   { text: 'China', value: 'china' },
   { text: 'India', value: 'india' },
   { text: 'Nepal', value: 'nepal' },
   { text: 'Sri Lanka', value: 'sri-lanka' },
   { text: 'Mongolia', value: 'mongolia' },
   { text: 'Myanmar', value: 'myanmar' },
-  { text: 'Camboya', value: 'cambodia' },
+  { text: 'Cambodia', value: 'cambodia' },
   { text: 'Laos', value: 'laos' },
-  { text: 'Brunéi', value: 'brunei' }
+  { text: 'Brunei', value: 'brunei' }
 ];
 
 export const budgetRanges = [
-  { text: 'Seleccionar presupuesto...', value: '' },
-  { text: 'Menos de $1,000 USD', value: 'under-1000' },
+  { text: 'Select budget...', value: '' },
+  { text: 'Under $1,000 USD', value: 'under-1000' },
   { text: '$1,000 - $2,500 USD', value: '1000-2500' },
   { text: '$2,500 - $5,000 USD', value: '2500-5000' },
   { text: '$5,000 - $10,000 USD', value: '5000-10000' },
   { text: '$10,000 - $20,000 USD', value: '10000-20000' },
-  { text: 'Más de $20,000 USD', value: 'over-20000' }
+  { text: 'Over $20,000 USD', value: 'over-20000' }
 ];
 
 export const groupSizes = [
   { text: 'Solo', value: 'solo' },
-  { text: 'Pareja', value: 'couple' },
-  { text: 'Familia (3-4 personas)', value: 'family' },
-  { text: 'Grupo pequeño (5-8 personas)', value: 'small-group' },
-  { text: 'Grupo grande (9+ personas)', value: 'large-group' }
+  { text: 'Couple', value: 'couple' },
+  { text: 'Family (3-4 people)', value: 'family' },
+  { text: 'Small group (5-8 people)', value: 'small-group' },
+  { text: 'Large group (9+ people)', value: 'large-group' }
 ];
 
 export const accommodationTypes = [
-  { text: 'Hotel de lujo', value: 'luxury-hotel' },
-  { text: 'Hotel estándar', value: 'standard-hotel' },
-  { text: 'Hostal/B&B', value: 'hostel-bnb' },
-  { text: 'Apartamento', value: 'apartment' },
+  { text: 'Luxury hotel', value: 'luxury-hotel' },
+  { text: 'Standard hotel', value: 'standard-hotel' },
+  { text: 'Hostel/B&B', value: 'hostel-bnb' },
+  { text: 'Apartment', value: 'apartment' },
   { text: 'Resort', value: 'resort' },
-  { text: 'Ryokan (Japón)', value: 'ryokan' },
-  { text: 'Casa tradicional', value: 'traditional-house' }
+  { text: 'Ryokan (Japan)', value: 'ryokan' },
+  { text: 'Traditional house', value: 'traditional-house' }
 ];
 
 export const interests = [
-  { text: 'Cultura e historia', value: 'culture-history' },
-  { text: 'Gastronomía', value: 'food' },
-  { text: 'Naturaleza y aventura', value: 'nature-adventure' },
-  { text: 'Relajación y spa', value: 'relaxation-spa' },
-  { text: 'Compras', value: 'shopping' },
-  { text: 'Arte y museos', value: 'art-museums' },
-  { text: 'Vida nocturna', value: 'nightlife' },
-  { text: 'Fotografía', value: 'photography' },
-  { text: 'Templos y espiritualidad', value: 'temples-spirituality' },
-  { text: 'Deportes acuáticos', value: 'water-sports' }
+  { text: 'Culture and history', value: 'culture-history' },
+  { text: 'Gastronomy', value: 'food' },
+  { text: 'Nature and adventure', value: 'nature-adventure' },
+  { text: 'Relaxation and spa', value: 'relaxation-spa' },
+  { text: 'Shopping', value: 'shopping' },
+  { text: 'Art and museums', value: 'art-museums' },
+  { text: 'Nightlife', value: 'nightlife' },
+  { text: 'Photography', value: 'photography' },
+  { text: 'Temples and spirituality', value: 'temples-spirituality' },
+  { text: 'Water sports', value: 'water-sports' }
 ];
 
 export const travelStyles = [
-  { text: 'Presupuesto', value: 'budget' },
-  { text: 'Económico', value: 'economy' },
-  { text: 'Estándar', value: 'standard' },
-  { text: 'Lujo', value: 'luxury' },
-  { text: 'Ultra lujo', value: 'ultra-luxury' }
+  { text: 'Budget', value: 'budget' },
+  { text: 'Economy', value: 'economy' },
+  { text: 'Standard', value: 'standard' },
+  { text: 'Luxury', value: 'luxury' },
+  { text: 'Ultra luxury', value: 'ultra-luxury' }
 ];
 
 // Datos adicionales para el nuevo formulario

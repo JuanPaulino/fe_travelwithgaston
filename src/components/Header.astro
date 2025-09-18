@@ -116,7 +116,7 @@ console.log(mainNavigation);
       <AuthActions client:load />
     </div>
     <!-- Menú hamburguesa (solo móvil) -->
-    <button id="hamburger-button" class="md:hidden ml-4 z-20 transition-transform duration-200 hover:scale-110 active:scale-95" aria-label="Abrir menú">
+    <button id="hamburger-button" class="md:hidden ml-4 z-20 transition-transform duration-200 hover:scale-110 active:scale-95" aria-label="Open menu">
       <div class="space-y-1">
         <span class="block w-6 h-0.5 bg-neutral-lighter transition-all duration-200"></span>
         <span class="block w-6 h-0.5 bg-neutral-lighter transition-all duration-200"></span>
@@ -150,7 +150,7 @@ console.log(mainNavigation);
     <button 
       id="close-menu-button"
       class="absolute top-4 right-4 text-neutral-lighter hover:text-neutral-darkest transition-all duration-200 hover:scale-110 active:scale-95"
-      aria-label="Cerrar menú"
+      aria-label="Close menu"
     >
       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -169,7 +169,6 @@ console.log(mainNavigation);
           {item.title}
         </a>
       ))}
-      {JSON.stringify(mainNavigation)}
     </div>
 
     <AuthActionsMobile client:load />

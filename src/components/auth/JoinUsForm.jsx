@@ -43,39 +43,39 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
     const newErrors = {};
     
     if (!formData.accountType) {
-      newErrors.accountType = 'El tipo de cuenta es requerido';
+      newErrors.accountType = 'Account type is required';
     }
     
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'El nombre es requerido';
+      newErrors.firstName = 'First name is required';
     }
     
     if (!formData.lastName.trim()) {
-      newErrors.lastName = 'El apellido es requerido';
+      newErrors.lastName = 'Last name is required';
     }
     
     if (!formData.city.trim()) {
-      newErrors.city = 'La ciudad de residencia es requerida';
+      newErrors.city = 'City of residence is required';
     }
     
     if (!formData.email.trim()) {
-      newErrors.email = 'El email es requerido';
+      newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El email no es válido';
+      newErrors.email = 'Email is not valid';
     }
     
     if (!formData.password.trim()) {
-      newErrors.password = 'La contraseña es requerida';
+      newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
-      newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
+      newErrors.password = 'Password must be at least 8 characters';
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'La contraseña debe contener al menos una mayúscula, una minúscula y un número';
+      newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter and one number';
     }
     
     if (!formData.confirmPassword.trim()) {
-      newErrors.confirmPassword = 'Confirma tu contraseña';
+      newErrors.confirmPassword = 'Confirm your password';
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden';
+      newErrors.confirmPassword = 'Passwords do not match';
     }
     
     if (!formData.terms) {
@@ -110,7 +110,7 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
       });
       
       if (data.success) {
-        console.log('Usuario registrado exitosamente');
+        console.log('User registered successfully');
         
         // Guardar datos en el nano store
         const authData = {
@@ -131,11 +131,11 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
         window.location.href = '/checkout';
         
       } else {
-        setErrors({ general: data.message || 'Error al crear la cuenta' });
+        setErrors({ general: data.message || 'Error creating account' });
       }
       
     } catch (error) {
-      console.error('Error al registrar usuario:', error);
+      console.error('Error registering user:', error);
       const errorData = handleAPIError(error);
       setErrors({ general: errorData.message });
     } finally {
@@ -275,7 +275,7 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
               onClick={() => togglePasswordVisibility('password')}
               className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              {showPassword ? 'Ocultar' : 'Mostrar'}
+              {showPassword ? 'Hide' : 'Show'}
             </button>
           </div>
           {errors.password && (
@@ -303,7 +303,7 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
               onClick={() => togglePasswordVisibility('confirmPassword')}
               className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              {showConfirmPassword ? 'Ocultar' : 'Mostrar'}
+              {showConfirmPassword ? 'Hide' : 'Show'}
             </button>
           </div>
           {errors.confirmPassword && (
