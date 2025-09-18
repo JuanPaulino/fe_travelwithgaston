@@ -24,29 +24,16 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
 
   // Estados locales para control de UI
   const [showAdditionalFields, setShowAdditionalFields] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
   const [showGuestsDropdown, setShowGuestsDropdown] = useState(false)
   const [minCheckOutDate, setMinCheckOutDate] = useState('')
   const dropdownRef = useRef(null)
-
-  // Detectar si es dispositivo móvil/tablet
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 1024) // lg breakpoint
-    }
-    
-    checkIsMobile()
-    window.addEventListener('resize', checkIsMobile)
-    
-    return () => window.removeEventListener('resize', checkIsMobile)
-  }, [])
 
   // Mostrar campos adicionales si hay datos iniciales
   useEffect(() => {
     if (initialData.selectedDestinationId) {
       setShowAdditionalFields(true)
     }
-  }, [initialData, setShowAdditionalFields])
+  }, [initialData])
 
   // Función para autocompletar el formulario con datos externos
   const autocompleteForm = (sourceData) => {
@@ -103,7 +90,8 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     if (sourceData.destinationId || sourceData.destination) {
       autocompleteForm(sourceData);
       
-      if (isMobile) {
+      // En móvil, mostrar campos adicionales después de autocompletar
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
         setShowAdditionalFields(true);
       }
 
@@ -111,7 +99,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
         executeAutoSearch();
       }
     }
-  }, [urlParams, initialData, isMobile]);
+  }, [urlParams, initialData]);
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
@@ -179,7 +167,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   const handleDestinationSelection = (suggestion) => {
     setSelectedDestination(suggestion)
     // En móvil, mostrar campos adicionales después de seleccionar destino
-    if (isMobile) {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setShowAdditionalFields(true)
     }
   }
@@ -190,7 +178,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     if (searchData.selectedDestinationId && text !== searchData.selectedDestinationText) {
       setSelectedDestination(null)
       // En móvil, ocultar campos adicionales si se borra la selección
-      if (isMobile && !text) {
+      if (typeof window !== 'undefined' && window.innerWidth < 1024 && !text) {
         setShowAdditionalFields(false)
       }
     }
@@ -285,8 +273,138 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   return (
     <div className={className}>
       <form onSubmit={handleSubmit}>
-        {/* Diseño Responsive */}
+        {/* Diseño Responsive - Mobile First */}
         <div className={`block ${isOnHomePage() ? 'bg-white/85 hover:bg-white' : 'bg-white'} rounded-lg shadow-lg`}>
+          {/* Layout Mobile - Vertical (Mobile First) */}
+          <div className="flex flex-col lg:hidden p-4 space-y-4">
+            {/* Campo de destino - 100% */}
+            <div className="w-full">
+              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
+              <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
+                <SearchAutocomplete
+                  value={searchData.searchText}
+                  onChange={handleSearchTextChange}
+                  onSelectionChange={handleDestinationSelection}
+                  onClear={() => {
+                    setSearchText('')
+                    setSelectedDestination(null)
+                  }}
+                  disabled={disabled}
+                  className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 placeholder-gray-400 flex-1"
+                />
+              </div>
+            </div>
+
+            {/* Fechas - Check In y Check Out en filas separadas para móvil */}
+            <div className="space-y-4">
+              {/* Check In */}
+              <div className="w-full">
+                <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK IN</div>
+                <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <input
+                    type="date"
+                    value={searchData.checkInDate}
+                    onChange={(e) => setCheckInDate(e.target.value)}
+                    disabled={disabled}
+                    className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
+                    min={(() => {
+                      const tomorrow = new Date();
+                      tomorrow.setDate(tomorrow.getDate() + 1);
+                      return tomorrow.toISOString().split('T')[0];
+                    })()}
+                  />
+                </div>
+              </div>
+
+              {/* Check Out */}
+              <div className="w-full">
+                <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK OUT</div>
+                <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <input
+                    type="date"
+                    value={searchData.checkOutDate}
+                    onChange={(e) => setCheckOutDate(e.target.value)}
+                    disabled={disabled}
+                    className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
+                    min={minCheckOutDate}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Selector de huéspedes - 100% */}
+            <div className="w-full relative" ref={dropdownRef} data-dropdown="guests">
+              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
+              <button
+                type="button"
+                onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
+                disabled={disabled}
+                className="w-full flex items-center justify-between gap-2 text-base font-medium text-gray-900 p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+              >
+                <span>{searchData.adults} Adults, {searchData.children} child, {searchData.rooms} rooms</span>
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Dropdown de huéspedes para móvil */}
+              {showGuestsDropdown && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-50 p-4" data-dropdown="guests">
+                  <h3 className="font-medium text-gray-900 mb-4">Configure guests</h3>
+                  
+                  <GuestSelector
+                    adults={searchData.adults}
+                    children={searchData.children}
+                    rooms={searchData.rooms}
+                    childrenAges={searchData.childrenAges}
+                    onAdultsChange={handleAdultsChange}
+                    onChildrenChange={handleChildrenChange}
+                    onRoomsChange={handleRoomsChange}
+                    onChildrenAgesChange={handleChildrenAgesChange}
+                    disabled={disabled}
+                    forceSingleRoom={shouldForceSingleRoom()}
+                  />
+                  
+                  {shouldForceSingleRoom() && (
+                    <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                      <p className="text-sm text-orange-800">
+                        <span className="font-medium">Note:</span> When including children in the reservation, only one room can be booked at a time.
+                      </p>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setShowGuestsDropdown(false)}
+                    className="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded text-sm font-medium"
+                  >
+                    Apply
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Botón de búsqueda - 100% */}
+            <div className="w-full">
+              <button
+                type="submit"
+                disabled={disabled || !searchData.checkInDate || !searchData.checkOutDate}
+                className="w-full cursor-pointer bg-primary hover:bg-primary-dark text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 py-3 px-4 rounded-lg"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                Search
+              </button>
+            </div>
+          </div>
+
           {/* Layout Desktop - Horizontal */}
           <div className="hidden lg:flex items-stretch divide-x divide-gray-200">
             {/* Campo de destino */}
@@ -403,136 +521,6 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                   disabled={disabled || !searchData.checkInDate || !searchData.checkOutDate}
                   className="cursor-pointer bg-primary hover:bg-primary-dark text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full h-full px-6 py-4"
                 >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                Search
-              </button>
-            </div>
-          </div>
-
-          {/* Layout Mobile - Vertical */}
-          <div className="lg:hidden p-4 space-y-4">
-            {/* Campo de destino - 100% */}
-            <div className="w-full">
-              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
-              <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
-                <SearchAutocomplete
-                  value={searchData.searchText}
-                  onChange={handleSearchTextChange}
-                  onSelectionChange={handleDestinationSelection}
-                  onClear={() => {
-                    setSearchText('')
-                    setSelectedDestination(null)
-                  }}
-                  disabled={disabled}
-                  className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 placeholder-gray-400 flex-1"
-                />
-              </div>
-            </div>
-
-            {/* Fechas - Check In y Check Out en 50% cada una */}
-            <div className="flex gap-2">
-              {/* Check In */}
-              <div className="flex-1">
-                <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK IN</div>
-                <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <input
-                    type="date"
-                    value={searchData.checkInDate}
-                    onChange={(e) => setCheckInDate(e.target.value)}
-                    disabled={disabled}
-                    className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
-                    min={(() => {
-                      const tomorrow = new Date();
-                      tomorrow.setDate(tomorrow.getDate() + 1);
-                      return tomorrow.toISOString().split('T')[0];
-                    })()}
-                  />
-                </div>
-              </div>
-
-              {/* Check Out */}
-              <div className="flex-1">
-                <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK OUT</div>
-                <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <input
-                    type="date"
-                    value={searchData.checkOutDate}
-                    onChange={(e) => setCheckOutDate(e.target.value)}
-                    disabled={disabled}
-                    className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
-                    min={minCheckOutDate}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Selector de huéspedes - 100% */}
-            <div className="w-full relative" ref={dropdownRef} data-dropdown="guests">
-              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
-              <button
-                type="button"
-                onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
-                disabled={disabled}
-                className="w-full flex items-center justify-between gap-2 text-base font-medium text-gray-900 p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
-              >
-                <span>{searchData.adults} Adults, {searchData.children} child, {searchData.rooms} rooms</span>
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {/* Dropdown de huéspedes para móvil */}
-              {showGuestsDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-50 p-4" data-dropdown="guests">
-                  <h3 className="font-medium text-gray-900 mb-4">Configure guests</h3>
-                  
-                  <GuestSelector
-                    adults={searchData.adults}
-                    children={searchData.children}
-                    rooms={searchData.rooms}
-                    childrenAges={searchData.childrenAges}
-                    onAdultsChange={handleAdultsChange}
-                    onChildrenChange={handleChildrenChange}
-                    onRoomsChange={handleRoomsChange}
-                    onChildrenAgesChange={handleChildrenAgesChange}
-                    disabled={disabled}
-                    forceSingleRoom={shouldForceSingleRoom()}
-                  />
-                  
-                  {shouldForceSingleRoom() && (
-                    <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                      <p className="text-sm text-orange-800">
-                        <span className="font-medium">Note:</span> When including children in the reservation, only one room can be booked at a time.
-                      </p>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setShowGuestsDropdown(false)}
-                    className="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded text-sm font-medium"
-                  >
-                    Apply
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Botón de búsqueda - 100% */}
-            <div className="w-full">
-              <button
-                type="submit"
-                disabled={disabled || !searchData.checkInDate || !searchData.checkOutDate}
-                className="w-full cursor-pointer bg-primary hover:bg-primary-dark text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 py-3 px-4 rounded-lg"
-              >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
