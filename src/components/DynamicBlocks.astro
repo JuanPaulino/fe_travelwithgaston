@@ -1,5 +1,5 @@
 ---
-import HeroSection from './HeroSection.astro';
+import HeroSection from './blocks/HeroSection.astro';
 import InspirationGrid from './InspirationGrid.astro';
 import FeaturedHotels from './FeaturedHotels.astro';
 import FormBlock from './FormBlock.jsx';
@@ -24,14 +24,14 @@ const { blocks } = Astro.props;
     
     // Inspiration Grid
     if (block.collection === 'block_inspiration_grid' || block.collection === 'inspiration_grid') {
-      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-4">
+      return <div class="mx-auto w-full px-4 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-4">
         <InspirationGrid data={block.item} />
       </div>;
     }
     
     // Featured Hotels
     if (block.collection === 'block_featured_hotels') {
-      return <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl">
+      return <div class="mt-6 mx-auto w-full px-4 lg:w-full xl:max-w-7xl 2xl:max-w-7xl">
         <FeaturedHotels data={block.item} />
       </div>;
     }

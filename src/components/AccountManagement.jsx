@@ -19,7 +19,7 @@ const AccountManagement = () => {
     { key: 'bookings', label: 'Bookings' },
     { key: 'manage-account', label: 'Manage account' },
     { key: 'payment-information', label: 'Payment information' },
-    { key: 'preferences', label: 'Preferences' }
+    // { key: 'preferences', label: 'Preferences' }
   ];
 
   // Renderizar el contenido del tab activo

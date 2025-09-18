@@ -3,6 +3,7 @@ import SearchAutocomplete from './SearchAutocomplete.jsx'
 import GuestSelector from './common/GuestSelector.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 import { useUrlParams } from '../hooks/useUrlParams.js'
+import { useDebounce } from '../hooks/useDebounce.js'
 
 function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   const { 
@@ -18,7 +19,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     setChildrenAges,
     executeSearch 
   } = useSearchStore()
-
+  console.log('🔍 searchData', searchData)
   // Hook para parámetros de URL
   const { urlParams, updateUrl, buildSearchUrl } = useUrlParams()
 
@@ -65,23 +66,27 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     });
   };
 
-  // Función para ejecutar búsqueda automática
-  const executeAutoSearch = async () => {
-    console.log('🚀 Ejecutando búsqueda automática con parámetros de URL');
-    
-    setTimeout(async () => {
-      try {
-        await executeSearch();
-      } catch (error) {
-        console.error('❌ Error en búsqueda automática:', error);
-      }
-    }, 500);
+  // Función para verificar si estamos en la página de búsqueda
+  const isOnSearchPage = () => {
+    return typeof window !== 'undefined' && window.location.pathname === '/search';
   };
 
   // Función para verificar si se pueden ejecutar búsquedas automáticas
   const canExecuteAutoSearch = (sourceData) => {
     return sourceData.destinationId && sourceData.checkIn && sourceData.checkOut && sourceData.adults;
   };
+
+  // Hook de debounce para auto search
+  const { debouncedCallback: debouncedAutoSearch } = useDebounce(
+    async () => {
+      console.log('🚀 Ejecutando búsqueda automática con parámetros de URL');
+      await executeSearch();
+    },
+    500,
+    {
+      condition: () => isOnSearchPage()
+    }
+  );
 
   // Autocompletar formulario con parámetros de URL o initialData al cargar
   useEffect(() => {
@@ -96,7 +101,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
       }
 
       if (canExecuteAutoSearch(sourceData)) {
-        executeAutoSearch();
+        debouncedAutoSearch();
       }
     }
   }, [urlParams, initialData]);
@@ -252,7 +257,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     
     // Ejecutar búsqueda usando el store
     const response = await executeSearch()
-    debugger
+
     if (response.search_type === 'hotel') {
       // Redireccionar a la página del hotel específico
       window.location.href = `/hotels/${searchData.selectedDestinationId}${buildSearchUrl(searchData)}`

@@ -27,3 +27,13 @@ p, span, div, a, button, input, textarea, select {
 input.remove-clear::-webkit-clear-button {
   display: none;
 }
+
+/* Hide scrollbar for mobile tabs */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}

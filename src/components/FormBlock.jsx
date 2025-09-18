@@ -110,7 +110,6 @@ const FormBlock = ({ data, background = 'light' }) => {
     setIsSubmitting(true);
     setSubmitStatus(null);
     setErrors({});
-    debugger;
     // Validar todos los campos
     const newErrors = {};
     let hasErrors = false;

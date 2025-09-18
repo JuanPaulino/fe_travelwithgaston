@@ -45,18 +45,12 @@ const AuthActionsMobile = ({ onButtonClick = null, onCloseMenu = null }) => {
   if (authenticated) {
     return (
       <div className="flex flex-col gap-4">
-        <button 
-          onClick={() => handleButtonClick('profile')}
+        <a 
+          href="/account"
           className="text-neutral hover:text-primary transition-colors px-3 py-2 rounded text-lg"
         >
-          Profile
-        </button>
-        <button 
-          onClick={() => handleButtonClick('bookings')}
-          className="text-neutral hover:text-primary transition-colors px-3 py-2 rounded text-lg"
-        >
-          Bookings
-        </button>
+          Account
+        </a>
         <button 
           onClick={handleLogout}
           className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors text-lg"

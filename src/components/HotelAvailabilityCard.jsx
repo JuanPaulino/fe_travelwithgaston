@@ -77,9 +77,9 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
           </div>
         )}
         {/*row with 3 columns*/}
-        <div className='flex flex-row flex-grow gap-4'>
+        <div className='flex flex-col md:flex-row flex-grow gap-4'>
           {/* carrusel 4 of 12 */}
-          <div className='w-4/12'>
+          <div className='w-full md:w-4/12'>
             {isVisible ? (
               <ImageCarousel
                 images={hotel.images}
@@ -99,7 +99,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
             )}
           </div>
           {/* information 8 of 12 */}
-          <div className='w-5/12'>
+          <div className='w-full md:w-5/12'>
             <div className='flex flex-col'>
               <p className='text-gray-600 mb-2'>{hotel.location}</p>
               <h5 className='font-heading text-xl mb-2'>
@@ -134,7 +134,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
               )}
           </div>
           {/* price 4 of 12 */}
-          <div className='w-3/12'>
+          <div className='w-full md:w-3/12'>
             {/* Estado del hotel */}
             <div className="flex flex-wrap gap-2 text-xs">
               {hotelData.is_under_refurbishment && (
@@ -154,7 +154,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
               )}
             </div>
             {/* Precio y botón */}
-            <div className="ml-6">
+            <div className="md:ml-6">
               {isAvailable ? (
                 <>
                   <div className="mb-4 p-4">
@@ -171,19 +171,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
                         </div>
                         
                       </>
-                    ) : (
-                      <>
-                        <div className="text-3xl font-bold text-gray-900 blur-sm select-none">
-                          0000
-                        </div>
-                        <div className="text-sm text-gray-600 blur-xs select-none">
-                          Total for {rooms} {rooms === 1 ? 'room' : 'rooms'} with taxes included
-                        </div>
-                        <div className="text-sm text-gray-600 mt-1 blur-xs select-none">
-                          Average per night 0000
-                        </div>
-                      </>
-                    )}
+                    ) : null}
                   </div>
                   
                   <button 

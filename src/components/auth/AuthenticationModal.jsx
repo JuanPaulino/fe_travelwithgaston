@@ -53,7 +53,7 @@ const AuthenticationModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
         <div className="relative p-8">
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors w-8 h-8"
           >
             <img src="/close.png" alt="Close" />
           </button>
