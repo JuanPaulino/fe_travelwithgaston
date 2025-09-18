@@ -33,10 +33,10 @@ const SearchFilters = () => {
         });
         setExpandedCategories(initialExpanded);
       } else {
-        throw new Error(response.data.message || 'Error al cargar filtros');
+        throw new Error(response.data.message || 'Error loading filters');
       }
     } catch (err) {
-      setError(err.message || 'Error al cargar filtros');
+      setError(err.message || 'Error loading filters');
     } finally {
       setLoading(false);
     }

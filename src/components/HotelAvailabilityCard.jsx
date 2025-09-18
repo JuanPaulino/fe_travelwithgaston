@@ -93,7 +93,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
               <div className={`w-full h-full bg-gray-200 flex items-center justify-center aspect-[3/2] ${!isAvailable ? 'opacity-60' : ''}`}>
                 <div className="text-gray-500 text-center p-8">
                   <div className="text-4xl mb-2">🏨</div>
-                  <p>Cargando...</p>
+                  <p>Loading...</p>
                 </div>
               </div>
             )}

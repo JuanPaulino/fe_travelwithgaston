@@ -41,7 +41,7 @@ const GuestSelector = ({
     <div className={`space-y-4 ${className}`} style={{ pointerEvents: 'auto' }}>
       {/* Adultos */}
       <div className="flex items-center justify-between">
-        <span className="text-gray-900 font-medium">Adultos</span>
+        <span className="text-gray-900 font-medium">Adults</span>
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -77,7 +77,7 @@ const GuestSelector = ({
 
       {/* Niños */}
       <div className="flex items-center justify-between">
-        <span className="text-gray-900 font-medium">Niños</span>
+        <span className="text-gray-900 font-medium">Children</span>
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -114,10 +114,10 @@ const GuestSelector = ({
       {/* Habitaciones */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-gray-900 font-medium">Habitaciones</span>
+          <span className="text-gray-900 font-medium">Rooms</span>
           {forceSingleRoom && (
             <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
-              Solo 1 habitación
+              Only 1 room
             </span>
           )}
         </div>

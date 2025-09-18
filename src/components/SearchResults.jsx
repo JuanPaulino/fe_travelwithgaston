@@ -24,7 +24,7 @@ const SearchResults = ({ className = '' }) => {
         )}
         {hotels && hotels.length > 0 && (
           <div className="mt-2 p-2 bg-white rounded text-xs">
-            <div>Primer hotel:</div>
+            <div>First hotel:</div>
             <pre>{JSON.stringify(hotels[0], null, 2)}</pre>
           </div>
         )}
