@@ -1,9 +1,11 @@
 import React, { useRef, useEffect, useState } from 'react'
 import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
+import { useAuth } from '../lib/useAuth.js'
 
 function HotelAvailabilityCard({ hotelData, rooms }) {
   const { setSelectedDestination } = useSearchStore()
+  const { isAuthenticated } = useAuth()
   const [isVisible, setIsVisible] = useState(false)
   const cardRef = useRef(null)
 
@@ -44,7 +46,8 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
 
   console.log('🏨 HotelAvailabilityCard - Datos extraídos:', hotel)
 
-  const isAvailable = hotelData.is_available
+  // Si el usuario no está autenticado, mostrar todos los hoteles como disponibles
+  const isAvailable = isAuthenticated ? hotelData.is_available : true
 
   // Función para navegar al hotel
   const handleViewHotel = () => {
@@ -64,7 +67,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
     // Aquí podrías abrir un modal con la imagen en tamaño completo
   }
 
-  console.log('🏨 HotelAvailabilityCard - Renderizando hotel:', hotel.name, 'Disponible:', isAvailable)
+  console.log('🏨 HotelAvailabilityCard - Renderizando hotel:', hotel.name, 'Disponible:', isAvailable, 'Usuario autenticado:', isAuthenticated)
 
   return (
     <div ref={cardRef} className="overflow-hidden min-w-80 relative">

@@ -68,7 +68,6 @@ const HotelAvailabilityList = ({
     )
   }
 
-  console.log('✅ HotelAvailabilityList - Renderizando lista de hoteles')
   return (
     <div className="space-y-6">
       {/* Hoteles disponibles primero */}
