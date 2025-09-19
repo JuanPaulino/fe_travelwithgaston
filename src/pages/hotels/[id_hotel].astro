@@ -97,6 +97,7 @@ const title = `Hotel ${hotelData.name}`;
 		<div class="w-full h-[1px] bg-neutral-lighter mb-8"></div>
 		<div class="flex flex-col max-w-7xl mx-auto mb-8">
       {/* Breadcrumbs */}
+      <!--
       <nav class="mb-6">
         <ol class="flex items-center space-x-2 text-sm text-neutral-light">
           <li><a href="/" class="hover:text-primary">Home</a></li>
@@ -108,15 +109,16 @@ const title = `Hotel ${hotelData.name}`;
           <li class="text-neutral-dark">{hotelData.name}</li>
         </ol>
       </nav>
-      <div class="flex items-center gap-2 mb-4">
+      -->
+      <div class="flex items-center flex-col md:flex-row gap-2 mb-4">
         {hotelData.short_info?.logo && (
-          <img src={hotelData.short_info.logo} alt="logo" class="max-h-16 object-contain border border-neutral-lighter p-2" />
+          <img src={hotelData.short_info.logo} alt="logo" class="max-h-12 md:max-h-16 object-contain border border-neutral-lighter p-2" />
         )}
         <div class="flex flex-col p-2">
-          <h1 class="text-h1 font-heading text-neutral-darkest mb-2">{hotelData.name}</h1>
+            <h1 class="text-h1 font-heading text-neutral-darkest mb-2 text-center md:text-left">{hotelData.name}</h1>
           <div class="flex items-center gap-2">
-            <img src="/images/location.png" alt="location" class="w-4 h-4" />
-            <p class="text-base text-neutral-DEFAULT m-0">{hotelData.address}, {hotelData.location}</p>
+            <img src="/images/location.png" alt="locatio -->n" class="w-4 h-4" />
+            <p class="text-base text-neutral-DEFAULT m-0">{hotelData.address}</p>
           </div>
         </div>
       </div>
@@ -125,8 +127,8 @@ const title = `Hotel ${hotelData.name}`;
       </div>
       <div class="flex flex-col gap-2 mb-4">
         <h2 class="text-h2 font-heading text-neutral-darkest">About this hotel</h2>
-        <div class="flex flex-row gap-8">
-          <div class="flex flex-col  md:flex-col gap-4">
+        <div class="flex flex-col md:flex-row gap-8">
+          <div class="flex flex-row md:flex-col w-full md:w-1/5 md:flex-col gap-4">
              {/* Sostenibilidad */}
              {/*hotelData.sustainability_rating && (
                <div class="">
@@ -196,7 +198,7 @@ const title = `Hotel ${hotelData.name}`;
                </div>
              )}
           </div>
-          <div>
+          <div class="w-full md:w-4/5">
             <p class="text-base text-neutral-DEFAULT m-0 mb-2">{hotelData.description}</p>
             <p class="text-base text-neutral-DEFAULT m-0">{hotelData.unique_experiences}</p>
           </div>
@@ -204,20 +206,20 @@ const title = `Hotel ${hotelData.name}`;
       </div>
       <div class="flex flex-col gap-2 mb-4 md:max-w-4xl">
          <h2 class="text-h2 font-heading text-neutral-darkest">Hotel information</h2>
-         <div class="flex flex-row gap-8">
+         <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
            {hotelData.hotel_information.map((item: any) => (
-             <div class="flex flex-col gap-4">
+             <div class="flex flex-col gap-4 flex-1">
                <div class="flex flex-row items-center gap-2">
                  <div class="w-5 h-5 flex items-center justify-center flex-shrink-0">
                    <span class="material-symbols-outlined text-primary text-xs">{getIconForTitle(item.title)}</span>
                  </div>
                  <p class="text-base font-semibold text-neutral-darkest text-nowrap">{item.title}</p>
                </div>
-               {item.description.map((description: any) => <div class="flex flex-row items-center gap-2">
+               {item.description.map((description: any) => <div class="flex flex-row items-start gap-2">
                  <div class="w-4 h-4 flex items-center justify-center flex-shrink-0 mt-0.5">
                    <span class="material-symbols-outlined text-primary text-xs">check</span>
                  </div>
-                 <p class="text-base text-neutral-DEFAULT m-0 max-w-lg">{description}</p>
+                 <p class="text-base text-neutral-DEFAULT m-0 flex-1 break-words">{description}</p>
                </div>)}
              </div>
            ))
@@ -235,7 +237,6 @@ const title = `Hotel ${hotelData.name}`;
       </div>
 		</div>
 	</main>
-
 	<AuthModalWrapper client:load />
 	<StoreDebuggerWrapper client:load />
 </Layout>

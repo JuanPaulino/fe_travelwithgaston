@@ -3,6 +3,7 @@ import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 import { useBookingStore } from '../stores/useBookingStore.js'
 import { useAuth } from '../lib/useAuth.js'
+import MembershipCard from './MembershipCard.jsx'
 
 const AvailableHotelRooms = ({ parentHotelData }) => {
   const { searchData, executeSearch } = useSearchStore();
@@ -32,8 +33,9 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
         }
       }
     };
-
-    fetchHotelAvailability();
+    if (isAuthenticated) {
+      fetchHotelAvailability();
+    }
   }, [searchData?.selectedDestinationId, executeSearch]);
 
   const hotel = hotelData;
@@ -128,18 +130,18 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
 
   return (
     <div className="mb-8 w-full">
-      <h2 className="text-h3 sm:text-h3-desktop font-heading text-neutral-darkest mb-6">
-        Select your room
-      </h2>
       {
       roomTypes.length > 0
         ? <>
+            <h2 className="text-h3 sm:text-h3-desktop font-heading text-neutral-darkest mb-6">
+              Select your room
+            </h2>
             {roomTypes.map((room, index) => (
               <div key={index} className={`flex flex-col md:flex-row gap-6 border-x border-t ${index === roomTypes.length - 1 ? 'border-b' : ''} border-neutral-lighter p-4`}>
               {/* Panel izquierdo - Imagen y descripción */}
                 <div className="w-full md:w-2/5">
                   {/* Título de la habitación */}
-                  <h3 className="text-h5 sm:text-h5-desktop font-heading text-neutral-darkest">
+                  <h3 className="text-h5 sm:text-h5-desktop font-heading text-neutral-darkest mb-4">
                     {room.name}
                     {room.has_accessibility && " - Accessible"}
                   </h3>
@@ -319,7 +321,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
               </div>
             ))}
           </>
-        : <p className="text-neutral-light font-body">No room information available.</p>}
+        : <MembershipCard />}
     </div>
   );
 };

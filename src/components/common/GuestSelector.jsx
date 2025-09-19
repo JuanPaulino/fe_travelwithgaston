@@ -14,6 +14,10 @@ const GuestSelector = ({
   className = "",
   forceSingleRoom = false
 }) => {
+  // Convertir valores a números para evitar concatenación de strings
+  const numAdults = Number(adults);
+  const numChildren = Number(children);
+  const numRooms = Number(rooms);
   const handleAdultsChange = (newValue) => {
     if (newValue >= 1 && newValue <= 6 && onAdultsChange) {
       onAdultsChange(newValue)
@@ -38,36 +42,34 @@ const GuestSelector = ({
   }
 
   return (
-    <div className={`space-y-4 ${className}`} style={{ pointerEvents: 'auto' }}>
+    <div className={`space-y-4 ${className}`}>
       {/* Adultos */}
       <div className="flex items-center justify-between">
-        <span className="text-gray-900 font-medium">Adults</span>
+        <span className="text-neutral-darker font-medium font-body">Adults</span>
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => handleAdultsChange(adults - 1)}
-            disabled={disabled || adults <= 1}
-            style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-colors ${
-              adults > 1 
-                ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            onClick={() => handleAdultsChange(numAdults - 1)}
+            disabled={disabled || numAdults <= 1}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-all duration-200 ${
+              numAdults > 1 
+                ? 'bg-primary text-white hover:bg-primary-dark active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-lighter' 
+                : 'bg-neutral-lighter text-neutral-light cursor-not-allowed'
             }`}
           >
             -
           </button>
-          <span className="text-gray-900 font-medium min-w-[2rem] text-center">
-            {adults}
+          <span className="text-neutral-darker font-medium min-w-[2rem] text-center font-body">
+            {numAdults}
           </span>
           <button
             type="button"
-            onClick={() => handleAdultsChange(adults + 1)}
-            disabled={disabled || adults >= 6}
-            style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-colors ${
-              adults < 6 
-                ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            onClick={() => handleAdultsChange(numAdults + 1)}
+            disabled={disabled || numAdults >= 6}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-all duration-200 ${
+              numAdults < 6 
+                ? 'bg-primary text-white hover:bg-primary-dark active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-lighter' 
+                : 'bg-neutral-lighter text-neutral-light cursor-not-allowed'
             }`}
           >
             +
@@ -77,33 +79,31 @@ const GuestSelector = ({
 
       {/* Niños */}
       <div className="flex items-center justify-between">
-        <span className="text-gray-900 font-medium">Children</span>
+        <span className="text-neutral-darker font-medium font-body">Children</span>
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => handleChildrenChange(children - 1)}
-            disabled={disabled || children <= 0}
-            style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-colors ${
-              children > 0 
-                ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            onClick={() => handleChildrenChange(numChildren - 1)}
+            disabled={disabled || numChildren <= 0}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-all duration-200 ${
+              numChildren > 0 
+                ? 'bg-primary text-white hover:bg-primary-dark active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-lighter' 
+                : 'bg-neutral-lighter text-neutral-light cursor-not-allowed'
             }`}
           >
             -
           </button>
-          <span className="text-gray-900 font-medium min-w-[2rem] text-center">
-            {children}
+          <span className="text-neutral-darker font-medium min-w-[2rem] text-center font-body">
+            {numChildren}
           </span>
           <button
             type="button"
-            onClick={() => handleChildrenChange(children + 1)}
-            disabled={disabled || children >= 10}
-            style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-colors ${
-              children < 10 
-                ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            onClick={() => handleChildrenChange(numChildren + 1)}
+            disabled={disabled || numChildren >= 10}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-all duration-200 ${
+              numChildren < 10 
+                ? 'bg-primary text-white hover:bg-primary-dark active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-lighter' 
+                : 'bg-neutral-lighter text-neutral-light cursor-not-allowed'
             }`}
           >
             +
@@ -114,9 +114,9 @@ const GuestSelector = ({
       {/* Habitaciones */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-gray-900 font-medium">Rooms</span>
+          <span className="text-neutral-darker font-medium font-body">Rooms</span>
           {forceSingleRoom && (
-            <span className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+            <span className="text-xs text-secondary-dark bg-secondary-lightest px-2 py-1 rounded-full font-body">
               Only 1 room
             </span>
           )}
@@ -124,29 +124,27 @@ const GuestSelector = ({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => handleRoomsChange(rooms - 1)}
-            disabled={disabled || rooms <= 1}
-            style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-colors ${
-              rooms > 1 
-                ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            onClick={() => handleRoomsChange(numRooms - 1)}
+            disabled={disabled || numRooms <= 1}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-all duration-200 ${
+              numRooms > 1 
+                ? 'bg-primary text-white hover:bg-primary-dark active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-lighter' 
+                : 'bg-neutral-lighter text-neutral-light cursor-not-allowed'
             }`}
           >
             -
           </button>
-          <span className="text-gray-900 font-medium min-w-[2rem] text-center">
-            {rooms}
+          <span className="text-neutral-darker font-medium min-w-[2rem] text-center font-body">
+            {numRooms}
           </span>
           <button
             type="button"
-            onClick={() => handleRoomsChange(rooms + 1)}
-            disabled={disabled || rooms >= 8 || forceSingleRoom}
-            style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-colors ${
-              (rooms < 8 && !forceSingleRoom)
-                ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            onClick={() => handleRoomsChange(numRooms + 1)}
+            disabled={disabled || numRooms >= 8 || forceSingleRoom}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-lg font-medium transition-all duration-200 ${
+              (numRooms < 8 && !forceSingleRoom)
+                ? 'bg-primary text-white hover:bg-primary-dark active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-lighter' 
+                : 'bg-neutral-lighter text-neutral-light cursor-not-allowed'
             }`}
           >
             +
@@ -155,9 +153,9 @@ const GuestSelector = ({
       </div>
       
       {/* Selector de edades de niños */}
-      {children > 0 && onChildrenAgesChange && (
+      {numChildren > 0 && onChildrenAgesChange && (
         <ChildrenAgeSelector
-          children={children}
+          children={numChildren}
           childrenAges={childrenAges}
           onChildrenAgesChange={onChildrenAgesChange}
         />

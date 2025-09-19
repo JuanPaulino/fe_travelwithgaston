@@ -154,10 +154,10 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
               )}
             </div>
             {/* Precio y botón */}
-            <div className="md:ml-6">
+            <div className="">
               {isAvailable ? (
                 <>
-                  <div className="mb-4 p-4">
+                  <div className="mb-4 py-4">
                     {hotel.lowest_rate ? (
                       <>
                         <div className="text-3xl font-bold text-gray-900">

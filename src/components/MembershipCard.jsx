@@ -66,7 +66,7 @@ const MembershipCard = () => {
           <img
             src={membershipCardImage}
             alt="Travel with Gaston Membership Card"
-            className="w-full max-w-sm rounded-2xl shadow-lg"
+            className="w-full max-h-[250px] object-contain rounded-2xl shadow-lg"
           />
         </div>
 
@@ -95,22 +95,33 @@ const MembershipCard = () => {
               </button>
             )}
 
-            <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-4">
-              {/* Solo mostrar "Already a member? Sign In" si NO está autenticado */}
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-4 mt-8">
+              {/* Mostrar botones cuando NO está autenticado */}
               {!authStatus && (
-                <p className="text-neutral-DEFAULT text-xs">
-                  Already a member? 
+                <>
+                  {/* Botón principal Join Us - más destacado */}
                   <button 
-                    className="ml-1 text-neutral-darkest font-medium hover:text-neutral-dark transition-colors underline"
-                    onClick={handleSignIn}
+                    className="bg-black hover:bg-primary text-white px-8 py-3 text-base font-semibold transition-colors shadow-md hover:shadow-lg"
+                    onClick={handleBecomeMember}
                   >
-                    Sign In
+                    Join Us
                   </button>
-                </p>
+                  
+                  {/* Botón secundario Sign In - menos destacado */}
+                  <p className="text-neutral-DEFAULT text-xs">
+                    Already a member? 
+                    <button 
+                      className="ml-1 text-neutral-darkest font-medium hover:text-neutral-dark transition-colors underline"
+                      onClick={handleSignIn}
+                    >
+                      Sign In
+                    </button>
+                  </p>
+                </>
               )}
 
-              {
-              authStatus && user?.role === 'basic' && (
+              {/* Mostrar botón Become a member si está autenticado y tiene rol basic */}
+              {authStatus && user?.role === 'basic' && (
                 <button 
                   className="bg-neutral-darkest hover:bg-neutral-dark text-white px-8 py-3 text-base font-medium transition-colors"
                   onClick={handleBecomeMember}>
