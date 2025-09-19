@@ -269,6 +269,8 @@ const BookingDetail = ({ booking, onBack }) => {
       </div>
 
       {/* Botones de acción */}
+      {/*
+      TODO: Add back the buttons
       <div className="mt-8 flex flex-col sm:flex-row gap-4">
         <button className="flex-1 bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors font-medium">
           Download confirmation
@@ -282,6 +284,7 @@ const BookingDetail = ({ booking, onBack }) => {
           Contact support
         </button>
       </div>
+      */}
     </div>
   );
 };

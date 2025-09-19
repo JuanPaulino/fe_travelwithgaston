@@ -24,6 +24,7 @@ const AuthModalWrapper = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    window.location.reload();
   };
 
   return (

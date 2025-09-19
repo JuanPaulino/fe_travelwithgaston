@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../lib/useAuth';
 import { authAPI, handleAPIError } from '../../lib/http';
+import worldCities from '../../data/world-cities.json';
 
 const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess }) => {
   const [formData, setFormData] = useState({
@@ -15,13 +16,52 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
     whatsapp: false,
     terms: false
   });
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  
+  // Estados para el autocompletador de ciudades
+  const [citySearch, setCitySearch] = useState('');
+  const [filteredCities, setFilteredCities] = useState([]);
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const [selectedCityIndex, setSelectedCityIndex] = useState(-1);
+  const cityInputRef = useRef(null);
+  const cityDropdownRef = useRef(null);
 
   // Usar el hook de autenticación para acceder al store
   const { register } = useAuth();
+
+  // Efecto para filtrar ciudades cuando cambia la búsqueda
+  useEffect(() => {
+    if (citySearch.length > 0) {
+      const filtered = worldCities.filter(city =>
+        city.toLowerCase().includes(citySearch.toLowerCase())
+      ).slice(0, 10); // Limitar a 10 resultados
+      setFilteredCities(filtered);
+      setShowCityDropdown(true);
+      setSelectedCityIndex(-1);
+    } else {
+      setFilteredCities([]);
+      setShowCityDropdown(false);
+    }
+  }, [citySearch]);
+
+  // Efecto para cerrar el dropdown cuando se hace click fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target) &&
+          cityInputRef.current && !cityInputRef.current.contains(event.target)) {
+        setShowCityDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -36,6 +76,89 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
         ...prev,
         [name]: ''
       }));
+    }
+  };
+
+  // Función para manejar la búsqueda de ciudades
+  const handleCitySearch = (e) => {
+    const value = e.target.value;
+    setCitySearch(value);
+    setFormData(prev => ({
+      ...prev,
+      city: value
+    }));
+  };
+
+  // Función para autocompletar con la primera sugerencia
+  const handleCityInput = (e) => {
+    const value = e.target.value;
+    setCitySearch(value);
+    setFormData(prev => ({
+      ...prev,
+      city: value
+    }));
+
+    // Si hay sugerencias y el usuario no ha seleccionado una opción específica
+    if (filteredCities.length > 0 && selectedCityIndex === -1) {
+      const firstSuggestion = filteredCities[0];
+      // Solo autocompletar si el valor actual es un prefijo de la primera sugerencia
+      if (firstSuggestion.toLowerCase().startsWith(value.toLowerCase()) && value.length > 0) {
+        // No autocompletar automáticamente, solo mostrar sugerencias
+        setShowCityDropdown(true);
+      }
+    }
+  };
+
+  // Función para seleccionar una ciudad del dropdown
+  const selectCity = (city) => {
+    setCitySearch(city);
+    setFormData(prev => ({
+      ...prev,
+      city: city
+    }));
+    setShowCityDropdown(false);
+    setSelectedCityIndex(-1);
+  };
+
+  // Función para manejar la navegación con teclado
+  const handleCityKeyDown = (e) => {
+    if (!showCityDropdown) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedCityIndex(prev => 
+          prev < filteredCities.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedCityIndex(prev => prev > 0 ? prev - 1 : -1);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedCityIndex >= 0 && selectedCityIndex < filteredCities.length) {
+          selectCity(filteredCities[selectedCityIndex]);
+        } else if (filteredCities.length > 0) {
+          // Si no hay selección específica, tomar la primera opción
+          selectCity(filteredCities[0]);
+        }
+        break;
+      case 'Tab':
+        e.preventDefault();
+        if (filteredCities.length > 0) {
+          if (selectedCityIndex >= 0 && selectedCityIndex < filteredCities.length) {
+            selectCity(filteredCities[selectedCityIndex]);
+          } else {
+            // Autocompletar con la primera sugerencia
+            selectCity(filteredCities[0]);
+          }
+        }
+        break;
+      case 'Escape':
+        setShowCityDropdown(false);
+        setSelectedCityIndex(-1);
+        break;
     }
   };
 
@@ -68,8 +191,8 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter and one number';
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter and one lowercase letter. We recommend adding numbers and special characters for better security.';
     }
     
     if (!formData.confirmPassword.trim()) {
@@ -275,7 +398,16 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
               onClick={() => togglePasswordVisibility('password')}
               className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              {showPassword ? 'Hide' : 'Show'}
+              {showPassword ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              )}
             </button>
           </div>
           {errors.password && (
@@ -303,7 +435,16 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
               onClick={() => togglePasswordVisibility('confirmPassword')}
               className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
             >
-              {showConfirmPassword ? 'Hide' : 'Show'}
+              {showConfirmPassword ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              )}
             </button>
           </div>
           {errors.confirmPassword && (
@@ -316,22 +457,64 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
         <label className="block font-body text-sm font-semibold text-gray-900 mb-3">
           City of residence*
         </label>
-        <div className="relative">
+        <div className="relative" ref={cityDropdownRef}>
           <input
+            ref={cityInputRef}
             type="text"
             name="city"
-            value={formData.city}
-            onChange={handleInputChange}
-            placeholder="*required"
+            value={citySearch}
+            onChange={handleCityInput}
+            onKeyDown={handleCityKeyDown}
+            onFocus={() => citySearch.length > 0 && setShowCityDropdown(true)}
+            placeholder="Search for your city worldwide... (Press Tab to autocomplete)"
             className={`w-full h-10 px-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-colors ${
               errors.city ? 'border-red-300' : 'border-gray-300'
             }`}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
+            data-lpignore="true"
+            data-form-type="other"
+            role="combobox"
+            aria-expanded={showCityDropdown}
+            aria-haspopup="listbox"
+            aria-autocomplete="list"
           />
           <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
+          
+          {/* Dropdown de ciudades */}
+          {showCityDropdown && filteredCities.length > 0 && (
+            <div 
+              className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto"
+              role="listbox"
+              aria-label="City suggestions"
+            >
+              {filteredCities.map((city, index) => (
+                <div
+                  key={city}
+                  className={`px-4 py-2 cursor-pointer hover:bg-gray-100 flex items-center justify-between ${
+                    index === selectedCityIndex ? 'bg-amber-50 text-amber-700' : ''
+                  }`}
+                  onClick={() => selectCity(city)}
+                  onMouseEnter={() => setSelectedCityIndex(index)}
+                  role="option"
+                  aria-selected={index === selectedCityIndex}
+                >
+                  <span className="text-sm">{city}</span>
+                  {index === 0 && (
+                    <span className="text-xs text-gray-500 ml-2">
+                      Press Tab to autocomplete
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         {errors.city && (
           <p className="mt-1 text-sm text-red-600">{errors.city}</p>

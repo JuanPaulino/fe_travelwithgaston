@@ -29,12 +29,12 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   const [minCheckOutDate, setMinCheckOutDate] = useState('')
   const dropdownRef = useRef(null)
 
-  // Mostrar campos adicionales si hay datos iniciales
+  // Mostrar campos adicionales solo si hay parámetros de URL
   useEffect(() => {
-    if (initialData.selectedDestinationId) {
+    if (Object.keys(urlParams).length > 0 && urlParams.destinationId) {
       setShowAdditionalFields(true)
     }
-  }, [initialData])
+  }, [urlParams])
 
   // Función para autocompletar el formulario con datos externos
   const autocompleteForm = (sourceData) => {
@@ -88,23 +88,22 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     }
   );
 
-  // Autocompletar formulario con parámetros de URL o initialData al cargar
+  // Solo autocompletar formulario con parámetros de URL (no con initialData)
   useEffect(() => {
-    const sourceData = Object.keys(urlParams).length > 0 && urlParams.destinationId ? urlParams : initialData;
-    
-    if (sourceData.destinationId || sourceData.destination) {
-      autocompleteForm(sourceData);
+    // Solo proceder si hay parámetros de URL válidos
+    if (Object.keys(urlParams).length > 0 && urlParams.destinationId) {
+      autocompleteForm(urlParams);
       
       // En móvil, mostrar campos adicionales después de autocompletar
       if (typeof window !== 'undefined' && window.innerWidth < 1024) {
         setShowAdditionalFields(true);
       }
 
-      if (canExecuteAutoSearch(sourceData)) {
+      if (canExecuteAutoSearch(urlParams)) {
         debouncedAutoSearch();
       }
     }
-  }, [urlParams, initialData]);
+  }, [urlParams]);
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
@@ -180,6 +179,10 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   // Manejar cambio de texto en el input de búsqueda
   const handleSearchTextChange = (text) => {
     setSearchText(text)
+    // Mostrar campos adicionales cuando el usuario empiece a escribir
+    if (text && !showAdditionalFields) {
+      setShowAdditionalFields(true)
+    }
     if (searchData.selectedDestinationId && text !== searchData.selectedDestinationText) {
       setSelectedDestination(null)
       // En móvil, ocultar campos adicionales si se borra la selección
@@ -243,6 +246,17 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     return typeof window !== 'undefined' && (window.location.pathname === '/' || window.location.pathname === '/index.html');
   }
 
+  // Función para determinar si debe mostrar valores del store o campos vacíos
+  const shouldShowStoreValues = () => {
+    // Mostrar valores del store si hay parámetros de URL o si el usuario ha interactuado
+    return (Object.keys(urlParams).length > 0 && urlParams.destinationId) || showAdditionalFields;
+  }
+
+  // Función para obtener el valor a mostrar en los campos
+  const getFieldValue = (storeValue, emptyValue = '') => {
+    return shouldShowStoreValues() ? storeValue : emptyValue;
+  }
+
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -287,7 +301,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
               <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
                 <SearchAutocomplete
-                  value={searchData.searchText}
+                  value={getFieldValue(searchData.searchText)}
                   onChange={handleSearchTextChange}
                   onSelectionChange={handleDestinationSelection}
                   onClear={() => {
@@ -311,7 +325,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                   </svg>
                   <input
                     type="date"
-                    value={searchData.checkInDate}
+                    value={getFieldValue(searchData.checkInDate)}
                     onChange={(e) => setCheckInDate(e.target.value)}
                     disabled={disabled}
                     className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
@@ -333,7 +347,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                   </svg>
                   <input
                     type="date"
-                    value={searchData.checkOutDate}
+                    value={getFieldValue(searchData.checkOutDate)}
                     onChange={(e) => setCheckOutDate(e.target.value)}
                     disabled={disabled}
                     className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
@@ -352,7 +366,12 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                 disabled={disabled}
                 className="w-full flex items-center justify-between gap-2 text-base font-medium text-gray-900 p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
               >
-                <span>{searchData.adults} Adults, {searchData.children} child, {searchData.rooms} rooms</span>
+                <span>
+                  {shouldShowStoreValues() 
+                    ? `${searchData.adults} Adults, ${searchData.children} child, ${searchData.rooms} rooms`
+                    : 'Select guests'
+                  }
+                </span>
                 <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -417,7 +436,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
               <div className="flex items-center gap-2">
                 <SearchAutocomplete
-                  value={searchData.searchText}
+                  value={getFieldValue(searchData.searchText)}
                   onChange={handleSearchTextChange}
                   onSelectionChange={handleDestinationSelection}
                   onClear={() => {
@@ -439,7 +458,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                 </svg>
                 <input
                   type="date"
-                  value={searchData.checkInDate}
+                  value={getFieldValue(searchData.checkInDate)}
                   onChange={(e) => setCheckInDate(e.target.value)}
                   disabled={disabled}
                   className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 bg-transparent cursor-pointer"
@@ -461,7 +480,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                 </svg>
                 <input
                   type="date"
-                  value={searchData.checkOutDate}
+                  value={getFieldValue(searchData.checkOutDate)}
                   onChange={(e) => setCheckOutDate(e.target.value)}
                   disabled={disabled}
                   className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 bg-transparent cursor-pointer"
@@ -479,7 +498,12 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
                 disabled={disabled}
                 className=" flex items-center gap-2 text-base font-medium text-gray-900 hover:text-gray-700 transition-colors"
               >
-                <span>{searchData.adults} Adults, {searchData.children} child, {searchData.rooms} rooms</span>
+                <span>
+                  {shouldShowStoreValues() 
+                    ? `${searchData.adults} Adults, ${searchData.children} child, ${searchData.rooms} rooms`
+                    : 'Select guests'
+                  }
+                </span>
               </button>
 
               {/* Dropdown de huéspedes */}
