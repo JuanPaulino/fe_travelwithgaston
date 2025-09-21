@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { bookingAPI, handleAPIError } from '../../lib/http';
+import { showSuccess, showError } from '../../stores/bannerStore';
+import ConfirmationModal from '../modals/ConfirmationModal';
 
 const BookingDetail = ({ booking, onBack }) => {
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+
   if (!booking || !booking.providerData) {
     return (
       <div className="text-center py-12">
@@ -17,6 +23,42 @@ const BookingDetail = ({ booking, onBack }) => {
 
   const { providerData } = booking;
   const room = providerData.rooms?.[0]; // Tomamos la primera habitación
+
+  // Función para mostrar el modal de confirmación
+  const handleCancelClick = () => {
+    setShowCancelModal(true);
+  };
+
+  // Función para manejar la cancelación de la reserva
+  const handleCancelBooking = async () => {
+    setIsCancelling(true);
+    setShowCancelModal(false);
+
+    try {
+      const result = await bookingAPI.cancelBooking(booking.id);
+      
+      if (result.success) {
+        // Mostrar mensaje de éxito con banner
+        showSuccess('Booking cancelled successfully!', { autoHide: true });
+        
+        // Actualizar el estado de la reserva en el componente padre
+        if (typeof onBack === 'function') {
+          onBack();
+        }
+        // Recargar la página para mostrar el estado actualizado
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        showError(result.message || 'Error cancelling the booking', { autoHide: true });
+      }
+    } catch (error) {
+      const errorResult = handleAPIError(error);
+      showError(errorResult.message, { autoHide: true });
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -269,22 +311,38 @@ const BookingDetail = ({ booking, onBack }) => {
       </div>
 
       {/* Botones de acción */}
-      {/*
-      TODO: Add back the buttons
       <div className="mt-8 flex flex-col sm:flex-row gap-4">
-        <button className="flex-1 bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors font-medium">
-          Download confirmation
-        </button>
         {providerData.is_cancellable && (
-          <button className="flex-1 bg-white border border-red-300 text-red-700 px-6 py-3 rounded-md hover:bg-red-50 transition-colors font-medium">
-            Cancel booking
+          <button 
+            onClick={handleCancelClick}
+            disabled={isCancelling}
+            className="flex-1 bg-white border border-red-300 text-red-700 px-6 py-3 rounded-md hover:bg-red-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isCancelling ? 'Cancelling...' : 'Cancel booking'}
           </button>
         )}
-        <button className="flex-1 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors font-medium">
-          Contact support
-        </button>
+        {/*
+          TODO: Add back the buttons
+          <button className="flex-1 bg-black text-white px-6 py-3 rounded-md hover:bg-gray-800 transition-colors font-medium">
+            Download confirmation
+          </button>
+          <button className="flex-1 bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 transition-colors font-medium">
+            Contact support
+          </button>
+        */}
       </div>
-      */}
+
+      {/* Modal de confirmación */}
+      <ConfirmationModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleCancelBooking}
+        title="Cancel Booking"
+        message="Are you sure you want to cancel this booking? This action cannot be undone."
+        confirmText="Yes, Cancel"
+        cancelText="Keep Booking"
+        type="danger"
+      />
     </div>
   );
 };
