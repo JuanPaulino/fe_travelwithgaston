@@ -7,10 +7,14 @@ const { data } = Astro.props;
 // Extraer los datos del bloque hero
 const headline = data?.headline || "Unbeatable rates and exclusive perks at the world's finest hotels";
 const description = data?.description || "Yorem ipsum dolor sit amet, consectetur adipiscing elit.";
-const image = data?.image;
 const layout = data?.layout;
+const activeCarrusel = data?.active_carrusel;
+const image = data?.image;
+const images = data?.images;
 // Construir la URL de la imagen si existe
 const backgroundImage = image ? `${import.meta.env.DIRECTUS_URL}/assets/${image}` : null;
+// Construir las URLs de las imágenes del carrusel
+const carruselImages = images ? images.map((img: any) => `${import.meta.env.DIRECTUS_URL}/assets/${img.directus_files_id}`) : [];
 ---
 {layout === 'hero_text_top' && (
   <div class="mx-auto w-full px-8 lg:w-full xl:max-w-7xl 2xl:max-w-7xl py-8">
@@ -48,7 +52,7 @@ const backgroundImage = image ? `${import.meta.env.DIRECTUS_URL}/assets/${image}
     </section>
   </div>
 )}
-{layout === 'main' && (
+{layout === 'main' && !activeCarrusel && (
   <section class={`h-auto min-h-[300px] sm:min-h-[350px] md:h-[650px] md:min-h-[650px] lg:h-[500px] lg:min-h-[500px] py-8 px-2 xs:px-4 relative flex items-center justify-center box-content ${!backgroundImage ? 'bg-gradient-to-br from-indigo-500 to-purple-600' : ''}`}>
     {backgroundImage && (
       <div class="absolute inset-0 z-0">
@@ -78,6 +82,51 @@ const backgroundImage = image ? `${import.meta.env.DIRECTUS_URL}/assets/${image}
       <!-- Formulario de búsqueda -->
       <div class="w-full max-w-full z-10">
         <SearchForm client:load />
+      </div>
+    </div>
+  </section>
+)}
+
+{layout === 'main' && activeCarrusel && (
+  <section class="h-auto min-h-[300px] sm:min-h-[350px] md:h-[650px] md:min-h-[650px] lg:h-[500px] lg:min-h-[500px] py-8 px-2 xs:px-4 relative flex items-center justify-center box-content bg-gradient-to-br from-indigo-500 to-purple-600">
+    {carruselImages.length > 0 && (
+      <div class="absolute inset-0 z-0">
+        <!-- Carrusel de imágenes -->
+        <div class="carousel-container w-full h-full relative overflow-hidden">
+          {carruselImages.map((imgSrc: string, index: number) => (
+            <div 
+              class={`carousel-slide absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === 0 ? 'opacity-100' : 'opacity-0'}`}
+              data-slide={index}
+            >
+              <img
+                src={imgSrc}
+                alt={`Hero background ${index + 1}`}
+                class="w-full h-full object-cover"
+                loading="eager"
+              />
+            </div>
+          ))}
+        </div>
+        <!-- Overlay muy sutil solo para mejorar legibilidad del texto -->
+        <div class="absolute inset-0 bg-black opacity-25"></div>
+      </div>
+    )}
+    
+    <!-- Contenido del hero -->
+    <div class="relative z-10 text-left text-white max-w-6xl mx-auto px-2 xs:px-4 w-full">
+      <!-- Headline principal -->
+      <h1 class="hero-headline font-semibold leading-tight mb-6 break-words overflow-hidden w-full">
+        {headline}
+      </h1>
+      
+      <!-- Descripción -->
+      <p class="hero-description font-light mb-8 max-w-2xl w-full">
+        {description}
+      </p>
+
+      <!-- Formulario de búsqueda -->
+      <div class="w-full max-w-full z-10">
+        <SearchForm client:load isMain={true} />
       </div>
     </div>
   </section>
@@ -158,3 +207,33 @@ const backgroundImage = image ? `${import.meta.env.DIRECTUS_URL}/assets/${image}
     }
   }
 </style>
+
+<script>
+  // Carrusel automático para el hero
+  document.addEventListener('DOMContentLoaded', function() {
+    const carouselContainer = document.querySelector('.carousel-container');
+    if (!carouselContainer) return;
+    
+    const slides = carouselContainer.querySelectorAll('.carousel-slide');
+    if (slides.length <= 1) return;
+    
+    let currentSlide = 0;
+    
+    function showSlide(index: number) {
+      slides.forEach((slide, i) => {
+        (slide as HTMLElement).style.opacity = i === index ? '1' : '0';
+      });
+    }
+    
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }
+    
+    // Cambiar slide cada 5 segundos
+    setInterval(nextSlide, 5000);
+    
+    // Inicializar con la primera imagen
+    showSlide(0);
+  });
+</script>

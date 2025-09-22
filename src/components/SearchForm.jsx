@@ -5,7 +5,7 @@ import { useSearchStore } from '../stores/useSearchStore.js'
 import { useUrlParams } from '../hooks/useUrlParams.js'
 import { useDebounce } from '../hooks/useDebounce.js'
 
-function SearchForm({ initialData = {}, disabled = false, className = "" }) {
+function SearchForm({ initialData = {}, disabled = false, className = "", isMain = false }) {
   const { 
     searchData, 
     setSearchText, 
@@ -244,8 +244,8 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
 
   // Función para verificar si estamos en la página home
   const isOnHomePage = () => {
-    if (typeof window === 'undefined') return false;
-    return window.location.pathname === '/' || window.location.pathname === '/index.html';
+    if (isMain) return true;
+    return false;
   }
 
   // Función para determinar si debe mostrar valores del store o campos vacíos
@@ -317,14 +317,16 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
       return 'opacity-100';
     }
     const text = getFieldValue(searchData.searchText);
-
     if (text && text.trim().length > 0) {
       return 'opacity-100';
     }
     
     return 'opacity-60 hover:opacity-100';
   })();
-
+  console.log(isOnHomePage());
+  console.log(getFieldValue(searchData.searchText));
+  console.log(searchData.searchText);
+  console.log(opacityClasses);
   return (
     <div className={className}>
       <form 

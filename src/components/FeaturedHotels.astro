@@ -8,7 +8,7 @@ const description = data?.tagline || "Yorem ipsum dolor sit amet, consectetur ad
 const items = data?.items || [];
 
 // Construir la URL de Directus para las imágenes
-const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL;
 
 // Procesar los items para extraer solo los datos necesarios
 const hotelItems = items.map((item: any) => ({
@@ -335,7 +335,13 @@ const hotelItems = items.map((item: any) => ({
         behavior: 'smooth'
       });
     });
-    
+    setInterval(() => {
+        const scrollAmount = getScrollAmount();
+        scrollContainer?.scrollBy({
+        left: scrollAmount,
+          behavior: 'smooth'
+        });
+    }, 5000);
     // Actualizar visibilidad de botones al hacer scroll
     scrollContainer?.addEventListener('scroll', updateButtonVisibility);
     
