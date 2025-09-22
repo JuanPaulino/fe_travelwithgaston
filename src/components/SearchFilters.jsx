@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { filtersApi } from '../lib/http.js';
 import { useFiltersStore } from '../stores/useFiltersStore.js';
+import { useSearchStore } from '../stores/useSearchStore.js';
 import { capitalize, replaceUnderscores } from '../lib/stringUtils.js';
 
 const SearchFilters = () => {
@@ -16,6 +17,9 @@ const SearchFilters = () => {
     clearAllFilters, 
     getFilterCount 
   } = useFiltersStore();
+
+  // Usar el store de búsqueda para ejecutar búsquedas automáticas
+  const { executeSearch, isSearchValid } = useSearchStore();
 
   useEffect(() => {
     fetchFilters();
@@ -42,9 +46,21 @@ const SearchFilters = () => {
     }
   };
 
-  const handleFilterChange = (category, filterId, checked) => {
+  const handleFilterChange = async (category, filterId, checked) => {
     // Usar la acción del store para toggle del filtro
     toggleFilter(category, filterId);
+    
+    // Ejecutar búsqueda automática si los datos requeridos están completos
+    if (isSearchValid()) {
+      console.log('🔍 SearchFilters - Ejecutando búsqueda automática después de cambiar filtro');
+      try {
+        await executeSearch();
+      } catch (error) {
+        console.error('❌ SearchFilters - Error al ejecutar búsqueda automática:', error);
+      }
+    } else {
+      console.log('⚠️ SearchFilters - No se puede ejecutar búsqueda automática, datos incompletos');
+    }
   };
 
   const toggleCategory = (category) => {
@@ -54,8 +70,20 @@ const SearchFilters = () => {
     }));
   };
 
-  const resetFilters = () => {
+  const resetFilters = async () => {
     clearAllFilters();
+    
+    // Ejecutar búsqueda automática después de limpiar filtros si los datos requeridos están completos
+    if (isSearchValid()) {
+      console.log('🔍 SearchFilters - Ejecutando búsqueda automática después de limpiar filtros');
+      try {
+        await executeSearch();
+      } catch (error) {
+        console.error('❌ SearchFilters - Error al ejecutar búsqueda automática:', error);
+      }
+    } else {
+      console.log('⚠️ SearchFilters - No se puede ejecutar búsqueda automática, datos incompletos');
+    }
   };
 
   if (loading) {
