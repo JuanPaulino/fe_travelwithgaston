@@ -82,7 +82,7 @@ const formFields = {
     label: 'Do you have specific travel dates?',
     required: false,
     choices: travelDateOptions,
-    width: '50'
+    width: '100'
   },
   startDate: {
     id: 'start-date',
@@ -107,7 +107,7 @@ const formFields = {
     label: 'How many nights do you plan to travel?',
     required: false,
     choices: nightsOptions,
-    width: '50'
+    width: '100'
   },
   currency: {
     id: 'currency',
@@ -307,29 +307,34 @@ const formFields = {
         </div>
   
         <!-- Travel Dates -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="mb-6">
           <FormField field={formFields.travelDates} />
-          <div>
-            <label class="block text-sm text-gray-700 mb-2">In case you have specific dates, please let us know here</label>
-            <div class="grid grid-cols-2 gap-2">
-              <FormField field={formFields.startDate} />
-              <FormField field={formFields.returnDate} />
-            </div>
+        </div>
+        
+        <!-- Specific Dates -->
+        <div class="mb-6">
+          <label class="block text-sm text-gray-700 mb-2">En caso de que tengas fechas específicas, por favor háznoslo saber aquí</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField field={formFields.startDate} />
+            <FormField field={formFields.returnDate} />
           </div>
         </div>
 
         <!-- Nights and Budget -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <!-- Nights field in its own row -->
+        <div class="mb-6">
           <FormField field={formFields.nights} />
-          <div>
-            <label class="block text-sm text-gray-700 mb-2">What is your estimated budget per person?</label>
-            <div class="grid grid-cols-2 gap-2">
-              <FormField field={formFields.currency} />
-              <FormField field={formFields.budgetAmount} />
-            </div>
-            <div class="mt-2">
-              <FormField field={formFields.budgetDetails} />
-            </div>
+        </div>
+
+        <!-- Budget section in the next row -->
+        <div class="mb-6">
+          <label class="block text-sm text-gray-700 mb-2">What is your estimated budget per person?</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField field={formFields.currency} />
+            <FormField field={formFields.budgetAmount} />
+          </div>
+          <div class="mt-2">
+            <FormField field={formFields.budgetDetails} />
           </div>
         </div>
 

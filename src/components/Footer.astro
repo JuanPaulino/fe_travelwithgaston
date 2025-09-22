@@ -14,13 +14,13 @@ const { data: footerNavigationData, error } = await getFooterNavigation();
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
       {footerNavigationData && footerNavigationData.map((section: any) => (
         <div class="space-y-4">
-          <Heading level={5} className="text-white font-semibold">{section.title}</Heading>
+          <Heading level={5} className="text-white font-semibold text-base">{section.title}</Heading>
           <ul class="space-y-2">
             {section.items && section.items.map((item: any) => (
               <li>
                 <a 
                   href={item.url || (item.page ? `${item.page.permalink || item.title.toLowerCase().replace(/\s+/g, '-')}` : `${item.title.toLowerCase().replace(/\s+/g, '-')}`)} 
-                  class="font-body text-base text-gray-300 hover:text-white transition-colors"
+                  class="font-body text-sm text-gray-300 hover:text-white transition-colors"
                 >
                   {item.title}
                 </a>
@@ -39,8 +39,8 @@ const { data: footerNavigationData, error } = await getFooterNavigation();
         
         <!-- Lado izquierdo: Branding -->
         <div class="space-y-1">
-          <img src="/api/assets/logo_x2.png" alt="Travel with Gastón" class="w-50 md:w-auto md:h-5 lg:h-8">
-          <Text size="sm" className="text-gray-400">Powered by Little Emperors</Text>
+          <img src="/logo_x2.png" alt="Travel with Gastón" class="w-50 md:w-auto md:h-5 lg:h-8">
+          <Text size="sm" className="text-gray-400 text-sm">Powered by Little Emperors</Text>
         </div>
 
         <!-- Lado derecho: Enlaces legales -->

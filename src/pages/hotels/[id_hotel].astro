@@ -125,10 +125,14 @@ const title = `Hotel ${hotelData.name}`;
       <div class="mb-4">
         <HotelImageGallery client:load images={hotelImages} />
       </div>
-      <div class="flex flex-col gap-2 mb-4">
+      <div class="flex flex-col gap-2 mb-8">
         <h2 class="text-h2 font-heading text-neutral-darkest">About this hotel</h2>
-        <div class="flex flex-col md:flex-row gap-8">
-          <div class="flex flex-row md:flex-col w-full md:w-1/5 md:flex-col gap-4">
+        <div class="flex flex-col gap-8">
+          <div class="w-full">
+            <p class="text-base text-neutral-DEFAULT m-0 mb-2">{hotelData.description}</p>
+            <p class="text-base text-neutral-DEFAULT m-0">{hotelData.unique_experiences}</p>
+          </div>
+          <div class="flex flex-row w-full gap-4">
              {/* Sostenibilidad */}
              {/*hotelData.sustainability_rating && (
                <div class="">
@@ -198,10 +202,7 @@ const title = `Hotel ${hotelData.name}`;
                </div>
              )}
           </div>
-          <div class="w-full md:w-4/5">
-            <p class="text-base text-neutral-DEFAULT m-0 mb-2">{hotelData.description}</p>
-            <p class="text-base text-neutral-DEFAULT m-0">{hotelData.unique_experiences}</p>
-          </div>
+
         </div>
       </div>
       <div class="flex flex-col gap-2 mb-4 md:max-w-4xl">

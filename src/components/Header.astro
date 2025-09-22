@@ -3,7 +3,7 @@
 import AuthActions from './AuthActions.jsx';
 import AuthActionsMobile from './AuthActionsMobile.jsx';
 import { getNavigationData } from '../lib/directus.js';
-
+import { Image } from "astro:assets";
 // Obtener datos de navegación
 const { data: navigationData, error } = await getNavigationData();
 const mainNavigation = navigationData?.find(nav => nav.id === 'main')?.items || [];
@@ -109,7 +109,7 @@ console.log(mainNavigation);
     <!-- Logo -->
     <div class="flex-1 flex flex-col md:justify-center md:items-center">
       <a href="/">
-        <img src="/api/assets/logo_x2.png" alt="Travel with Gastón" class="w-50 md:w-auto md:h-5 lg:h-8">
+        <img src="/logo_x2.png" alt="Travel with Gastón" class="w-50 md:w-auto md:h-5 lg:h-8">
       </a>
       <div class="mt-2 hidden md:block text-center text-xs font-normal text-neutral-dark italic font-heading">Crafting Journeys Beyond Expectations</div>
     </div>
