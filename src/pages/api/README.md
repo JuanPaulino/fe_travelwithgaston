@@ -1,85 +1,171 @@
-# API Endpoints
+# API Endpoints Documentation
 
-## Trip Inquiry API
+This document describes the API endpoints for the Travel with Gaston forms.
 
-### Endpoint: `/api/trip-inquiry`
+## Available Endpoints
 
-**Método:** POST  
-**Content-Type:** application/json
+### 1. Trip Inquiry Form
+- **Endpoint**: `/api/trip-inquiry`
+- **Method**: `POST`
+- **Description**: Handles trip inquiry form submissions
+- **File**: `src/pages/api/trip-inquiry.js`
 
-### Descripción
-Endpoint para procesar el formulario de consulta de viajes. Valida los datos del formulario y los envía al webhook de Travel with Gaston.
+### 2. Custom Journeys Form
+- **Endpoint**: `/api/custom-journeys`
+- **Method**: `POST`
+- **Description**: Handles custom journey form submissions
+- **File**: `src/pages/api/custom-journeys.js`
 
-### Flujo de Procesamiento
+### 3. Corporate Services Form
+- **Endpoint**: `/api/corporate-services`
+- **Method**: `POST`
+- **Description**: Handles corporate services form submissions
+- **File**: `src/pages/api/corporate-services.js`
 
-1. **Validación de Datos**
-   - Campos requeridos: `name`, `surname`, `email`, `city`, `country`, `destination`
-   - Validación de formato de email
-   - Validación de fechas (si están presentes)
+## Common Features
 
-2. **Envío al Webhook**
-   - URL: `https://travelwithgaston.com/cms/flows/trigger/3b6d0ed7-cf6a-487c-b2b0-a0f74bef4c1b`
-   - Método: POST
-   - Content-Type: application/json
+All endpoints share the following characteristics:
 
-3. **Respuesta**
-   - Éxito: 200 con datos de confirmación
-   - Error de validación: 400 con detalles de errores
-   - Error del webhook: 500 con mensaje de error
+### CORS Support
+- `Access-Control-Allow-Origin: *`
+- `Access-Control-Allow-Methods: POST, OPTIONS`
+- `Access-Control-Allow-Headers: Content-Type`
 
-### CORS
-El endpoint incluye headers CORS apropiados para permitir requests desde el frontend.
+### Error Handling
+- Centralized error handling
+- Detailed error logging
+- Consistent error response format
 
-### Ejemplo de Request
+### Validation
+- Required field validation
+- Email format validation
+- Date validation (where applicable)
+- Custom validation per form type
 
-```json
+### Webhook Integration
+- All forms send data to Travel with Gaston webhook
+- Webhook URL: `https://travelwithgaston.com/cms/flows/trigger/3b6d0ed7-cf6a-487c-b2b0-a0f74bef4c1b`
+- Form type identification in webhook data
+
+## Request Format
+
+All endpoints expect JSON data in the request body:
+
+```javascript
 {
-  "destination": "japan",
-  "secondaryDestination": "thailand",
-  "tripType": "safari",
-  "travelDates": "flexible",
-  "startDate": "2024-03-15",
-  "returnDate": "2024-03-22",
-  "weddingDay": "2024",
-  "currency": "usd",
-  "budgetAmount": "5000-10000",
-  "nights": "8-14",
-  "registry": "yes",
-  "tripDetails": "Looking for a romantic honeymoon...",
-  "name": "Juan",
-  "surname": "Pérez",
-  "email": "juan@example.com",
-  "phone": "+1234567890",
-  "address": "123 Main St",
-  "city": "Madrid",
-  "zip": "28001",
-  "country": "Spain",
-  "additionalInfo": "Special dietary requirements...",
-  "newsletter": true,
-  "privacy": true,
-  "tripTypes": ["safari", "wellness", "gastronomy"]
+  // Form-specific fields...
+  "formType": "trip-inquiry|custom-journeys|corporate-services",
+  "timestamp": "2024-01-01T00:00:00.000Z"
 }
 ```
 
-### Ejemplo de Response (Éxito)
+## Response Format
 
-```json
+### Success Response
+```javascript
 {
   "success": true,
-  "message": "Formulario enviado correctamente",
+  "message": "Form submitted successfully",
   "data": {
-    "id": "12345",
-    "status": "received"
+    // Webhook response data
   }
 }
 ```
 
-### Ejemplo de Response (Error)
-
-```json
+### Error Response
+```javascript
 {
   "success": false,
-  "error": "Datos de formulario inválidos",
-  "details": ["name es requerido", "email inválido"]
+  "error": "Error description",
+  "details": [
+    // Array of specific validation errors
+  ]
 }
 ```
+
+## Validation Rules
+
+### Trip Inquiry Form
+**Required Fields:**
+- `name`
+- `surname`
+- `email`
+- `city`
+- `country`
+- `destination`
+
+**Validation:**
+- Email format validation
+- Date validation (return date must be after start date)
+
+### Custom Journeys Form
+**Required Fields:**
+- `name`
+- `email`
+- `destination`
+
+**Validation:**
+- Email format validation
+- Date validation (return date must be after start date)
+- Optional: Trip types and holiday experiences validation
+
+### Corporate Services Form
+**Required Fields:**
+- `companyName`
+- `contactPerson`
+- `email`
+- `phone`
+
+**Validation:**
+- Email format validation
+- Date validation (end date must be after start date)
+- Conditional field validation based on selected services
+
+## Webhook Data Structure
+
+Each form sends data to the webhook with the following structure:
+
+```javascript
+{
+  "formType": "form-type-identifier",
+  "timestamp": "ISO-8601-timestamp",
+  // ... all form fields
+}
+```
+
+## Error Codes
+
+- `400`: Bad Request - Invalid form data
+- `500`: Internal Server Error - Server or webhook error
+
+## Testing
+
+You can test the endpoints using the following test pages:
+
+- Trip Inquiry: `/trip-inquiry-form`
+- Custom Journeys: `/custom-journeys-form`
+- Corporate Services: `/corporate-services-form`
+
+## Logging
+
+All endpoints include comprehensive logging:
+
+- Request data logging
+- Webhook response logging
+- Error logging with context
+- Validation error logging
+
+## Security Considerations
+
+- CORS is configured for all origins (consider restricting in production)
+- Input validation prevents malicious data
+- Error messages don't expose sensitive information
+- Webhook communication is secure (HTTPS)
+
+## Future Enhancements
+
+- Rate limiting
+- Request size limits
+- Enhanced validation rules
+- Separate webhook URLs per form type
+- Database logging for audit trails

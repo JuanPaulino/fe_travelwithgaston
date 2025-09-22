@@ -279,6 +279,8 @@ const formFields = {
 <div class="w-full bg-primary-lighter py-8">
   <div class="max-w-6xl mx-auto px-4">
     <form id="custom-journeys-form" class="space-y-8">
+      <!-- Campo oculto para identificar el formulario -->
+      <input type="hidden" name="form_id" value="custom_journeys">
       <div>
         <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">About the Trip</h2>
         
@@ -680,7 +682,7 @@ const formFields = {
 
     // Función para enviar datos al endpoint local
     async function sendToAPI(formData: Record<string, any>) {
-      const apiUrl = '/api/custom-journeys';
+      const apiUrl = '/api/send-form';
       
       try {
         const response = await fetch(apiUrl, {

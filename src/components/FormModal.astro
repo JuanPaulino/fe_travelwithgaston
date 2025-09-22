@@ -1,0 +1,198 @@
+---
+import JetInquiryForm from './forms/JetInquiryForm.jsx';
+import VillaInquiryForm from './forms/VillaInquiryForm.jsx';
+import YachtInquiryForm from './forms/YachtInquiryForm.jsx';
+import ChauffeurInquiryForm from './forms/ChauffeurInquiryForm.jsx';
+import AirportInquiryForm from './forms/AirportInquiryForm.jsx';
+import AssistantInquiryForm from './forms/AssistantInquiryForm.jsx';
+import EventsInquiryForm from './forms/EventsInquiryForm.jsx';
+import ExclusiveInquiryForm from './forms/ExclusiveInquiryForm.jsx';
+import ShoppingInquiryForm from './forms/ShoppingInquiryForm.jsx';
+
+export interface Props {
+  id: string;
+  title: string;
+  content?: string;
+  btnLink?: string;
+}
+
+const { id, title, content, btnLink } = Astro.props;
+
+// Determinar qué formulario mostrar basado en el btnLink
+const getFormComponent = () => {
+  if (btnLink?.includes("#jetandhelicopter")) {
+    return "jet";
+  } else if (btnLink?.includes("#village")) {
+    return "villa";
+  } else if (btnLink?.includes("#yacht")) {
+    return "yacht";
+  } else if (btnLink?.includes("#chauffeur")) {
+    return "chauffeur";
+  } else if (btnLink?.includes("#airport")) {
+    return "airport";
+  } else if (btnLink?.includes("#assistant")) {
+    return "assistant";
+  } else if (btnLink?.includes("#events")) {
+    return "events";
+  } else if (btnLink?.includes("#exclusive")) {
+    return "exclusive";
+  } else if (btnLink?.includes("#shopping")) {
+    return "shopping";
+  }
+  return null;
+};
+
+const formType = getFormComponent();
+---
+
+<div id={id} class="modal fixed inset-0 bg-opacity-50 hidden z-50 p-4" style="display: none;" data-modal-id={id} data-btn-link={btnLink}>
+  <div class="modal-content bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <!-- Modal Header -->
+    <div class="modal-header flex items-center justify-between p-6">
+      <h3 class="modal-title text-xl font-semibold text-gray-900">{title}</h3>
+      <button 
+        class="modal-close text-gray-400 hover:text-gray-600 transition-colors duration-200"
+        aria-label="Cerrar modal"
+        onclick={`closeModal('${id}')`}
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="modal-body px-6 pb-6">
+      {formType === "jet" ? (
+        <JetInquiryForm client:load />
+      ) : formType === "villa" ? (
+        <VillaInquiryForm client:load />
+      ) : formType === "yacht" ? (
+        <YachtInquiryForm client:load />
+      ) : formType === "chauffeur" ? (
+        <ChauffeurInquiryForm client:load />
+      ) : formType === "airport" ? (
+        <AirportInquiryForm client:load />
+      ) : formType === "assistant" ? (
+        <AssistantInquiryForm client:load />
+      ) : formType === "events" ? (
+        <EventsInquiryForm client:load />
+      ) : formType === "exclusive" ? (
+        <ExclusiveInquiryForm client:load />
+      ) : formType === "shopping" ? (
+        <ShoppingInquiryForm client:load />
+      ) : (
+        <!-- Default content -->
+        {content && (
+          <div class="text-gray-700" set:html={content}></div>
+        )}
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  .modal {
+    backdrop-filter: blur(8px);
+    transition: backdrop-filter 0.3s ease;
+  }
+  
+  .modal-content {
+    animation: modalSlideIn 0.4s ease-out;
+  }
+  
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  
+  .modal.fade-out {
+    animation: modalFadeOut 0.3s ease-in forwards;
+  }
+  
+  @keyframes modalFadeOut {
+    from {
+      opacity: 1;
+      backdrop-filter: blur(8px);
+    }
+    to {
+      opacity: 0;
+      backdrop-filter: blur(0px);
+    }
+  }
+</style>
+
+<script>
+  // Función global para cerrar modal
+  function closeModal(modalId: string) {
+    const modal = document.getElementById(modalId) as HTMLElement;
+    if (!modal) return;
+    
+    modal.classList.add('fade-out');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.classList.add('hidden');
+      modal.classList.remove('fade-out');
+      document.body.classList.remove('overflow-hidden');
+    }, 300);
+  }
+  
+  // Función global para abrir modal
+  function openModal(modalId: string) {
+    const modal = document.getElementById(modalId) as HTMLElement;
+    if (!modal) return;
+    
+    modal.classList.remove('hidden');
+    modal.style.display = 'flex';
+    modal.classList.add('flex', 'items-center', 'justify-center');
+    document.body.classList.add('overflow-hidden');
+    
+    // Focus en el botón de cerrar
+    const closeButton = modal.querySelector('.modal-close') as HTMLElement;
+    if (closeButton) {
+      closeButton.focus();
+    }
+  }
+  
+  // Inicializar modal específico
+  function initModal(modalId: string) {
+    const modal = document.getElementById(modalId) as HTMLElement;
+    if (!modal) return;
+    
+    // Cerrar al hacer clic fuera del modal
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal(modalId);
+      }
+    });
+    
+    // Cerrar con tecla Escape
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && modal.style.display !== 'none') {
+        closeModal(modalId);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+  }
+  
+  // Exponer funciones globalmente
+  (window as any).closeModal = closeModal;
+  (window as any).openModal = openModal;
+  
+  // Inicializar cuando se carga el DOM
+  document.addEventListener('DOMContentLoaded', () => {
+    initModal('{id}');
+  });
+  
+  // También inicializar en astro:page-load para contenido dinámico
+  document.addEventListener('astro:page-load', () => {
+    initModal('{id}');
+  });
+</script>

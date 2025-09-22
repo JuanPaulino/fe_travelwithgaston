@@ -1,4 +1,6 @@
 ---
+import FormModal from './FormModal.astro';
+
 export interface Props {
   data: {
     id: number;
@@ -14,6 +16,9 @@ export interface Props {
 }
 
 const { data, background = 'light' } = Astro.props;
+
+// Generar ID único para el modal
+const modalId = `card-modal-${data.id}`;
 ---
 {data.layout === 'horizontal' && (
 <div class={`card-block bg-${background} mb-8 flex flex-col-reverse md:flex-row justify-between items-center`}>
@@ -41,7 +46,12 @@ const { data, background = 'light' } = Astro.props;
     )}
 
     {data.btn_link && (
-      <a href={data.btn_link} class="font-base font-family-body text-neutral-dark border-2 border-neutral-lighter px-6 py-3 hover:bg-neutral-lighter">{data.btn_cta}</a>
+      <button 
+        data-modal-trigger={modalId}
+        class="modal-trigger font-base font-family-body text-neutral-dark border-2 border-neutral-lighter px-6 py-3 hover:bg-neutral-lighter transition-colors duration-200"
+      >
+        {data.btn_cta}
+      </button>
     )}
   </div>
 </div>
@@ -63,7 +73,12 @@ const { data, background = 'light' } = Astro.props;
     )}
 
     {data.btn_link && (
-      <a href={data.btn_link} class="font-base font-family-body text-neutral-dark border-2 border-neutral-lighter px-6 py-3 hover:bg-neutral-lighter">{data.btn_cta}</a>
+      <button 
+        data-modal-trigger={modalId}
+        class="modal-trigger font-base font-family-body text-neutral-dark border-2 border-neutral-lighter px-6 py-3 hover:bg-neutral-lighter transition-colors duration-200"
+      >
+        {data.btn_cta}
+      </button>
     )}
   </div>
   {data.image && (
@@ -103,11 +118,55 @@ const { data, background = 'light' } = Astro.props;
   </div>
 
   {data.btn_link && (
-    <a href={data.btn_link} class="font-base font-family-body text-neutral-dark border-2 border-neutral-lighter px-6 py-3 hover:bg-neutral-lighter">{data.btn_cta}</a>
+    <button 
+      data-modal-trigger={modalId}
+      class="modal-trigger font-base font-family-body text-neutral-dark border-2 border-neutral-lighter px-6 py-3 hover:bg-neutral-lighter transition-colors duration-200"
+    >
+      {data.btn_cta}
+    </button>
   )}
 
 </div>
 )}
+
+        <!-- FormModal para mostrar el título de la tarjeta -->
+        {data.btn_link && (
+          <FormModal id={modalId} title={data.heading} btnLink={data.btn_link} />
+        )}
+
+<script>
+  // Función para inicializar los triggers de modal
+  function initModalTriggers() {
+    const triggers = document.querySelectorAll('[data-modal-trigger]');
+    
+    triggers.forEach(trigger => {
+      // Remover listeners existentes para evitar duplicados
+      trigger.removeEventListener('click', handleModalTrigger);
+      trigger.addEventListener('click', handleModalTrigger);
+    });
+  }
+  
+  function handleModalTrigger(e: Event) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const trigger = e.target as HTMLElement;
+    const modalId = trigger.getAttribute('data-modal-trigger');
+    console.log(modalId);
+    if (modalId) {
+      // Usar la función global openModal
+      if ((window as any).openModal) {
+        (window as any).openModal(modalId);
+      }
+    }
+  }
+  
+  // Inicializar cuando se carga el DOM
+  document.addEventListener('DOMContentLoaded', initModalTriggers);
+  
+  // Reinicializar si se carga contenido dinámicamente
+  document.addEventListener('astro:page-load', initModalTriggers);
+</script>
 
 <style is:global>
   .card-block {
@@ -164,5 +223,22 @@ const { data, background = 'light' } = Astro.props;
      font-weight: 900 !important;
      font-size: 1em;
      font-family: Arial, sans-serif;
+   }
+   
+   .modal-trigger {
+     cursor: pointer;
+     border: 2px solid #e5e5e5;
+     background: transparent;
+     transition: all 0.2s ease-in-out;
+   }
+   
+   .modal-trigger:hover {
+     background-color: #f5f5f5;
+     border-color: #d5d5d5;
+   }
+   
+   .modal-trigger:focus {
+     outline: 2px solid var(--color-primary, #3b82f6);
+     outline-offset: 2px;
    }
 </style>

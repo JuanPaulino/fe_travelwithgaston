@@ -222,6 +222,8 @@ const formFields = {
 <div class="w-full bg-primary-lighter py-8">
   <div class="max-w-6xl mx-auto px-4">
     <form id="corporate-services-form" class="space-y-8">
+      <!-- Campo oculto para identificar el formulario -->
+      <input type="hidden" name="form_id" value="corporate_services">
       <div>
         <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">Company Information</h2>
         
@@ -555,7 +557,7 @@ const formFields = {
 
     // Function to send data to API
     async function sendToAPI(formData: Record<string, any>) {
-      const apiUrl = '/api/corporate-services';
+      const apiUrl = '/api/send-form';
       
       try {
         const response = await fetch(apiUrl, {
