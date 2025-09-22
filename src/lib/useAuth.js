@@ -33,6 +33,7 @@ export const useAuth = () => {
     register: authActions.register,
     logout: authActions.logout,
     clearError: authActions.clearError,
+    updateProfile: authActions.updateProfile,
     
     // Utilidades
     checkAuth: authActions.checkAuth

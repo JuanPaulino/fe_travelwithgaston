@@ -1,5 +1,5 @@
 import { atom } from 'nanostores'
-import { authAPI, handleAPIError } from '../lib/http'
+import { authAPI, userAPI, handleAPIError } from '../lib/http'
 import { persistentMap } from '@nanostores/persistent'
 
 // Estado inicial
@@ -193,6 +193,56 @@ export const authActions = {
   // Limpiar errores
   clearError: () => {
     authStore.set({ ...authStore.get(), error: null })
+  },
+
+  // Actualizar perfil del usuario
+  updateProfile: async () => {
+    const currentState = authStore.get()
+    
+    if (!currentState.token || !currentState.isAuthenticated) {
+      console.warn('No hay token de autenticación para actualizar perfil')
+      return { success: false, error: 'No autenticado' }
+    }
+
+    try {
+      const data = await userAPI.getProfile()
+      
+      if (data.success && data.data?.user) {
+        // Actualizar solo los datos del usuario en el store
+        const updatedState = {
+          ...currentState,
+          user: data.data.user,
+          loading: false,
+          error: null
+        }
+        
+        authStore.set(updatedState)
+        
+        // Emitir evento para notificar a otros componentes
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:profileUpdated', { detail: data.data.user }))
+        }
+        
+        return { success: true, data: data.data.user }
+      } else {
+        const errorMessage = data.message || 'Error al obtener perfil'
+        authStore.set({
+          ...currentState,
+          loading: false,
+          error: errorMessage
+        })
+        return { success: false, error: errorMessage }
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      const errorData = handleAPIError(error)
+      authStore.set({
+        ...currentState,
+        loading: false,
+        error: errorData.message
+      })
+      return { success: false, error: errorData.message }
+    }
   }
 }
 
