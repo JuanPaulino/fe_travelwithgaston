@@ -1,0 +1,92 @@
+---
+export interface Props {
+  data: {
+    content: string;
+    headline?: string;
+    tagline?: string;
+    alignment?: 'left' | 'center' | 'right';
+  };
+  background?: 'light' | 'dark' | 'transparent';
+}
+
+const { data, background = 'light' } = Astro.props;
+
+// Determinar las clases de fondo
+const backgroundClasses = {
+  light: 'bg-primary-lightest',
+  dark: 'bg-primar text-white',
+  transparent: 'bg-transparent'
+};
+
+// Determinar las clases de alineación
+const alignmentClasses = {
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right'
+};
+
+const backgroundClass = backgroundClasses[background as keyof typeof backgroundClasses] || backgroundClasses.light;
+const alignmentClass = alignmentClasses[data.alignment as keyof typeof alignmentClasses] || alignmentClasses.left;
+---
+
+<div class={`rich-text-block py-12 px-4 ${backgroundClass}`}>
+  <div class="mx-auto max-w-4xl">
+    {data.headline && (
+      <h2 class={`text-4xl font-bold mb-6 ${alignmentClass}`}>
+        {data.headline}
+      </h2>
+    )}
+    
+    {data.tagline && (
+      <p class={`text-xl text-gray-600 mb-8 ${alignmentClass} ${background === 'dark' ? 'text-gray-300' : ''}`}>
+        {data.tagline}
+      </p>
+    )}
+    
+    {data.content && (
+      <div 
+        class={`prose prose-lg max-w-none ${alignmentClass} ${background === 'dark' ? 'prose-invert' : ''}`}
+        set:html={data.content}
+      />
+    )}
+  </div>
+</div>
+
+<style>
+  .rich-text-block {
+    width: 100%;
+  }
+  
+  /* Estilos personalizados para el contenido rich text */
+  .rich-text-block .prose {
+    line-height: 1.7;
+  }
+  
+  .rich-text-block .prose p {
+    margin-bottom: 1.5rem;
+  }
+  
+  .rich-text-block .prose p:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Estilos para elementos específicos del contenido */
+  .rich-text-block .prose .p2 {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Estilos para modo oscuro */
+  .rich-text-block .prose-invert {
+    color: #e5e7eb;
+  }
+  
+  .rich-text-block .prose-invert p {
+    color: #e5e7eb;
+  }
+  
+  .rich-text-block .prose-invert .p2 {
+    color: #e5e7eb;
+  }
+</style>

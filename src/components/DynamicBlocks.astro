@@ -7,6 +7,10 @@ import JoinNow from './JoinNow.astro';
 import CardBlock from './CardBlock.astro';
 import ProcessTimeline from './ProcessTimeline.astro';
 import TripInquiryForm from './TripInquiryForm.astro';
+import CustomJourneysForm from './CustomJourneysForm.astro';
+import CorporateServicesForm from './CorporateServicesForm.astro';
+import RichTextBlock from './blocks/RichTextBlock.astro';
+import ContactForm from './ContactForm.astro';
 
 export interface Props {
   blocks: any[];
@@ -80,6 +84,15 @@ const { blocks } = Astro.props;
       if (block.item?.kind === 'trip_inquiry_form') {
         return <TripInquiryForm data={block.item.data} />;
       }
+      else if (block.item?.kind === 'custom_journeys_form') {
+        return <CustomJourneysForm data={block.item.data} />;
+      }
+      else if (block.item?.kind === 'corporate_services_form') {
+        return <CorporateServicesForm data={block.item.data} />;
+      }
+      else if (block.item?.kind === 'contact_form') {
+        return <ContactForm data={block.item.data} />;
+      }
       
       // Fallback para otros tipos de block_json
       return (
@@ -90,6 +103,11 @@ const { blocks } = Astro.props;
           )}
         </div>
       );
+    }
+    
+    // Rich Text Block
+    if (block.collection === 'block_richtext') {
+      return <RichTextBlock data={block.item} background={block.background} />;
     }
     
     // Content Block / Rich Text

@@ -142,7 +142,7 @@ const { field, value = '', error, onChange = '() => {}' } = Astro.props;
               type="button"
               name={field.name}
               value={choice.value}
-              class={`px-4 py-2 border border-neutral-darkest text-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 trip-type-btn ${
+              class={`px-4 py-2 border border-neutral-darkest text-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 ${field.buttonClass || 'trip-type-btn'} ${
                 value && value.includes(choice.value) 
                   ? 'bg-primary text-white border-primary' 
                   : 'text-neutral-darkest'
@@ -150,6 +150,24 @@ const { field, value = '', error, onChange = '() => {}' } = Astro.props;
             >
               {choice.text}
             </button>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {field.type === 'checkbox_group' && (
+      <div class="space-y-2">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {field.choices?.map((choice: any) => (
+            <label class={`flex items-start gap-3 ${field.name === 'luxuryServices' ? 'luxury-services-checkbox' : 'corporate-services-checkbox'}`}>
+              <input
+                type="checkbox"
+                name={field.name}
+                value={choice.value}
+                class="mt-1 w-4 h-4 text-blue-600 border-neutral-darkest focus:ring-primary"
+              />
+              <span class="text-sm text-neutral-darkest">{choice.text}</span>
+            </label>
           ))}
         </div>
       </div>

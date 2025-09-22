@@ -12,7 +12,6 @@ const { data: footerNavigationData, error } = await getFooterNavigation();
   <!-- Sección superior con columnas de enlaces -->
   <div class="container mx-auto px-6 py-12">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-      
       {footerNavigationData && footerNavigationData.map((section: any) => (
         <div class="space-y-4">
           <Heading level={5} className="text-white font-semibold">{section.title}</Heading>
@@ -20,7 +19,7 @@ const { data: footerNavigationData, error } = await getFooterNavigation();
             {section.items && section.items.map((item: any) => (
               <li>
                 <a 
-                  href={item.url || (item.page ? `/${item.page.permalink || item.title.toLowerCase().replace(/\s+/g, '-')}` : `/${item.title.toLowerCase().replace(/\s+/g, '-')}`)} 
+                  href={item.url || (item.page ? `${item.page.permalink || item.title.toLowerCase().replace(/\s+/g, '-')}` : `${item.title.toLowerCase().replace(/\s+/g, '-')}`)} 
                   class="font-body text-base text-gray-300 hover:text-white transition-colors"
                 >
                   {item.title}
@@ -46,11 +45,10 @@ const { data: footerNavigationData, error } = await getFooterNavigation();
 
         <!-- Lado derecho: Enlaces legales -->
         <div class="flex space-x-6">
-          <a href="#" class="font-body text-sm text-gray-300 hover:text-white transition-colors">Terms and conditions</a>
-          <a href="#" class="font-body text-sm text-gray-300 hover:text-white transition-colors">Privacy policy</a>
+          
         </div>
 
       </div>
     </div>
   </div>
-</footer> 
+</footer>

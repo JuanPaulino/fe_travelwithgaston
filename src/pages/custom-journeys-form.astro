@@ -1,0 +1,43 @@
+---
+// Página de ejemplo para el formulario CustomJourneysForm
+import Layout from '../layouts/Layout.astro';
+import CustomJourneysForm from '../components/CustomJourneysForm.astro';
+---
+
+<Layout title="Custom Journeys - Travel with Gaston">
+  <main class="min-h-screen bg-gray-50">
+
+    <!-- Form Section -->
+    <section class="py-12">
+      <div class="max-w-6xl mx-auto px-4">
+        <!-- Form Component -->
+        <CustomJourneysForm />
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  /* Smooth scrolling for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+  }
+</style>

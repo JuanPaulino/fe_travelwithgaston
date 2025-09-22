@@ -1,0 +1,386 @@
+---
+// ContactForm.astro - Basic contact form
+import { howDidYouHear, contactReasons } from '../data/contactFormData.js';
+import FormField from './form/FormField.astro';
+
+// Form field definitions
+const formFields = {
+  // Contact Information
+  name: {
+    id: 'name',
+    name: 'name',
+    type: 'text',
+    label: 'Full Name',
+    required: true,
+    width: '50'
+  },
+  email: {
+    id: 'email',
+    name: 'email',
+    type: 'email',
+    label: 'Email Address',
+    required: true,
+    width: '50'
+  },
+  phone: {
+    id: 'phone',
+    name: 'phone',
+    type: 'tel',
+    label: 'Phone Number',
+    required: false,
+    width: '50'
+  },
+  company: {
+    id: 'company',
+    name: 'company',
+    type: 'text',
+    label: 'Company (Optional)',
+    required: false,
+    width: '50'
+  },
+  contactReason: {
+    id: 'contact-reason',
+    name: 'contactReason',
+    type: 'select',
+    label: 'How can we help you?',
+    required: false,
+    choices: contactReasons,
+    width: '100'
+  },
+  message: {
+    id: 'message',
+    name: 'message',
+    type: 'textarea',
+    label: 'Message',
+    required: true,
+    placeholder: 'Please provide details about your inquiry...',
+    rows: 5,
+    width: '100'
+  },
+  newsletter: {
+    id: 'newsletter',
+    name: 'newsletter',
+    type: 'checkbox',
+    label: 'I\'d like to receive exclusive travel offers & news from Travel with Gaston.',
+    required: false,
+    width: '100'
+  },
+  privacy: {
+    id: 'privacy',
+    name: 'privacy',
+    type: 'checkbox',
+    label: 'I have read and accept the Privacy Policy and data protection.',
+    required: true,
+    width: '100'
+  }
+};
+---
+<div class="w-full bg-primary-lighter py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <form id="contact-form" class="space-y-8">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">Contact Information</h2>
+        
+        <!-- Personal Information -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField field={formFields.name} />
+          <FormField field={formFields.email} />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField field={formFields.phone} />
+          <FormField field={formFields.company} />
+        </div>
+
+        <!-- Contact Reason -->
+        <div class="mb-6">
+          <FormField field={formFields.contactReason} />
+        </div>
+
+        <!-- Message -->
+        <div class="mb-6">
+          <FormField field={formFields.message} />
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="space-y-3 mb-6">
+          <FormField field={formFields.newsletter} />
+          <FormField field={formFields.privacy} />
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="button" 
+          id="submit-btn"
+          class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        >
+          Send Message
+        </button>
+      </div>
+
+      <!-- Status message -->
+      <div id="status-message" class="hidden mt-4 p-4 rounded-md"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Form validation
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('contact-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const statusMessage = document.getElementById('status-message');
+
+    if (!form || !submitBtn || !statusMessage) {
+      console.error('Form elements not found');
+      return;
+    }
+
+    // Function to show errors
+    function showError(fieldName: string, message: string) {
+      const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+      const errorElement = document.getElementById(`${fieldName}-error`);
+      
+      if (field && errorElement) {
+        field.setAttribute('aria-invalid', 'true');
+        field.classList.add('border-red-500');
+        field.classList.remove('border-gray-300');
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+      }
+    }
+
+    // Function to clear errors
+    function clearError(fieldName: string) {
+      const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+      const errorElement = document.getElementById(`${fieldName}-error`);
+      
+      if (field && errorElement) {
+        field.setAttribute('aria-invalid', 'false');
+        field.classList.remove('border-red-500');
+        field.classList.add('border-gray-300');
+        errorElement.classList.add('hidden');
+      }
+    }
+
+    // Function to validate email
+    function isValidEmail(email: string) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    // Function to validate required fields
+    function validateRequiredFields() {
+      const requiredFields = ['name', 'email', 'message'];
+      
+      let isValid = true;
+      
+      requiredFields.forEach(fieldName => {
+        const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+        if (!field) return;
+        
+        if (!field.value.trim()) {
+          showError(fieldName, 'This field is required');
+          isValid = false;
+        } else {
+          clearError(fieldName);
+        }
+      });
+      
+      // Validate privacy checkbox
+      const privacyCheckbox = document.getElementById('privacy') as HTMLInputElement | null;
+      if (privacyCheckbox && !privacyCheckbox.checked) {
+        showError('privacy', 'You must accept the privacy policy');
+        isValid = false;
+      } else if (privacyCheckbox) {
+        clearError('privacy');
+      }
+      
+      return isValid;
+    }
+
+    // Function to validate email
+    function validateEmail() {
+      const emailField = document.getElementById('email') as HTMLInputElement | null;
+      if (emailField && emailField.value && !isValidEmail(emailField.value)) {
+        showError('email', 'Please enter a valid email address');
+        return false;
+      }
+      return true;
+    }
+
+    // Real-time validation event listeners
+    const fields = form.querySelectorAll('input, select, textarea');
+    fields.forEach(field => {
+      field.addEventListener('blur', function(this: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {
+        const fieldName = this.name || this.id;
+        
+        // Clear error when user starts typing
+        if (this.value && this.value.trim()) {
+          clearError(fieldName);
+        }
+        
+        // Specific validations
+        if (fieldName === 'email' && this.value) {
+          if (!isValidEmail(this.value)) {
+            showError('email', 'Please enter a valid email address');
+          }
+        }
+      });
+    });
+
+    // Function to collect form data
+    function collectFormData() {
+      const formData: Record<string, any> = {};
+      
+      if (!form) return formData;
+      
+      // Collect data from all form elements
+      const formElements = form.querySelectorAll('input, select, textarea');
+      formElements.forEach((element: any) => {
+        if (element.type === 'checkbox') {
+          formData[element.name] = element.checked;
+        } else {
+          formData[element.name] = element.value;
+        }
+      });
+      
+      return formData;
+    }
+
+    // Function to send data to API
+    async function sendToAPI(formData: Record<string, any>) {
+      const apiUrl = '/api/contact';
+      
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        console.log('API Response:', result);
+        
+        if (response.ok && result.success) {
+          return { success: true, data: result.data, message: result.message };
+        } else {
+          return { 
+            success: false, 
+            error: result.error || `Error ${response.status}: ${response.statusText}`,
+            details: result.details
+          };
+        }
+      } catch (error) {
+        console.error('Error sending to API:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      }
+    }
+
+    // Form submission handler
+    submitBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      
+      // Clear previous messages
+      statusMessage.classList.add('hidden');
+      
+      // Validate form
+      const isFormValid = validateRequiredFields() && validateEmail();
+      
+      if (isFormValid) {
+        // Collect form data
+        const formData = collectFormData();
+        
+        // Show data in console
+        console.log('=== CONTACT FORM DATA ===');
+        console.log('Form valid:', isFormValid);
+        console.log('Collected data:', formData);
+        console.log('========================');
+        
+        // Disable button during submission
+        (submitBtn as HTMLButtonElement).disabled = true;
+        (submitBtn as HTMLButtonElement).textContent = 'Sending...';
+        
+        try {
+          // Send to API
+          const result = await sendToAPI(formData);
+          
+          if (result.success) {
+            // Success
+            statusMessage.textContent = result.message || 'Message sent successfully! We will get back to you soon.';
+            statusMessage.className = 'mt-4 p-4 rounded-md bg-green-100 text-green-800 border border-green-200';
+            statusMessage.classList.remove('hidden');
+            
+            // TODO: Clear form
+            // (form as HTMLFormElement).reset();
+          } else {
+            // API error
+            const errorDetails = result.details ? ` (${result.details.join(', ')})` : '';
+            statusMessage.textContent = `Error sending message: ${result.error}${errorDetails}`;
+            statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
+            statusMessage.classList.remove('hidden');
+          }
+        } catch (error) {
+          // Network error
+          statusMessage.textContent = 'Connection error. Please try again.';
+          statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
+          statusMessage.classList.remove('hidden');
+        } finally {
+          // Re-enable button
+          (submitBtn as HTMLButtonElement).disabled = false;
+          (submitBtn as HTMLButtonElement).textContent = 'Send Message';
+        }
+        
+        // Scroll to message
+        statusMessage.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        // Show validation error message
+        statusMessage.textContent = 'Please correct the errors before sending.';
+        statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
+        statusMessage.classList.remove('hidden');
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Additional styles for accessibility */
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  input[aria-invalid="true"],
+  select[aria-invalid="true"],
+  textarea[aria-invalid="true"] {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  /* Checkbox styles */
+  input[type="checkbox"] {
+    accent-color: #3b82f6;
+  }
+
+  /* Hover states for better UX */
+  button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  /* Disabled button styles */
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+</style>

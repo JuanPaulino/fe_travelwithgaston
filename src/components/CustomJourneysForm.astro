@@ -1,6 +1,20 @@
 ---
-// TripInquiryForm.astro - Formulario de consulta de viajes
-import { destinations, budgetRanges, groupSizes, accommodationTypes, interests, travelStyles, tripTypes, dateOptions, nightOptions, currencyOptions, budgetAmounts, weddingOptions, registryOptions } from '../data/destinations.js';
+// CustomJourneysForm.astro - Formulario de viajes personalizados
+import { 
+  worldRegions, 
+  countries, 
+  tripTypes, 
+  holidayExperiences, 
+  travelDateOptions, 
+  nightsOptions, 
+  currencyOptions, 
+  budgetRanges, 
+  specialOccasions, 
+  luxuryServices, 
+  travelingWith, 
+  howDidYouHear, 
+  countriesOfResidence 
+} from '../data/customJourneysData.js';
 import FormField from './form/FormField.astro';
 
 // Definición de campos del formulario
@@ -12,34 +26,62 @@ const formFields = {
     type: 'select',
     label: 'Which destination would you like to explore on your next trip?',
     required: true,
-    choices: destinations,
+    choices: worldRegions,
+    width: '50'
+  },
+  specificCountry: {
+    id: 'specific-country',
+    name: 'specificCountry',
+    type: 'select',
+    label: 'Specific Country',
+    required: false,
+    choices: countries,
     width: '50'
   },
   secondaryDestination: {
     id: 'secondary-destination',
     name: 'secondaryDestination',
     type: 'select',
-    label: 'What other destination would you like to visit?',
+    label: 'Do you have a secondary destination in mind?',
     required: false,
-    choices: destinations,
+    choices: worldRegions,
+    width: '50'
+  },
+  secondarySpecificCountry: {
+    id: 'secondary-specific-country',
+    name: 'secondarySpecificCountry',
+    type: 'select',
+    label: 'Secondary Specific Country',
+    required: false,
+    choices: countries,
     width: '50'
   },
   tripType: {
     id: 'trip-type',
     name: 'tripType',
     type: 'button_group',
-    label: 'What kind of trip would you like to do? You can choose from several options',
+    label: 'What type of trip are you planning?',
     required: false,
     choices: tripTypes,
     width: '100'
+  },
+  holidayExperience: {
+    id: 'holiday-experience',
+    name: 'holidayExperience',
+    type: 'button_group',
+    label: 'What type of holiday experience would you like?',
+    required: false,
+    choices: holidayExperiences,
+    width: '100',
+    buttonClass: 'holiday-experience-btn'
   },
   travelDates: {
     id: 'travel-dates',
     name: 'travelDates',
     type: 'select',
-    label: 'Do you have specific travel dates in mind?',
+    label: 'Do you have specific travel dates?',
     required: false,
-    choices: dateOptions,
+    choices: travelDateOptions,
     width: '50'
   },
   startDate: {
@@ -58,13 +100,13 @@ const formFields = {
     required: false,
     width: '50'
   },
-  weddingDay: {
-    id: 'wedding-day',
-    name: 'weddingDay',
+  nights: {
+    id: 'nights',
+    name: 'nights',
     type: 'select',
-    label: 'When is your wedding day?',
+    label: 'How many nights do you plan to travel?',
     required: false,
-    choices: weddingOptions,
+    choices: nightsOptions,
     width: '50'
   },
   currency: {
@@ -82,35 +124,53 @@ const formFields = {
     type: 'select',
     label: 'Budget Amount',
     required: false,
-    choices: budgetAmounts,
+    choices: budgetRanges,
     width: '50'
   },
-  nights: {
-    id: 'nights',
-    name: 'nights',
-    type: 'select',
-    label: 'How many nights does the trip last?',
+  budgetDetails: {
+    id: 'budget-details',
+    name: 'budgetDetails',
+    type: 'text',
+    label: 'Additional budget details (optional)',
     required: false,
-    choices: nightOptions,
+    placeholder: 'Please specify your budget details...',
     width: '50'
   },
-  registry: {
-    id: 'registry',
-    name: 'registry',
+  specialOccasion: {
+    id: 'special-occasion',
+    name: 'specialOccasion',
     type: 'select',
-    label: 'Do you plan to create your wedding registry with us?',
+    label: 'Are you celebrating a special occasion?',
     required: false,
-    choices: registryOptions,
+    choices: specialOccasions,
     width: '50'
+  },
+  luxuryServices: {
+    id: 'luxury-services',
+    name: 'luxuryServices',
+    type: 'checkbox_group',
+    label: 'Do you require any additional luxury services? (Select all that apply)',
+    required: false,
+    choices: luxuryServices,
+    width: '100'
+  },
+  luxuryServicesOther: {
+    id: 'luxury-services-other',
+    name: 'luxuryServicesOther',
+    type: 'text',
+    label: 'Please specify other luxury services',
+    required: false,
+    placeholder: 'Please specify...',
+    width: '100'
   },
   tripDetails: {
     id: 'trip-details',
     name: 'tripDetails',
     type: 'textarea',
-    label: 'Would you like to tell us more about your trip?',
+    label: 'Would you like me to know more details about your dream trip?',
     required: false,
-    placeholder: 'Write your message here...',
-    rows: 3,
+    placeholder: 'Tell us about your dream trip...',
+    rows: 4,
     width: '100'
   },
   // Personal Information
@@ -118,17 +178,9 @@ const formFields = {
     id: 'name',
     name: 'name',
     type: 'text',
-    label: 'Name',
+    label: 'Name & Surname',
     required: true,
-    width: '50'
-  },
-  surname: {
-    id: 'surname',
-    name: 'surname',
-    type: 'text',
-    label: 'Surname',
-    required: true,
-    width: '50'
+    width: '100'
   },
   email: {
     id: 'email',
@@ -142,7 +194,7 @@ const formFields = {
     id: 'phone',
     name: 'phone',
     type: 'tel',
-    label: 'Phone',
+    label: 'Phone (with country code)',
     required: false,
     width: '50'
   },
@@ -159,40 +211,58 @@ const formFields = {
     name: 'city',
     type: 'text',
     label: 'City',
-    required: true,
-    width: '100'
-  },
-  zip: {
-    id: 'zip',
-    name: 'zip',
-    type: 'text',
-    label: 'Zip/Postal Code',
     required: false,
-    width: '100'
+    width: '50'
   },
-  country: {
-    id: 'country',
-    name: 'country',
+  postalCode: {
+    id: 'postal-code',
+    name: 'postalCode',
     type: 'text',
-    label: 'Country',
-    required: true,
-    width: '100'
-  },
-  additionalInfo: {
-    id: 'additional-info',
-    name: 'additionalInfo',
-    type: 'textarea',
-    label: 'Would you like to tell us more about your trip?',
+    label: 'Postal Code',
     required: false,
-    placeholder: 'Write your message here...',
-    rows: 3,
-    width: '100'
+    width: '50'
+  },
+  countryOfResidence: {
+    id: 'country-of-residence',
+    name: 'countryOfResidence',
+    type: 'select',
+    label: 'Country of Residence',
+    required: false,
+    choices: countriesOfResidence,
+    width: '50'
+  },
+  travelingWith: {
+    id: 'traveling-with',
+    name: 'travelingWith',
+    type: 'select',
+    label: 'Who will be traveling with you?',
+    required: false,
+    choices: travelingWith,
+    width: '50'
+  },
+  kidsAge: {
+    id: 'kids-age',
+    name: 'kidsAge',
+    type: 'text',
+    label: 'Kids age (if applicable)',
+    required: false,
+    placeholder: 'e.g., 5, 8, 12',
+    width: '50'
+  },
+  howDidYouHear: {
+    id: 'how-did-you-hear',
+    name: 'howDidYouHear',
+    type: 'select',
+    label: 'How did you hear about Travel with Gaston?',
+    required: false,
+    choices: howDidYouHear,
+    width: '50'
   },
   newsletter: {
     id: 'newsletter',
     name: 'newsletter',
     type: 'checkbox',
-    label: 'I want to keep up with all the latest travel news and I know that I can unsubscribe at any time.',
+    label: 'I\'d like to receive exclusive travel offers & news from Travel with Gaston.',
     required: false,
     width: '100'
   },
@@ -208,47 +278,71 @@ const formFields = {
 ---
 <div class="w-full bg-primary-lighter py-8">
   <div class="max-w-6xl mx-auto px-4">
-    <form id="trip-inquiry-form" class="space-y-8">
+    <form id="custom-journeys-form" class="space-y-8">
       <div>
         <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">About the Trip</h2>
         
         <!-- Destination Selection -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <FormField field={formFields.destination} />
+          <FormField field={formFields.specificCountry} />
+        </div>
+
+        <!-- Secondary Destination -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <FormField field={formFields.secondaryDestination} />
+          <FormField field={formFields.secondarySpecificCountry} />
         </div>
   
         <!-- Trip Type Selection -->
         <div class="mb-6">
           <FormField field={formFields.tripType} />
         </div>
+
+        <!-- Holiday Experience Selection -->
+        <div class="mb-6">
+          <FormField field={formFields.holidayExperience} />
+        </div>
   
-        <!-- Travel Details -->
+        <!-- Travel Dates -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <FormField field={formFields.travelDates} />
           <div>
-            <label class="block text-sm text-gray-700 mb-2">In case you know dates, please let us know here</label>
+            <label class="block text-sm text-gray-700 mb-2">In case you have specific dates, please let us know here</label>
             <div class="grid grid-cols-2 gap-2">
               <FormField field={formFields.startDate} />
               <FormField field={formFields.returnDate} />
             </div>
           </div>
         </div>
-  
+
+        <!-- Nights and Budget -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <FormField field={formFields.weddingDay} />
+          <FormField field={formFields.nights} />
           <div>
-            <label class="block text-sm text-gray-700 mb-2">What is the estimated budget per person for the trip?</label>
+            <label class="block text-sm text-gray-700 mb-2">What is your estimated budget per person?</label>
             <div class="grid grid-cols-2 gap-2">
               <FormField field={formFields.currency} />
               <FormField field={formFields.budgetAmount} />
             </div>
+            <div class="mt-2">
+              <FormField field={formFields.budgetDetails} />
+            </div>
           </div>
         </div>
-  
+
+        <!-- Special Occasion -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <FormField field={formFields.nights} />
-          <FormField field={formFields.registry} />
+          <FormField field={formFields.specialOccasion} />
+          <div></div>
+        </div>
+
+        <!-- Luxury Services -->
+        <div class="mb-6">
+          <FormField field={formFields.luxuryServices} />
+          <div class="mt-2" id="luxury-services-other-container" style="display: none;">
+            <FormField field={formFields.luxuryServicesOther} />
+          </div>
         </div>
   
         <!-- Additional Trip Information -->
@@ -261,9 +355,8 @@ const formFields = {
       <div>
         <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">Personal Information</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="mb-4">
           <FormField field={formFields.name} />
-          <FormField field={formFields.surname} />
         </div>
   
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -275,21 +368,24 @@ const formFields = {
           <FormField field={formFields.address} />
         </div>
   
-        <div class="mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <FormField field={formFields.city} />
+          <FormField field={formFields.postalCode} />
         </div>
   
-        <div class="mb-4">
-          <FormField field={formFields.zip} />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField field={formFields.countryOfResidence} />
+          <FormField field={formFields.travelingWith} />
         </div>
-  
+
+        <!-- Kids Age (conditional) -->
+        <div class="mb-6" id="kids-age-container" style="display: none;">
+          <FormField field={formFields.kidsAge} />
+        </div>
+
+        <!-- How did you hear -->
         <div class="mb-6">
-          <FormField field={formFields.country} />
-        </div>
-  
-        <!-- Additional Information -->
-        <div class="mb-6">
-          <FormField field={formFields.additionalInfo} />
+          <FormField field={formFields.howDidYouHear} />
         </div>
   
         <!-- Checkboxes -->
@@ -304,7 +400,7 @@ const formFields = {
           id="submit-btn"
           class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
         >
-          Send
+          Start Planning My Journey
         </button>
       </div>
   
@@ -317,13 +413,26 @@ const formFields = {
 <script>
   // Validación del formulario
   document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('trip-inquiry-form');
+    const form = document.getElementById('custom-journeys-form');
     const submitBtn = document.getElementById('submit-btn');
     const statusMessage = document.getElementById('status-message');
+    const kidsAgeContainer = document.getElementById('kids-age-container');
+    const travelingWithSelect = document.getElementById('traveling-with') as HTMLSelectElement;
 
     if (!form || !submitBtn || !statusMessage) {
       console.error('Elementos del formulario no encontrados');
       return;
+    }
+
+    // Mostrar/ocultar campo de edad de niños
+    if (travelingWithSelect && kidsAgeContainer) {
+      travelingWithSelect.addEventListener('change', function() {
+        if (this.value === 'family-with-kids') {
+          kidsAgeContainer.style.display = 'block';
+        } else {
+          kidsAgeContainer.style.display = 'none';
+        }
+      });
     }
 
     // Función para mostrar errores
@@ -384,7 +493,7 @@ const formFields = {
     // Función para validar campos requeridos
     function validateRequiredFields() {
       const requiredFields = [
-        'name', 'surname', 'email', 'city', 'country', 'destination'
+        'name', 'email', 'destination'
       ];
       
       let isValid = true;
@@ -448,6 +557,49 @@ const formFields = {
       });
     });
 
+    // Manejo de botones de experiencia de vacaciones
+    const holidayExperienceButtons = document.querySelectorAll('.holiday-experience-btn');
+    let selectedHolidayExperiences: string[] = [];
+    
+    holidayExperienceButtons.forEach(button => {
+      button.addEventListener('click', function(this: HTMLButtonElement, e) {
+        e.preventDefault();
+        const value = this.value;
+        
+        if (this.classList.contains('bg-primary-dark')) {
+          // Deseleccionar
+          this.classList.remove('bg-primary-dark', 'text-white');
+          this.classList.add('bg-white', 'text-gray-700');
+          selectedHolidayExperiences = selectedHolidayExperiences.filter(type => type !== value);
+        } else {
+          // Seleccionar
+          this.classList.add('bg-primary-dark', 'text-white');
+          this.classList.remove('bg-white', 'text-gray-700');
+          selectedHolidayExperiences.push(value);
+        }
+        
+        clearError('holiday-experience');
+      });
+    });
+
+    // Manejo de checkboxes de servicios de lujo
+    const luxuryServiceCheckboxes = document.querySelectorAll('input[name="luxuryServices"]');
+    const luxuryServicesOtherContainer = document.getElementById('luxury-services-other-container');
+    
+    luxuryServiceCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', function(this: HTMLInputElement) {
+        if (this.value === 'other' && this.checked && luxuryServicesOtherContainer) {
+          luxuryServicesOtherContainer.style.display = 'block';
+        } else if (this.value === 'other' && !this.checked && luxuryServicesOtherContainer) {
+          luxuryServicesOtherContainer.style.display = 'none';
+          const otherInput = document.getElementById('luxury-services-other') as HTMLInputElement;
+          if (otherInput) {
+            otherInput.value = '';
+          }
+        }
+      });
+    });
+
     // Event listeners para validación en tiempo real
     const fields = form.querySelectorAll('input, select, textarea');
     fields.forEach(field => {
@@ -482,9 +634,21 @@ const formFields = {
       const formElements = form.querySelectorAll('input, select, textarea');
       formElements.forEach((element: any) => {
         if (element.type === 'checkbox') {
-          formData[element.name] = element.checked;
-        } else if (element.type === 'button' && element.classList.contains('trip-type-btn')) {
-          // Los botones de tipo de viaje se manejan por separado
+          // Manejar checkboxes individuales (newsletter, privacy)
+          if (element.name === 'newsletter' || element.name === 'privacy') {
+            formData[element.name] = element.checked;
+          }
+          // Manejar checkboxes de servicios de lujo
+          else if (element.name === 'luxuryServices') {
+            if (!formData.luxuryServices) {
+              formData.luxuryServices = [];
+            }
+            if (element.checked) {
+              formData.luxuryServices.push(element.value);
+            }
+          }
+        } else if (element.type === 'button' && (element.classList.contains('trip-type-btn') || element.classList.contains('holiday-experience-btn'))) {
+          // Los botones se manejan por separado
           return;
         } else {
           formData[element.name] = element.value;
@@ -501,12 +665,22 @@ const formFields = {
       });
       formData.tripTypes = selectedTripTypes;
       
+      // Agregar experiencias de vacaciones seleccionadas
+      const selectedHolidayExperiences: string[] = [];
+      const holidayExperienceButtons = document.querySelectorAll('.holiday-experience-btn');
+      holidayExperienceButtons.forEach((button: any) => {
+        if (button.classList.contains('bg-blue-500')) {
+          selectedHolidayExperiences.push(button.value);
+        }
+      });
+      formData.holidayExperiences = selectedHolidayExperiences;
+      
       return formData;
     }
 
     // Función para enviar datos al endpoint local
     async function sendToAPI(formData: Record<string, any>) {
-      const apiUrl = '/api/trip-inquiry';
+      const apiUrl = '/api/custom-journeys';
       
       try {
         const response = await fetch(apiUrl, {
@@ -572,11 +746,11 @@ const formFields = {
             // Limpiar formulario
             // TODO: (form as HTMLFormElement).reset();
             
-            // Limpiar selecciones de botones de tipo de viaje
+            // Limpiar selecciones de botones
             /* TODO:
-            const tripTypeButtons = document.querySelectorAll('.trip-type-btn');
-            tripTypeButtons.forEach((button: any) => {
-              button.classList.remove('bg-primary-dark', 'text-white');
+            const allButtons = document.querySelectorAll('.trip-type-btn, .holiday-experience-btn');
+            allButtons.forEach((button: any) => {
+              button.classList.remove('bg-blue-500', 'text-white');
               button.classList.add('bg-white', 'text-gray-700');
             });
             */
@@ -595,7 +769,7 @@ const formFields = {
         } finally {
           // Rehabilitar botón
           (submitBtn as HTMLButtonElement).disabled = false;
-          (submitBtn as HTMLButtonElement).textContent = 'Send';
+          (submitBtn as HTMLButtonElement).textContent = 'Start Planning My Journey';
         }
         
         // Scroll al mensaje
@@ -649,13 +823,30 @@ const formFields = {
     box-shadow: none;
   }
 
-  /* Estilos para botones de tipo de viaje */
-  .trip-type-btn {
+  /* Estilos para botones de selección múltiple */
+  .trip-type-btn,
+  .holiday-experience-btn {
     transition: all 0.2s ease;
   }
 
-  .trip-type-btn:hover {
+  .trip-type-btn:hover,
+  .holiday-experience-btn:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Estilos para checkboxes de servicios de lujo */
+  .luxury-services-checkbox {
+    margin-bottom: 0.5rem;
+  }
+
+  .luxury-services-checkbox input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+
+  .luxury-services-checkbox label {
+    font-size: 0.875rem;
+    color: #374151;
+    cursor: pointer;
   }
 </style>

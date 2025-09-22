@@ -27,6 +27,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
   const [showAdditionalFields, setShowAdditionalFields] = useState(false)
   const [showGuestsDropdown, setShowGuestsDropdown] = useState(false)
   const [minCheckOutDate, setMinCheckOutDate] = useState('')
+  const [isFormActive, setIsFormActive] = useState(false)
   const dropdownRef = useRef(null)
 
   // Mostrar campos adicionales solo si hay parámetros de URL
@@ -243,13 +244,35 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
 
   // Función para verificar si estamos en la página home
   const isOnHomePage = () => {
-    return typeof window !== 'undefined' && (window.location.pathname === '/' || window.location.pathname === '/index.html');
+    if (typeof window === 'undefined') return false;
+    return window.location.pathname === '/' || window.location.pathname === '/index.html';
   }
 
   // Función para determinar si debe mostrar valores del store o campos vacíos
   const shouldShowStoreValues = () => {
     // Mostrar valores del store si hay parámetros de URL o si el usuario ha interactuado
     return (Object.keys(urlParams).length > 0 && urlParams.destinationId) || showAdditionalFields;
+  }
+
+  // Manejar cuando el formulario se vuelve activo
+  const handleFormFocus = () => {
+    if (isOnHomePage()) {
+      setIsFormActive(true)
+    }
+  }
+
+  // Manejar cuando el formulario pierde el foco
+  const handleFormBlur = (e) => {
+    if (isOnHomePage()) {
+      // Solo desactivar si el foco no se movió a otro elemento del formulario
+      setTimeout(() => {
+        const activeElement = document.activeElement
+        const formElement = e.currentTarget
+        if (formElement && !formElement.contains(activeElement)) {
+          setIsFormActive(false)
+        }
+      }, 100)
+    }
   }
 
   // Función para obtener el valor a mostrar en los campos
@@ -289,9 +312,27 @@ function SearchForm({ initialData = {}, disabled = false, className = "" }) {
     }
   }
 
+  const opacityClasses = (() => {
+    if (!isOnHomePage()) {
+      return 'opacity-100';
+    }
+    const text = getFieldValue(searchData.searchText);
+
+    if (text && text.trim().length > 0) {
+      return 'opacity-100';
+    }
+    
+    return 'opacity-60 hover:opacity-100';
+  })();
+
   return (
     <div className={className}>
-      <form onSubmit={handleSubmit}>
+      <form 
+        onSubmit={handleSubmit}
+        onFocus={handleFormFocus}
+        onBlur={handleFormBlur}
+        className={`transition-all duration-300 ease-in-out ${opacityClasses}`}
+      >
         {/* Diseño Responsive - Mobile First */}
         <div className={`block ${isOnHomePage() ? 'bg-white/85 hover:bg-white' : 'bg-white'} rounded-lg shadow-lg`}>
           {/* Layout Mobile - Vertical (Mobile First) */}

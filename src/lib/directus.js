@@ -101,7 +101,8 @@ export async function getFooterNavigation() {
           "id",
           "title", 
           "is_active",
-          "items.*"
+          "items.*",
+          "items.page.permalink"
         ],
         filter: {
           is_active: {

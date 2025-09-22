@@ -1,0 +1,706 @@
+---
+// CorporateServicesForm.astro - Corporate services form
+import { 
+  corporateServices, 
+  numberOfTravelers, 
+  flightClasses, 
+  hotelCategories, 
+  groundTransportationNeeds, 
+  currencyOptions, 
+  howDidYouHear 
+} from '../data/corporateServicesData.js';
+import FormField from './form/FormField.astro';
+
+// Form field definitions
+const formFields = {
+  // Company Information
+  companyName: {
+    id: 'company-name',
+    name: 'companyName',
+    type: 'text',
+    label: 'Company Name',
+    required: true,
+    width: '100'
+  },
+  contactPerson: {
+    id: 'contact-person',
+    name: 'contactPerson',
+    type: 'text',
+    label: 'Contact Person',
+    required: true,
+    width: '50'
+  },
+  position: {
+    id: 'position',
+    name: 'position',
+    type: 'text',
+    label: 'Position',
+    required: false,
+    width: '50'
+  },
+  email: {
+    id: 'email',
+    name: 'email',
+    type: 'email',
+    label: 'Email',
+    required: true,
+    width: '50'
+  },
+  phone: {
+    id: 'phone',
+    name: 'phone',
+    type: 'tel',
+    label: 'Phone Number',
+    required: true,
+    width: '50'
+  },
+  services: {
+    id: 'services',
+    name: 'services',
+    type: 'checkbox_group',
+    label: 'What services do you require? (Select all that apply)',
+    required: false,
+    choices: corporateServices,
+    width: '100'
+  },
+  destinations: {
+    id: 'destinations',
+    name: 'destinations',
+    type: 'text',
+    label: 'Destination(s)',
+    required: false,
+    placeholder: 'Cities/countries',
+    width: '100'
+  },
+  startDate: {
+    id: 'start-date',
+    name: 'startDate',
+    type: 'date',
+    label: 'Start Date',
+    required: false,
+    width: '50'
+  },
+  endDate: {
+    id: 'end-date',
+    name: 'endDate',
+    type: 'date',
+    label: 'End Date',
+    required: false,
+    width: '50'
+  },
+  datesNotConfirmed: {
+    id: 'dates-not-confirmed',
+    name: 'datesNotConfirmed',
+    type: 'checkbox',
+    label: 'Dates not confirmed yet',
+    required: false,
+    width: '100'
+  },
+  numberOfTravelers: {
+    id: 'number-of-travelers',
+    name: 'numberOfTravelers',
+    type: 'select',
+    label: 'Number of Travelers',
+    required: false,
+    choices: numberOfTravelers,
+    width: '50'
+  },
+  flightClass: {
+    id: 'flight-class',
+    name: 'flightClass',
+    type: 'select',
+    label: 'Preferred Flight Class',
+    required: false,
+    choices: flightClasses,
+    width: '50'
+  },
+  hotelCategory: {
+    id: 'hotel-category',
+    name: 'hotelCategory',
+    type: 'select',
+    label: 'Preferred Hotel Category',
+    required: false,
+    choices: hotelCategories,
+    width: '50'
+  },
+  meetingSpaceType: {
+    id: 'meeting-space-type',
+    name: 'meetingSpaceType',
+    type: 'text',
+    label: 'Type of space',
+    required: false,
+    width: '50'
+  },
+  numberOfParticipants: {
+    id: 'number-of-participants',
+    name: 'numberOfParticipants',
+    type: 'text',
+    label: 'Number of participants',
+    required: false,
+    width: '50'
+  },
+  eventType: {
+    id: 'event-type',
+    name: 'eventType',
+    type: 'text',
+    label: 'Type of event',
+    required: false,
+    width: '50'
+  },
+  spaceDates: {
+    id: 'space-dates',
+    name: 'spaceDates',
+    type: 'text',
+    label: 'Dates that space will be needed',
+    required: false,
+    width: '50'
+  },
+  groundTransportation: {
+    id: 'ground-transportation',
+    name: 'groundTransportation',
+    type: 'select',
+    label: 'Ground Transportation Needs',
+    required: false,
+    choices: groundTransportationNeeds,
+    width: '50'
+  },
+  budgetCurrency: {
+    id: 'budget-currency',
+    name: 'budgetCurrency',
+    type: 'select',
+    label: 'Currency',
+    required: false,
+    choices: currencyOptions,
+    width: '50'
+  },
+  budgetAmount: {
+    id: 'budget-amount',
+    name: 'budgetAmount',
+    type: 'text',
+    label: 'Estimated Budget (per person or total)',
+    required: false,
+    placeholder: 'Enter budget amount',
+    width: '50'
+  },
+  specialRequests: {
+    id: 'special-requests',
+    name: 'specialRequests',
+    type: 'textarea',
+    label: 'Special Requests or Notes',
+    required: false,
+    placeholder: 'e.g. dietary needs, accessibility, branding, VIP treatment',
+    rows: 4,
+    width: '100'
+  },
+  howDidYouHear: {
+    id: 'how-did-you-hear',
+    name: 'howDidYouHear',
+    type: 'select',
+    label: 'How did you hear about Travel with Gaston?',
+    required: false,
+    choices: howDidYouHear,
+    width: '50'
+  },
+  newsletter: {
+    id: 'newsletter',
+    name: 'newsletter',
+    type: 'checkbox',
+    label: 'I\'d like to receive exclusive travel offers & news from Travel with Gaston.',
+    required: false,
+    width: '100'
+  },
+  privacy: {
+    id: 'privacy',
+    name: 'privacy',
+    type: 'checkbox',
+    label: 'I have read and accept the Privacy Policy and data protection.',
+    required: true,
+    width: '100'
+  }
+};
+---
+<div class="w-full bg-primary-lighter py-8">
+  <div class="max-w-6xl mx-auto px-4">
+    <form id="corporate-services-form" class="space-y-8">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">Company Information</h2>
+        
+        <!-- Company Details -->
+        <div class="mb-4">
+          <FormField field={formFields.companyName} />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <FormField field={formFields.contactPerson} />
+          <FormField field={formFields.position} />
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField field={formFields.email} />
+          <FormField field={formFields.phone} />
+        </div>
+      </div>
+
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-4 uppercase tracking-wide">Service Requirements</h2>
+        
+        <!-- Services Selection -->
+        <div class="mb-6">
+          <FormField field={formFields.services} />
+        </div>
+
+        <!-- Destinations -->
+        <div class="mb-6">
+          <FormField field={formFields.destinations} />
+        </div>
+
+        <!-- Dates -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-sm text-gray-700 mb-2">Tentative Dates</label>
+            <div class="grid grid-cols-2 gap-2">
+              <FormField field={formFields.startDate} />
+              <FormField field={formFields.endDate} />
+            </div>
+          </div>
+          <div class="flex items-end">
+            <FormField field={formFields.datesNotConfirmed} />
+          </div>
+        </div>
+
+        <!-- Number of Travelers -->
+        <div class="mb-6">
+          <FormField field={formFields.numberOfTravelers} />
+        </div>
+
+        <!-- Flight Class (conditional) -->
+        <div class="mb-6" id="flight-class-container" style="display: none;">
+          <FormField field={formFields.flightClass} />
+        </div>
+
+        <!-- Hotel Category (conditional) -->
+        <div class="mb-6" id="hotel-category-container" style="display: none;">
+          <FormField field={formFields.hotelCategory} />
+        </div>
+
+        <!-- Meeting/Event Spaces (conditional) -->
+        <div class="mb-6" id="meeting-spaces-container" style="display: none;">
+          <h3 class="text-md font-medium text-gray-700 mb-4">Meeting or Event Spaces</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField field={formFields.meetingSpaceType} />
+            <FormField field={formFields.numberOfParticipants} />
+            <FormField field={formFields.eventType} />
+            <FormField field={formFields.spaceDates} />
+          </div>
+        </div>
+
+        <!-- Ground Transportation (conditional) -->
+        <div class="mb-6" id="ground-transportation-container" style="display: none;">
+          <FormField field={formFields.groundTransportation} />
+        </div>
+
+        <!-- Budget -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField field={formFields.budgetCurrency} />
+          <FormField field={formFields.budgetAmount} />
+        </div>
+
+        <!-- Special Requests -->
+        <div class="mb-6">
+          <FormField field={formFields.specialRequests} />
+        </div>
+
+        <!-- How did you hear -->
+        <div class="mb-6">
+          <FormField field={formFields.howDidYouHear} />
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="space-y-3 mb-6">
+          <FormField field={formFields.newsletter} />
+          <FormField field={formFields.privacy} />
+        </div>
+
+        <!-- Submit Button -->
+        <button 
+          type="button" 
+          id="submit-btn"
+          class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        >
+          Start Planning My Corporate Trip
+        </button>
+      </div>
+
+      <!-- Status message -->
+      <div id="status-message" class="hidden mt-4 p-4 rounded-md"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Form validation
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('corporate-services-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const statusMessage = document.getElementById('status-message');
+
+    // Conditional field containers
+    const flightClassContainer = document.getElementById('flight-class-container');
+    const hotelCategoryContainer = document.getElementById('hotel-category-container');
+    const meetingSpacesContainer = document.getElementById('meeting-spaces-container');
+    const groundTransportationContainer = document.getElementById('ground-transportation-container');
+
+    if (!form || !submitBtn || !statusMessage) {
+      console.error('Form elements not found');
+      return;
+    }
+
+    // Show/hide conditional fields based on service selection
+    function toggleConditionalFields() {
+      const serviceCheckboxes = document.querySelectorAll('input[name="services"]');
+      
+      serviceCheckboxes.forEach(checkbox => {
+        const checkboxElement = checkbox as HTMLInputElement;
+        if (checkboxElement.checked) {
+          switch (checkboxElement.value) {
+            case 'flight-bookings':
+              if (flightClassContainer) flightClassContainer.style.display = 'block';
+              break;
+            case 'hotel-reservations':
+              if (hotelCategoryContainer) hotelCategoryContainer.style.display = 'block';
+              break;
+            case 'meetings-events':
+              if (meetingSpacesContainer) meetingSpacesContainer.style.display = 'block';
+              break;
+            case 'ground-transportation':
+              if (groundTransportationContainer) groundTransportationContainer.style.display = 'block';
+              break;
+          }
+        } else {
+          switch (checkboxElement.value) {
+            case 'flight-bookings':
+              if (flightClassContainer) flightClassContainer.style.display = 'none';
+              break;
+            case 'hotel-reservations':
+              if (hotelCategoryContainer) hotelCategoryContainer.style.display = 'none';
+              break;
+            case 'meetings-events':
+              if (meetingSpacesContainer) meetingSpacesContainer.style.display = 'none';
+              break;
+            case 'ground-transportation':
+              if (groundTransportationContainer) groundTransportationContainer.style.display = 'none';
+              break;
+          }
+        }
+      });
+    }
+
+    // Event listeners for service checkboxes
+    const serviceCheckboxes = document.querySelectorAll('input[name="services"]');
+    serviceCheckboxes.forEach(checkbox => {
+      (checkbox as HTMLInputElement).addEventListener('change', toggleConditionalFields);
+    });
+
+    // Function to show errors
+    function showError(fieldName: string, message: string) {
+      const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+      const errorElement = document.getElementById(`${fieldName}-error`);
+      
+      if (field && errorElement) {
+        field.setAttribute('aria-invalid', 'true');
+        field.classList.add('border-red-500');
+        field.classList.remove('border-gray-300');
+        errorElement.textContent = message;
+        errorElement.classList.remove('hidden');
+      }
+    }
+
+    // Function to clear errors
+    function clearError(fieldName: string) {
+      const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+      const errorElement = document.getElementById(`${fieldName}-error`);
+      
+      if (field && errorElement) {
+        field.setAttribute('aria-invalid', 'false');
+        field.classList.remove('border-red-500');
+        field.classList.add('border-gray-300');
+        errorElement.classList.add('hidden');
+      }
+    }
+
+    // Function to validate email
+    function isValidEmail(email: string) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    // Function to validate dates
+    function validateDates() {
+      const startDateField = document.getElementById('start-date') as HTMLInputElement | null;
+      const endDateField = document.getElementById('end-date') as HTMLInputElement | null;
+      
+      if (!startDateField || !endDateField) return true;
+      
+      const startDate = startDateField.value;
+      const endDate = endDateField.value;
+      
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        
+        if (end <= start) {
+          showError('end-date', 'End date must be after start date');
+          return false;
+        }
+      }
+      return true;
+    }
+
+    // Function to validate required fields
+    function validateRequiredFields() {
+      const requiredFields = [
+        'companyName', 'contactPerson', 'email', 'phone'
+      ];
+      
+      let isValid = true;
+      
+      requiredFields.forEach(fieldName => {
+        const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+        if (!field) return;
+        
+        if (!field.value.trim()) {
+          showError(fieldName, 'This field is required');
+          isValid = false;
+        } else {
+          clearError(fieldName);
+        }
+      });
+      
+      // Validate privacy checkbox
+      const privacyCheckbox = document.getElementById('privacy') as HTMLInputElement | null;
+      if (privacyCheckbox && !privacyCheckbox.checked) {
+        showError('privacy', 'You must accept the privacy policy');
+        isValid = false;
+      } else if (privacyCheckbox) {
+        clearError('privacy');
+      }
+      
+      return isValid;
+    }
+
+    // Function to validate email
+    function validateEmail() {
+      const emailField = document.getElementById('email') as HTMLInputElement | null;
+      if (emailField && emailField.value && !isValidEmail(emailField.value)) {
+        showError('email', 'Please enter a valid email address');
+        return false;
+      }
+      return true;
+    }
+
+    // Real-time validation event listeners
+    const fields = form.querySelectorAll('input, select, textarea');
+    fields.forEach(field => {
+      field.addEventListener('blur', function(this: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {
+        const fieldName = this.name || this.id;
+        
+        // Clear error when user starts typing
+        if (this.value && this.value.trim()) {
+          clearError(fieldName);
+        }
+        
+        // Specific validations
+        if (fieldName === 'email' && this.value) {
+          if (!isValidEmail(this.value)) {
+            showError('email', 'Please enter a valid email address');
+          }
+        }
+        
+        if (fieldName === 'start-date' || fieldName === 'end-date') {
+          validateDates();
+        }
+      });
+    });
+
+    // Function to collect form data
+    function collectFormData() {
+      const formData: Record<string, any> = {};
+      
+      if (!form) return formData;
+      
+      // Collect data from all form elements
+      const formElements = form.querySelectorAll('input, select, textarea');
+      formElements.forEach((element: any) => {
+        if (element.type === 'checkbox') {
+          // Handle individual checkboxes (newsletter, privacy, datesNotConfirmed)
+          if (element.name === 'newsletter' || element.name === 'privacy' || element.name === 'datesNotConfirmed') {
+            formData[element.name] = element.checked;
+          }
+          // Handle service checkboxes
+          else if (element.name === 'services') {
+            if (!formData.services) {
+              formData.services = [];
+            }
+            if (element.checked) {
+              formData.services.push(element.value);
+            }
+          }
+        } else {
+          formData[element.name] = element.value;
+        }
+      });
+      
+      return formData;
+    }
+
+    // Function to send data to API
+    async function sendToAPI(formData: Record<string, any>) {
+      const apiUrl = '/api/corporate-services';
+      
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        console.log('API Response:', result);
+        
+        if (response.ok && result.success) {
+          return { success: true, data: result.data, message: result.message };
+        } else {
+          return { 
+            success: false, 
+            error: result.error || `Error ${response.status}: ${response.statusText}`,
+            details: result.details
+          };
+        }
+      } catch (error) {
+        console.error('Error sending to API:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+      }
+    }
+
+    // Form submission handler
+    submitBtn.addEventListener('click', async function(e) {
+      e.preventDefault();
+      
+      // Clear previous messages
+      statusMessage.classList.add('hidden');
+      
+      // Validate form
+      const isFormValid = validateRequiredFields() && validateEmail() && validateDates();
+      
+      if (isFormValid) {
+        // Collect form data
+        const formData = collectFormData();
+        
+        // Show data in console
+        console.log('=== FORM DATA ===');
+        console.log('Form valid:', isFormValid);
+        console.log('Collected data:', formData);
+        console.log('================');
+        
+        // Disable button during submission
+        (submitBtn as HTMLButtonElement).disabled = true;
+        (submitBtn as HTMLButtonElement).textContent = 'Submitting...';
+        
+        try {
+          // Send to API
+          const result = await sendToAPI(formData);
+          
+          if (result.success) {
+            // Success
+            statusMessage.textContent = result.message || 'Form submitted successfully! We will contact you soon.';
+            statusMessage.className = 'mt-4 p-4 rounded-md bg-green-100 text-green-800 border border-green-200';
+            statusMessage.classList.remove('hidden');
+            
+            // TODO: Clear form
+            // (form as HTMLFormElement).reset();
+          } else {
+            // API error
+            const errorDetails = result.details ? ` (${result.details.join(', ')})` : '';
+            statusMessage.textContent = `Error submitting form: ${result.error}${errorDetails}`;
+            statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
+            statusMessage.classList.remove('hidden');
+          }
+        } catch (error) {
+          // Network error
+          statusMessage.textContent = 'Connection error. Please try again.';
+          statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
+          statusMessage.classList.remove('hidden');
+        } finally {
+          // Re-enable button
+          (submitBtn as HTMLButtonElement).disabled = false;
+          (submitBtn as HTMLButtonElement).textContent = 'Start Planning My Corporate Trip';
+        }
+        
+        // Scroll to message
+        statusMessage.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        // Show validation error message
+        statusMessage.textContent = 'Please correct the errors before submitting.';
+        statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
+        statusMessage.classList.remove('hidden');
+      }
+    });
+  });
+</script>
+
+<style>
+  /* Additional styles for accessibility */
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+
+  input[aria-invalid="true"],
+  select[aria-invalid="true"],
+  textarea[aria-invalid="true"] {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+
+  /* Checkbox styles */
+  input[type="checkbox"] {
+    accent-color: #3b82f6;
+  }
+
+  /* Hover states for better UX */
+  button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  /* Disabled button styles */
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Service checkbox styles */
+  .corporate-services-checkbox {
+    margin-bottom: 0.5rem;
+  }
+
+  .corporate-services-checkbox input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+
+  .corporate-services-checkbox label {
+    font-size: 0.875rem;
+    color: #374151;
+    cursor: pointer;
+  }
+</style>
