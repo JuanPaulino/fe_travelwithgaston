@@ -44,13 +44,13 @@ const AuthActions = ({ className = '', onButtonClick = null }) => {
       <div className={`flex items-center gap-4 ${className}`}>
         <a 
           href="/account"
-          className="text-neutral hover:text-primary transition-colors px-3 py-1 rounded"
+          className="border border-neutral-light text-black hover:border-primary transition-colors px-3 py-1"
         >
           Account
         </a>
         <button 
           onClick={handleLogout}
-          className="bg-red-600 text-white px-4 py-1.5 rounded hover:bg-red-700 transition-colors"
+          className="text-neutral hover:text-primary transition-colors px-4 py-1.5"
         >
           Logout
         </button>

@@ -47,13 +47,13 @@ const AuthActionsMobile = ({ onButtonClick = null, onCloseMenu = null }) => {
       <div className="flex flex-col gap-4">
         <a 
           href="/account"
-          className="text-neutral hover:text-primary transition-colors px-3 py-2 rounded text-lg"
+          className="border border-neutral-light text-black hover:border-primary transition-colors px-3 py-1 w-max"
         >
           Account
         </a>
         <button 
           onClick={handleLogout}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors text-lg"
+          className="text-neutral hover:text-primary transition-colors px-4 py-1.5 w-max"
         >
           Logout
         </button>
@@ -62,7 +62,7 @@ const AuthActionsMobile = ({ onButtonClick = null, onCloseMenu = null }) => {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col justify-center items-center gap-4">
       <button 
         onClick={() => handleButtonClick('join')}
         className="text-neutral hover:text-primary transition-colors px-3 py-2 rounded text-lg"

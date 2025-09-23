@@ -531,7 +531,7 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
             className="w-4 h-4 text-amber-400 bg-gray-100 border-gray-300 rounded focus:ring-amber-400 focus:ring-2"
           />
           <label className="ml-3 font-body text-sm text-gray-700">
-            (newsletter)
+            I'd like to receive exclusive travel offers & news from Travel with Gaston.
           </label>
         </div>
 
@@ -560,7 +560,7 @@ const JoinUsForm = ({ onSwitchToSignIn, onStepComplete, onRegistrationSuccess })
           />
           <label className="ml-3 font-body text-sm text-gray-700">
             I accept Travel with Gastón{' '}
-            <a href="#" className="underline hover:text-gray-900">
+            <a href="/terms-and-conditions" className="underline hover:text-gray-900">
               Terms & Conditions
             </a>
           </label>

@@ -280,6 +280,25 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     return shouldShowStoreValues() ? storeValue : emptyValue;
   }
 
+  // Función para hacer scroll a los resultados en móvil
+  const scrollToResults = () => {
+    // Solo hacer scroll en móvil
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        const resultsElement = document.getElementById('search-results');
+        if (resultsElement) {
+          const elementTop = resultsElement.getBoundingClientRect().top + window.pageYOffset;
+          const scrollPosition = elementTop - 50; // Pequeño offset
+          
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 500); // Delay para que inicie la búsqueda
+    }
+  }
+
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -291,6 +310,9 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     }
 
     updateUrl(searchData);
+    
+    // Hacer scroll a resultados en móvil antes de ejecutar búsqueda
+    scrollToResults();
     
     // Ejecutar búsqueda usando el store
     const response = await executeSearch()

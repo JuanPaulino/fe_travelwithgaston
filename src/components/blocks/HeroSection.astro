@@ -68,14 +68,14 @@ const carruselImages = images ? images.map((img: any) => `${import.meta.env.DIRE
     )}
     
     <!-- Contenido del hero -->
-    <div class="relative z-10 text-left text-white max-w-6xl mx-auto px-2 xs:px-4 w-full">
+    <div class="relative z-10 text-white max-w-6xl mx-auto px-2 xs:px-4 w-full">
       <!-- Headline principal -->
-      <h1 class="hero-headline font-semibold leading-tight mb-6 break-words overflow-hidden w-full">
+      <h1 class="hero-headline font-semibold leading-tight mb-6 break-words overflow-hidden w-full text-center md:text-left">
         {headline}
       </h1>
       
       <!-- Descripción -->
-      <p class="hero-description font-light mb-8 md:mb-16 max-w-2xl w-full">
+      <p class="hero-description font-light mb-8 md:mb-16 max-w-2xl w-full mx-auto md:mx-0 text-center md:text-left">
         {description}
       </p>
 
@@ -88,7 +88,7 @@ const carruselImages = images ? images.map((img: any) => `${import.meta.env.DIRE
 )}
 
 {layout === 'main' && activeCarrusel && (
-  <section class="h-auto min-h-[300px] sm:min-h-[350px] md:h-[650px] md:min-h-[650px] lg:h-[500px] lg:min-h-[500px] py-8 px-2 xs:px-4 relative flex items-center justify-center box-content bg-gradient-to-br from-indigo-500 to-purple-600">
+  <section class="h-auto min-h-[300px] sm:min-h-[350px] md:h-[800px] md:min-h-[650px] lg:h-[500px] lg:min-h-[500px] py-8 px-2 xs:px-4 relative flex items-center justify-center box-content">
     {carruselImages.length > 0 && (
       <div class="absolute inset-0 z-0">
         <!-- Carrusel de imágenes -->
@@ -113,14 +113,14 @@ const carruselImages = images ? images.map((img: any) => `${import.meta.env.DIRE
     )}
     
     <!-- Contenido del hero -->
-    <div class="relative z-10 text-left text-white max-w-6xl mx-auto px-2 xs:px-4 w-full">
+    <div class="relative z-10 text-white max-w-6xl mx-auto px-2 xs:px-4 w-full">
       <!-- Headline principal -->
-      <h1 class="hero-headline font-semibold leading-tight mb-6 break-words overflow-hidden w-full">
+      <h1 class="hero-headline font-semibold leading-tight mb-6 no-cut-words overflow-hidden w-full text-center md:text-left">
         {headline}
       </h1>
       
       <!-- Descripción -->
-      <p class="hero-description font-light mb-8 md:mb-20 max-w-2xl w-full">
+      <p class="hero-description no-cut-words font-light mb-8 md:mb-20 max-w-2xl w-full mx-auto md:mx-0 text-center md:text-left">
         {description}
       </p>
 
@@ -151,7 +151,12 @@ const carruselImages = images ? images.map((img: any) => `${import.meta.env.DIRE
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 0.75rem;
   }
-  
+  .no-cut-words {
+    word-break: normal;     /* evita cortes raros dentro de palabras */
+    overflow-wrap: normal;  /* no fuerza cortes en palabras largas */
+    hyphens: none;          /* sin guiones automáticos */
+    white-space: normal;    /* permite saltos solo donde toca */
+  }
   /* Pantallas muy pequeñas - 360px y superior */
   @media (min-width: 360px) {
     .hero-headline {

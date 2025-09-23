@@ -312,36 +312,55 @@ const hotelItems = items.map((item: any) => ({
     function updateButtonVisibility() {
       if (!scrollContainer || !prevBtn || !nextBtn) return;
       
-      const scrollLeft = scrollContainer.scrollLeft;
-      const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-      
-      // Mostrar/ocultar botones según la posición de scroll
-      (prevBtn as HTMLElement).style.opacity = scrollLeft > 0 ? '1' : '0.5';
-      (nextBtn as HTMLElement).style.opacity = scrollLeft < maxScroll - 10 ? '1' : '0.5';
+      // Con navegación circular, los botones siempre están disponibles
+      (prevBtn as HTMLElement).style.opacity = '1';
+      (nextBtn as HTMLElement).style.opacity = '1';
     }
     
-    prevBtn.addEventListener('click', () => {
+    // Función para navegar al siguiente elemento con loop
+    function scrollToNext() {
       const scrollAmount = getScrollAmount();
-      scrollContainer?.scrollBy({
-        left: -scrollAmount,
-        behavior: 'smooth'
-      });
-    });
-    
-    nextBtn.addEventListener('click', () => {
-      const scrollAmount = getScrollAmount();
-      scrollContainer?.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
-    });
-    setInterval(() => {
-        const scrollAmount = getScrollAmount();
-        scrollContainer?.scrollBy({
-        left: scrollAmount,
+      const currentScroll = scrollContainer.scrollLeft;
+      const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+      
+      // Si estamos cerca del final, volver al inicio
+      if (currentScroll >= maxScroll - 10) {
+        scrollContainer.scrollTo({
+          left: 0,
           behavior: 'smooth'
         });
-    }, 5000);
+      } else {
+        scrollContainer.scrollBy({
+          left: scrollAmount,
+          behavior: 'smooth'
+        });
+      }
+    }
+    
+    // Función para navegar al elemento anterior con loop
+    function scrollToPrev() {
+      const scrollAmount = getScrollAmount();
+      const currentScroll = scrollContainer.scrollLeft;
+      
+      // Si estamos cerca del inicio, ir al final
+      if (currentScroll <= 10) {
+        scrollContainer.scrollTo({
+          left: scrollContainer.scrollWidth - scrollContainer.clientWidth,
+          behavior: 'smooth'
+        });
+      } else {
+        scrollContainer.scrollBy({
+          left: -scrollAmount,
+          behavior: 'smooth'
+        });
+      }
+    }
+    
+    prevBtn.addEventListener('click', scrollToPrev);
+    nextBtn.addEventListener('click', scrollToNext);
+    
+    // Auto-scroll con loop
+    setInterval(scrollToNext, 5000);
     // Actualizar visibilidad de botones al hacer scroll
     scrollContainer?.addEventListener('scroll', updateButtonVisibility);
     
