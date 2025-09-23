@@ -71,7 +71,7 @@ const StoreDebuggerModal = () => {
         return 'Search Store';
     }
   };
-
+  return null;
   if (!isOpen) {
     return (
       <div className="fixed bottom-4 right-4 z-50">

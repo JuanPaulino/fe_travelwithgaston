@@ -321,7 +321,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
       return 'opacity-100';
     }
     
-    return 'opacity-75 hover:opacity-100';
+    return 'opacity-90 hover:opacity-100';
   })();
   console.log(isOnHomePage());
   console.log(getFieldValue(searchData.searchText));

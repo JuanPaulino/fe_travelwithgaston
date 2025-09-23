@@ -9,16 +9,29 @@ const items = data?.items || [];
 const show_button = data?.show_button;
 
 // Construir la URL de Directus para las imágenes
-const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL;
 
 // Procesar los items para extraer solo los datos necesarios
-const gridItems = items.map(item => ({
+const gridItems = items.map((item: any) => ({
   id: item.id,
   title: item.title,
   description: item.short_description,
   image: item.image?.id ? `${DIRECTUS_URL}/assets/${item.image.id}` : null,
   slug: item.slug,
 }));
+
+// Generar IDs únicos para este componente
+const componentId = Math.random().toString(36).substr(2, 9);
+const sliderId = `inspiration-slider-${componentId}`;
+const prevBtnId = `prev-btn-${componentId}`;
+const nextBtnId = `next-btn-${componentId}`;
+
+// Configuración del slider
+const sliderConfig = {
+  autoPlay: true,
+  interval: 4000, // 4 segundos
+  pauseOnHover: true
+};
 ---
 
 <section class="inspiration-section py-4 px-4">
@@ -34,8 +47,9 @@ const gridItems = items.map(item => ({
 
   <!-- Grid de inspiraciones -->
   <div class="max-w-7xl mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-      {gridItems.map((item) => (
+    <!-- Versión desktop/tablet: Grid normal -->
+    <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      {gridItems.map((item: any) => (
         <a href={`${item.slug}`} class="inspiration-card group cursor-pointer block">
           <!-- Imagen -->
           <div class="relative overflow-hidden rounded-lg mb-4 aspect-[4/3]">
@@ -67,6 +81,85 @@ const gridItems = items.map(item => ({
       ))}
     </div>
 
+    <!-- Versión móvil: Slider -->
+    <div class="md:hidden relative mb-12">
+      <!-- Contenedor del slider -->
+      <div class="overflow-hidden">
+        <div id={sliderId} class="flex transition-transform duration-500 ease-in-out">
+          {gridItems.map((item: any, index: number) => (
+            <div class="w-full flex-shrink-0 px-2">
+              <a href={`${item.slug}`} class="inspiration-card group cursor-pointer block">
+                <!-- Imagen -->
+                <div class="relative overflow-hidden rounded-lg mb-4 aspect-[4/3]">
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <span class="text-gray-500">No image</span>
+                    </div>
+                  )}
+                </div>
+                
+                <!-- Título -->
+                <h3 class="text-black text-lg font-medium mb-2 transition-colors duration-200">
+                  {item.title}
+                </h3>
+                
+                <!-- Descripción -->
+                {item.description && (
+                  <p class="text-black text-base">
+                    {item.description}
+                  </p>
+                )}
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Controles de navegación -->
+      <div class="flex justify-center items-center mt-6 gap-4">
+        <!-- Botón anterior -->
+        <button 
+          id={prevBtnId} 
+          class="p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Anterior"
+        >
+          <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+
+        <!-- Indicadores -->
+        <div class="flex gap-2">
+          {gridItems.map((_: any, index: number) => (
+            <button 
+              class={`slider-dot w-2 h-2 rounded-full transition-all duration-200 ${
+                index === 0 ? 'bg-black' : 'bg-gray-300'
+              }`}
+              data-slide={index}
+              aria-label={`Ir a slide ${index + 1}`}
+            ></button>
+          ))}
+        </div>
+
+        <!-- Botón siguiente -->
+        <button 
+          id={nextBtnId} 
+          class="p-2 rounded-full bg-white shadow-md hover:shadow-lg transition-shadow duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Siguiente"
+        >
+          <svg class="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
     <!-- Botón CTA -->
     {show_button && (
       <div class="text-center">
@@ -93,4 +186,171 @@ const gridItems = items.map(item => ({
   .inspiration-card:hover {
     transform: translateY(-2px);
   }
-</style> 
+
+  /* Estilos específicos del slider */
+  .slider-dot {
+    transition: all 0.2s ease;
+  }
+
+  .slider-dot:hover {
+    transform: scale(1.2);
+  }
+</style>
+
+<script define:vars={{ sliderId, prevBtnId, nextBtnId }}>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Solo ejecutar en dispositivos móviles
+    if (window.innerWidth >= 768) return;
+
+    const slider = document.getElementById(sliderId);
+    const prevBtn = document.getElementById(prevBtnId);
+    const nextBtn = document.getElementById(nextBtnId);
+    const dots = slider?.parentElement?.parentElement?.querySelectorAll('.slider-dot') || [];
+    
+    if (!slider || !prevBtn || !nextBtn) {
+      return;
+    }
+
+    let currentSlide = 0;
+    let autoPlayInterval = null;
+    let isUserInteracting = false;
+    
+    const config = {
+      autoPlay: true,
+      interval: 4000, // 4 segundos
+      pauseOnHover: true
+    };
+
+    const totalSlides = dots.length;
+
+    // Función para actualizar la posición del slider
+    function updateSlider() {
+      if (!slider) return;
+      
+      const translateX = -currentSlide * 100;
+      slider.style.transform = `translateX(${translateX}%)`;
+      
+      // Actualizar indicadores
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('bg-black', index === currentSlide);
+        dot.classList.toggle('bg-gray-300', index !== currentSlide);
+      });
+
+      // Actualizar estado de botones
+      if (prevBtn && nextBtn) {
+        prevBtn.disabled = currentSlide === 0;
+        nextBtn.disabled = currentSlide === totalSlides - 1;
+      }
+    }
+
+    // Función para ir al siguiente slide
+    function nextSlide() {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateSlider();
+    }
+
+    // Función para ir al slide anterior
+    function prevSlide() {
+      currentSlide = currentSlide > 0 ? currentSlide - 1 : totalSlides - 1;
+      updateSlider();
+    }
+
+    // Función para ir a un slide específico
+    function goToSlide(slideIndex) {
+      currentSlide = slideIndex;
+      updateSlider();
+    }
+
+    // Función para iniciar reproducción automática
+    function startAutoPlay() {
+      if (config.autoPlay && !isUserInteracting) {
+        autoPlayInterval = setInterval(nextSlide, config.interval);
+      }
+    }
+
+    // Función para detener reproducción automática
+    function stopAutoPlay() {
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+      }
+    }
+
+    // Función para pausar temporalmente
+    function pauseAutoPlay() {
+      stopAutoPlay();
+      isUserInteracting = true;
+      
+      // Reanudar después de un tiempo
+      setTimeout(() => {
+        isUserInteracting = false;
+        startAutoPlay();
+      }, 6000); // Pausa por 6 segundos después de interacción
+    }
+
+    // Event listeners para botones de navegación
+    nextBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      nextSlide();
+      pauseAutoPlay();
+    });
+
+    prevBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      prevSlide();
+      pauseAutoPlay();
+    });
+
+    // Event listeners para indicadores
+    dots.forEach((dot, index) => {
+      dot.addEventListener('click', () => {
+        goToSlide(index);
+        pauseAutoPlay();
+      });
+    });
+
+    // Pausar reproducción automática al hacer hover (si está habilitado)
+    if (config.pauseOnHover) {
+      const sliderContainer = slider.parentElement;
+      if (sliderContainer) {
+        sliderContainer.addEventListener('mouseenter', stopAutoPlay);
+        sliderContainer.addEventListener('mouseleave', () => {
+          if (!isUserInteracting) {
+            startAutoPlay();
+          }
+        });
+      }
+    }
+
+    // Pausar reproducción automática cuando la ventana pierde el foco
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopAutoPlay();
+      } else if (!isUserInteracting) {
+        startAutoPlay();
+      }
+    });
+
+    // Pausar reproducción automática al hacer scroll
+    let scrollTimeout = null;
+    window.addEventListener('scroll', () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      stopAutoPlay();
+      
+      scrollTimeout = setTimeout(() => {
+        if (!isUserInteracting) {
+          startAutoPlay();
+        }
+      }, 2000);
+    });
+
+    // Inicializar el slider
+    updateSlider();
+    startAutoPlay();
+
+    // Limpiar intervalos al salir de la página
+    window.addEventListener('beforeunload', () => {
+      stopAutoPlay();
+    });
+  });
+</script> 
