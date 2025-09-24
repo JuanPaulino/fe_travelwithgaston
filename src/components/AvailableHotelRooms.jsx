@@ -321,7 +321,13 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
               </div>
             ))}
           </>
-        : <MembershipCard />}
+        : null}
+
+      {isAuthenticated && user?.role === 'basic' && (
+        <div className="mt-8">
+          <MembershipCard />
+        </div>
+      )}
     </div>
   );
 };

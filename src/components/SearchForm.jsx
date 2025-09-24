@@ -299,36 +299,49 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     }
   }
 
+  // Función para verificar si estamos en la página de hotel
+  const isOnHotelPage = () => {
+    return typeof window !== 'undefined' && window.location.pathname.startsWith('/hotels/');
+  };
+
   // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    // Validación: si hay niños, solo permitir 1 habitación
+    // 1. Validación: si hay niños, solo permitir 1 habitación
     if (searchData.children > 0 && searchData.rooms > 1) {
       alert('If you include children, only one room can be booked at a time.')
       return
     }
 
+    // 2. Preparar parámetros URL
     updateUrl(searchData);
     
     // Hacer scroll a resultados en móvil antes de ejecutar búsqueda
     scrollToResults();
     
-    // Ejecutar búsqueda usando el store
-    const response = await executeSearch()
-
-    if (response.search_type === 'hotel') {
-      // Redireccionar a la página del hotel específico
-      window.location.href = `/hotels/${searchData.selectedDestinationId}${buildSearchUrl(searchData)}`
-      return
+    // 3. Redirecciones
+    // Si la búsqueda es a hotel y estamos en la página search.astro o home
+    if (searchData.selectedDestinationType === 'hotel' && (isOnSearchPage() || isOnHomePage())) {
+      window.location.href = `/hotels/${searchData.selectedDestinationId}${buildSearchUrl(searchData)}`;
+      return;
     }
-
-    // Si estamos en la página home, redireccionar a /search con los parámetros
-    if (isOnHomePage()) {
+    // si la busqueda es a hotel y estamos en la página de hotel actualizar con los parametros de la url
+    if (searchData.selectedDestinationType === 'hotel' && isOnHotelPage()) {
+      const searchUrl = `/hotels/${searchData.selectedDestinationId}${buildSearchUrl(searchData)}`;
+      window.location.href = searchUrl;
+      return;
+    }
+    // Si la búsqueda es a location o inspiration y estamos en la página de hotel
+    if ((searchData.selectedDestinationType === 'location' || searchData.selectedDestinationType === 'inspiration') && (isOnHotelPage() || isOnHomePage())) {
       const searchUrl = `/search${buildSearchUrl(searchData)}`;
       window.location.href = searchUrl;
       return;
     }
+
+    // 4. Si ninguna coincide, continuamos y se realiza la búsqueda
+    const response = await executeSearch();
+    
     if (response.results) {
       console.log('Búsqueda ejecutada exitosamente:', response.results)
     }

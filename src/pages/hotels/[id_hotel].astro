@@ -208,25 +208,33 @@ const title = `Hotel ${hotelData.name}`;
       <div class="flex flex-col gap-2 mb-4 md:max-w-4xl">
          <h2 class="text-h2 font-heading text-neutral-darkest">Hotel information</h2>
          <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
-           {hotelData.hotel_information.map((item: any) => (
-             <div class="flex flex-col gap-4 flex-1">
-               <div class="flex flex-row items-center gap-2">
+           {hotelData.hotel_information.map((item: any, index: number) => (
+             <div class="flex flex-col gap-4 flex-1" id={`hotel-info-${index}`}>
+               <div class="flex flex-row items-center gap-2 cursor-pointer" onclick={`toggleAccordion(${index})`}>
                  <div class="w-5 h-5 flex items-center justify-center flex-shrink-0">
                    <span class="material-symbols-outlined text-primary text-xs">{getIconForTitle(item.title)}</span>
                  </div>
-                 <p class="text-base font-semibold text-neutral-darkest text-nowrap">{item.title}</p>
-               </div>
-               {item.description.map((description: any) => <div class="flex flex-row items-start gap-2">
-                 <div class="w-4 h-4 flex items-center justify-center flex-shrink-0 mt-0.5">
-                   <span class="material-symbols-outlined text-primary text-xs">check</span>
+                 <p class="text-base font-semibold text-neutral-darkest text-nowrap flex-1">{item.title}</p>
+                 <div class="w-5 h-5 flex items-center justify-center flex-shrink-0">
+                   <span class="material-symbols-outlined text-primary text-xs transition-transform duration-200" id={`accordion-icon-${index}`}>expand_more</span>
                  </div>
-                 <p class="text-base text-neutral-DEFAULT m-0 flex-1 break-words">{description}</p>
-               </div>)}
+               </div>
+               <div class="accordion-content hidden" id={`accordion-content-${index}`}>
+                 {item.description.map((description: any, descIndex: number) => (
+                   <div class="flex flex-row items-start gap-2 mb-2">
+                     <div class="w-4 h-4 flex items-center justify-center flex-shrink-0 mt-0.5">
+                       <span class="material-symbols-outlined text-primary text-xs">check</span>
+                     </div>
+                     <p class="text-base text-neutral-DEFAULT m-0 flex-1 break-words">{description}</p>
+                   </div>
+                 ))}
+               </div>
              </div>
            ))
            }
          </div>
       </div>
+
 			<AvailableHotelRooms client:load parentHotelData={hotelData} />
       <div class="flex flex-col">
         <HotelMap 
@@ -241,3 +249,23 @@ const title = `Hotel ${hotelData.name}`;
 	<AuthModalWrapper client:load />
 	<StoreDebuggerWrapper client:load />
 </Layout>
+
+<script>
+  function toggleAccordion(index: number) {
+    const content = document.getElementById(`accordion-content-${index}`);
+    const icon = document.getElementById(`accordion-icon-${index}`);
+    
+    if (content && icon) {
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+      }
+    }
+  }
+
+  // Hacer la función globalmente accesible
+  (window as any).toggleAccordion = toggleAccordion;
+</script>

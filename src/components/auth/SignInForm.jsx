@@ -71,13 +71,14 @@ const SignInForm = ({ onLoginSuccess }) => {
           onLoginSuccess();
         }
       } else {
-        setErrors({ general: result.error });
+        // Invalid Credentials
+        setErrors({ general: 'Invalid credentials' });
       }
       
     } catch (error) {
       console.error('Error al iniciar sesión:', error);
       const errorData = handleAPIError(error);
-      setErrors({ general: errorData.message });
+      setErrors({ general: 'Error al iniciar sesión' });
     }
   };
 

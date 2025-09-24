@@ -428,8 +428,8 @@ function SearchAutocomplete({
             {/* Columna de Destinos */}
             {visibleColumns.includes('destinations') && (
               <div className="overflow-y-auto max-h-[400px]">
-                <div className="sticky top-0 bg-primary px-4 py-3 border-b border-primary">
-                  <h3 className="text-sm font-medium text-white">Destinations</h3>
+                <div className="sticky top-0 bg-primary-lighter px-4 py-3 border-b border-primary-lighter">
+                  <h3 className="text-sm font-medium text-neutral-darkest">Destinations</h3>
                 </div>
                 <div className="divide-gray-100">
                   {destinations.map((suggestion, index) => (
@@ -439,7 +439,7 @@ function SearchAutocomplete({
                       onClick={() => handleSuggestionClick(suggestion)}
                       className={`w-full px-4 py-3 min-h-[48px] text-left hover:bg-gray-50 flex items-center gap-3 transition-colors ${
                         selectedColumn === 'destinations' && index === selectedIndex 
-                          ? 'bg-primary text-white' 
+                          ? 'bg-primary-lighter text-neutral-darkest' 
                           : 'text-gray-700'
                       }`}
                       onMouseEnter={() => {
@@ -467,8 +467,8 @@ function SearchAutocomplete({
             {/* Columna de Hoteles */}
             {visibleColumns.includes('hotels') && (
               <div className="overflow-y-auto max-h-[400px]">
-                <div className="sticky top-0 bg-primary px-4 py-3 border-b border-primary">
-                  <h3 className="text-sm font-medium text-white">Hotels</h3>
+                <div className="sticky top-0 bg-primary-lightest px-4 py-3 border-b border-primary-lightest">
+                  <h3 className="text-sm font-medium text-black">Hotels</h3>
                 </div>
                 <div className="divide-gray-100">
                   {hotels.map((suggestion, index) => (
@@ -478,8 +478,8 @@ function SearchAutocomplete({
                       onClick={() => handleSuggestionClick(suggestion)}
                       className={`w-full px-4 py-3 min-h-[48px] text-left hover:bg-gray-50 flex items-center gap-3 transition-colors ${
                         selectedColumn === 'hotels' && index === selectedIndex 
-                          ? 'bg-primary text-white' 
-                          : 'text-white'
+                          ? 'bg-primary-lighter text-neutral-darkest' 
+                          : 'text-black'
                       }`}
                       onMouseEnter={() => {
                         setSelectedColumn('hotels')
@@ -506,8 +506,8 @@ function SearchAutocomplete({
             {/* Columna de Inspiraciones */}
             {visibleColumns.includes('inspirations') && (
               <div className="overflow-y-auto max-h-[400px]">
-                <div className="sticky top-0 bg-primary px-4 py-3 border-b border-primary">
-                  <h3 className="text-sm font-medium text-white">Inspiration</h3>
+                <div className="sticky top-0 bg-primary-lighter px-4 py-3 border-b border-primary-lighter">
+                  <h3 className="text-sm font-medium text-black">Inspiration</h3>
                 </div>
                 <div className="divide-gray-100">
                   {inspirations.map((suggestion, index) => (
@@ -517,8 +517,8 @@ function SearchAutocomplete({
                       onClick={() => handleSuggestionClick(suggestion)}
                       className={`w-full px-4 py-3 min-h-[48px] text-left hover:bg-gray-50 flex items-center gap-3 transition-colors ${
                         selectedColumn === 'inspirations' && index === selectedIndex 
-                          ? 'bg-primary text-white' 
-                          : 'text-white'
+                          ? 'bg-primary-lighter text-neutral-darkest' 
+                          : 'text-black'
                       }`}
                       onMouseEnter={() => {
                         setSelectedColumn('inspirations')

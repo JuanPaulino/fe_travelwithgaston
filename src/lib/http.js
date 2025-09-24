@@ -4,7 +4,7 @@ import { config } from '../config/config.js';
 // Configuración base de axios
 const http = axios.create({
   baseURL: config.api.baseURL,
-  timeout: config.api.timeout,
+  // timeout: config.api.timeout,
   headers: {
     'Content-Type': 'application/json',
   },
