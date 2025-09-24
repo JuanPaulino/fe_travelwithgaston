@@ -5,7 +5,7 @@ export default function VillaInquiryForm() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
 
-  // Manejar cambio entre rental/purchase
+  // Handle change between rental/purchase
   useEffect(() => {
     const typeRadios = document.querySelectorAll('input[name="type"]');
     const rentalDates = document.getElementById('rental-dates');
@@ -71,7 +71,7 @@ export default function VillaInquiryForm() {
 
   return (
     <form id="villa-form" onSubmit={handleSubmit} className="space-y-4">
-      {/* Campo oculto para identificar el formulario */}
+      {/* Hidden field to identify the form */}
       <input type="hidden" name="form_id" value="villa_inquiry" />
       
       {/* Name & Contact */}

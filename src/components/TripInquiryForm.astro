@@ -322,11 +322,11 @@ const formFields = {
     const statusMessage = document.getElementById('status-message');
 
     if (!form || !submitBtn || !statusMessage) {
-      console.error('Elementos del formulario no encontrados');
+      console.error('Form elements not found');
       return;
     }
 
-    // Función para mostrar errores
+    // Function to show errors
     function showError(fieldName: string, message: string) {
       const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
       const errorElement = document.getElementById(`${fieldName}-error`);
@@ -340,7 +340,7 @@ const formFields = {
       }
     }
 
-    // Función para limpiar errores
+    // Function to clear errors
     function clearError(fieldName: string) {
       const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
       const errorElement = document.getElementById(`${fieldName}-error`);
@@ -353,13 +353,13 @@ const formFields = {
       }
     }
 
-    // Función para validar email
+    // Function to validate email
     function isValidEmail(email: string) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
     }
 
-    // Función para validar fechas
+    // Function to validate dates
     function validateDates() {
       const startDateField = document.getElementById('start-date') as HTMLInputElement | null;
       const returnDateField = document.getElementById('return-date') as HTMLInputElement | null;
@@ -374,14 +374,14 @@ const formFields = {
         const returnDateObj = new Date(returnDate);
         
         if (returnDateObj <= start) {
-          showError('return-date', 'La fecha de regreso debe ser posterior a la fecha de salida');
+          showError('return-date', 'Return date must be after start date');
           return false;
         }
       }
       return true;
     }
 
-    // Función para validar campos requeridos
+    // Function to validate required fields
     function validateRequiredFields() {
       const requiredFields = [
         'name', 'surname', 'email', 'city', 'country', 'destination'
@@ -394,17 +394,17 @@ const formFields = {
         if (!field) return;
         
         if (!field.value.trim()) {
-          showError(fieldName, 'Este campo es obligatorio');
+          showError(fieldName, 'This field is required');
           isValid = false;
         } else {
           clearError(fieldName);
         }
       });
       
-      // Validar checkbox de privacidad
+      // Validate privacy checkbox
       const privacyCheckbox = document.getElementById('privacy') as HTMLInputElement | null;
       if (privacyCheckbox && !privacyCheckbox.checked) {
-        showError('privacy', 'Debes aceptar la política de privacidad');
+        showError('privacy', 'You must accept the privacy policy');
         isValid = false;
       } else if (privacyCheckbox) {
         clearError('privacy');
@@ -413,17 +413,17 @@ const formFields = {
       return isValid;
     }
 
-    // Función para validar email
+    // Function to validate email
     function validateEmail() {
       const emailField = document.getElementById('email') as HTMLInputElement | null;
       if (emailField && emailField.value && !isValidEmail(emailField.value)) {
-        showError('email', 'Por favor ingresa un email válido');
+        showError('email', 'Please enter a valid email');
         return false;
       }
       return true;
     }
 
-    // Manejo de botones de tipo de viaje
+    // Handle trip type buttons
     const tripTypeButtons = document.querySelectorAll('.trip-type-btn');
     let selectedTripTypes: string[] = [];
     
@@ -433,12 +433,12 @@ const formFields = {
         const value = this.value;
         
         if (this.classList.contains('bg-primary-dark')) {
-          // Deseleccionar
+          // Deselect
           this.classList.remove('bg-primary-dark', 'text-white');
           this.classList.add('bg-white', 'text-gray-700');
           selectedTripTypes = selectedTripTypes.filter(type => type !== value);
         } else {
-          // Seleccionar
+          // Select
           this.classList.add('bg-primary-dark', 'text-white');
           this.classList.remove('bg-white', 'text-gray-700');
           selectedTripTypes.push(value);
@@ -448,21 +448,21 @@ const formFields = {
       });
     });
 
-    // Event listeners para validación en tiempo real
+    // Event listeners for real-time validation
     const fields = form.querySelectorAll('input, select, textarea');
     fields.forEach(field => {
       field.addEventListener('blur', function(this: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement) {
         const fieldName = this.name || this.id;
         
-        // Limpiar error al empezar a escribir
+        // Clear error when starting to type
         if (this.value && this.value.trim()) {
           clearError(fieldName);
         }
         
-        // Validaciones específicas
+        // Specific validations
         if (fieldName === 'email' && this.value) {
           if (!isValidEmail(this.value)) {
-            showError('email', 'Por favor ingresa un email válido');
+            showError('email', 'Please enter a valid email');
           }
         }
         
@@ -472,26 +472,26 @@ const formFields = {
       });
     });
 
-    // Función para recopilar datos del formulario
+    // Function to collect form data
     function collectFormData() {
       const formData: Record<string, any> = {};
       
       if (!form) return formData;
       
-      // Recopilar datos de todos los campos del formulario
+      // Collect data from all form fields
       const formElements = form.querySelectorAll('input, select, textarea');
       formElements.forEach((element: any) => {
         if (element.type === 'checkbox') {
           formData[element.name] = element.checked;
         } else if (element.type === 'button' && element.classList.contains('trip-type-btn')) {
-          // Los botones de tipo de viaje se manejan por separado
+          // Trip type buttons are handled separately
           return;
         } else {
           formData[element.name] = element.value;
         }
       });
       
-      // Agregar tipos de viaje seleccionados
+      // Add selected trip types
       const selectedTripTypes: string[] = [];
       const tripTypeButtons = document.querySelectorAll('.trip-type-btn');
       tripTypeButtons.forEach((button: any) => {
@@ -504,7 +504,7 @@ const formFields = {
       return formData;
     }
 
-    // Función para enviar datos al endpoint local
+    // Function to send data to local endpoint
     async function sendToAPI(formData: Record<string, any>) {
       const apiUrl = '/api/trip-inquiry';
       
@@ -518,7 +518,7 @@ const formFields = {
         });
         
         const result = await response.json();
-        console.log('Respuesta de la API:', result);
+        console.log('API response:', result);
         
         if (response.ok && result.success) {
           return { success: true, data: result.data, message: result.message };
@@ -530,49 +530,49 @@ const formFields = {
           };
         }
       } catch (error) {
-        console.error('Error al enviar a la API:', error);
-        return { success: false, error: error instanceof Error ? error.message : 'Error desconocido' };
+        console.error('Error sending to API:', error);
+        return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
       }
     }
 
-    // Manejo del envío del formulario
+    // Handle form submission
     submitBtn.addEventListener('click', async function(e) {
       e.preventDefault();
       
-      // Limpiar mensajes previos
+      // Clear previous messages
       statusMessage.classList.add('hidden');
       
-      // Validar formulario
+      // Validate form
       const isFormValid = validateRequiredFields() && validateEmail() && validateDates();
       
       if (isFormValid) {
-        // Recopilar datos del formulario
+        // Collect form data
         const formData = collectFormData();
         
-        // Mostrar datos en consola
-        console.log('=== DATOS DEL FORMULARIO ===');
-        console.log('Formulario válido:', isFormValid);
-        console.log('Datos recopilados:', formData);
-        console.log('============================');
+        // Show data in console
+        console.log('=== FORM DATA ===');
+        console.log('Form valid:', isFormValid);
+        console.log('Collected data:', formData);
+        console.log('================');
         
-        // Deshabilitar botón durante el envío
+        // Disable button during submission
         (submitBtn as HTMLButtonElement).disabled = true;
-        (submitBtn as HTMLButtonElement).textContent = 'Enviando...';
+        (submitBtn as HTMLButtonElement).textContent = 'Sending...';
         
         try {
-          // Enviar a la API local
+          // Send to local API
           const result = await sendToAPI(formData);
           
           if (result.success) {
-            // Éxito
-            statusMessage.textContent = result.message || '¡Formulario enviado correctamente! Te contactaremos pronto.';
+            // Success
+            statusMessage.textContent = result.message || 'Form submitted successfully! We will contact you soon.';
             statusMessage.className = 'mt-4 p-4 rounded-md bg-green-100 text-green-800 border border-green-200';
             statusMessage.classList.remove('hidden');
             
-            // Limpiar formulario
+            // Clear form
             // TODO: (form as HTMLFormElement).reset();
             
-            // Limpiar selecciones de botones de tipo de viaje
+            // Clear trip type button selections
             /* TODO:
             const tripTypeButtons = document.querySelectorAll('.trip-type-btn');
             tripTypeButtons.forEach((button: any) => {
@@ -581,28 +581,28 @@ const formFields = {
             });
             */
           } else {
-            // Error de la API
+            // API error
             const errorDetails = result.details ? ` (${result.details.join(', ')})` : '';
-            statusMessage.textContent = `Error al enviar el formulario: ${result.error}${errorDetails}`;
+            statusMessage.textContent = `Error sending form: ${result.error}${errorDetails}`;
             statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
             statusMessage.classList.remove('hidden');
           }
         } catch (error) {
-          // Error de red
-          statusMessage.textContent = 'Error de conexión. Por favor, inténtalo de nuevo.';
+          // Network error
+          statusMessage.textContent = 'Connection error. Please try again.';
           statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
           statusMessage.classList.remove('hidden');
         } finally {
-          // Rehabilitar botón
+          // Re-enable button
           (submitBtn as HTMLButtonElement).disabled = false;
           (submitBtn as HTMLButtonElement).textContent = 'Send';
         }
         
-        // Scroll al mensaje
+        // Scroll to message
         statusMessage.scrollIntoView({ behavior: 'smooth' });
       } else {
-        // Mostrar mensaje de error de validación
-        statusMessage.textContent = 'Por favor corrige los errores antes de enviar.';
+        // Show validation error message
+        statusMessage.textContent = 'Please correct the errors before submitting.';
         statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
         statusMessage.classList.remove('hidden');
       }
@@ -611,7 +611,7 @@ const formFields = {
 </script>
 
 <style>
-  /* Estilos adicionales para mejorar la accesibilidad */
+  /* Additional styles to improve accessibility */
   .form-field input:focus,
   .form-field select:focus,
   .form-field textarea:focus {
@@ -626,12 +626,12 @@ const formFields = {
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
   }
 
-  /* Estilos para checkboxes */
+  /* Styles for checkboxes */
   input[type="checkbox"] {
     accent-color: #3b82f6;
   }
 
-  /* Hover states para mejor UX */
+  /* Hover states for better UX */
   button:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -641,7 +641,7 @@ const formFields = {
     transform: translateY(0);
   }
 
-  /* Estilos para botón deshabilitado */
+  /* Styles for disabled button */
   button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -649,7 +649,7 @@ const formFields = {
     box-shadow: none;
   }
 
-  /* Estilos para botones de tipo de viaje */
+  /* Styles for trip type buttons */
   .trip-type-btn {
     transition: all 0.2s ease;
   }

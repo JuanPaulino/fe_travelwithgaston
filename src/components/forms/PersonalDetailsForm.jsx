@@ -12,7 +12,7 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Inicializar datos del formulario
+  // Initialize form data
   useEffect(() => {
     if (initialData) {
       setFormData(prev => ({ ...prev, ...initialData }));
@@ -30,8 +30,8 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Los campos firstName, lastName y email están deshabilitados, no se validan
-    // pero se incluyen en los datos enviados
+    // The firstName, lastName and email fields are disabled, not validated
+    // but they are included in the data sent
 
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
@@ -57,7 +57,7 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
     setIsSubmitting(true);
     
     try {
-      // Preparar datos para enviar
+      // Prepare data to send
       const dataToSend = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
@@ -67,12 +67,12 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
         address: formData.address.trim()
       };
 
-      // Llamar a la función de actualización
+      // Call the update function
       if (onUpdate) {
         await onUpdate(dataToSend);
       }
 
-      // Limpiar errores si todo fue exitoso
+      // Clear errors if everything was successful
       setErrors({});
     } catch (error) {
       console.error('Error updating personal details:', error);
@@ -85,7 +85,7 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Limpiar error del campo cuando el usuario empiece a escribir
+    // Clear field error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -96,7 +96,7 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
       <h2 className="text-lg font-semibold text-gray-900 mb-6">Personal details</h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Error general */}
+        {/* General error */}
         {errors.general && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-md">
             <p className="text-sm text-red-600">{errors.general}</p>

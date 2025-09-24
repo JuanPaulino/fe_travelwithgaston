@@ -1,5 +1,7 @@
 ---
 // Componente JoinNow.astro
+import AuthModalWrapper from './auth/AuthModalWrapper.jsx';
+
 export interface Props {
   data: {
     title: string;
@@ -46,10 +48,56 @@ const bgClass = background === 'dark' ? 'bg-gray-900' : 'bg-[#f6f2e7]';
         </div>
       ))}
     </div>
-    {data.cta && (
-      <a href={data.cta.url} class="mt-4 px-8 py-3 bg-black text-white font-body font-medium rounded hover:bg-gray-900 transition">
-        {data.cta.label}
-      </a>
-    )}
+
+    <button 
+      id="join-now-cta" 
+      class="mt-4 px-8 py-3 bg-black text-white font-body font-medium rounded hover:bg-gray-900 transition"
+    >
+      <span id="cta-text">Join now</span>
+    </button>
+    
   </div>
-</section> 
+</section>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const ctaButton = document.getElementById('join-now-cta');
+    const ctaText = document.getElementById('cta-text');
+    
+    // Función para actualizar el texto del botón según el estado de autenticación
+    function updateButtonText() {
+      const authState = JSON.parse(localStorage.getItem('auth') || '{}');
+      const isAuthenticated = authState.isAuthenticated === true;
+      
+      if (ctaText) {
+        ctaText.textContent = isAuthenticated ? 'Go to Account' : 'Join now';
+      }
+    }
+    
+    // Actualizar el texto inicial
+    updateButtonText();
+    
+    // Escuchar cambios en el estado de autenticación
+    window.addEventListener('auth:login', updateButtonText);
+    window.addEventListener('auth:logout', updateButtonText);
+    
+    if (ctaButton) {
+      ctaButton.addEventListener('click', function() {
+        // Verificar si el usuario está autenticado
+        const authState = JSON.parse(localStorage.getItem('auth') || '{}');
+        const isAuthenticated = authState.isAuthenticated === true;
+        
+        if (isAuthenticated) {
+          // Si está autenticado, redirigir a la página de account
+          window.location.href = '/account';
+        } else {
+          // Si no está autenticado, abrir el modal de SignIn
+          window.dispatchEvent(new CustomEvent('openAuthModal', { 
+            detail: { initialTab: 'signin' } 
+          }));
+        }
+      });
+    }
+  });
+</script> 

@@ -48,18 +48,18 @@ const ChangePasswordForm = ({ onUpdate }) => {
     setIsSubmitting(true);
     
     try {
-      // Preparar datos para enviar
+      // Prepare data to send
       const dataToSend = {
         oldPassword: formData.oldPassword,
         newPassword: formData.newPassword
       };
 
-      // Llamar a la función de actualización
+      // Call the update function
       if (onUpdate) {
         await onUpdate(dataToSend);
       }
 
-      // Limpiar formulario y errores si todo fue exitoso
+      // Clear form and errors if everything was successful
       setFormData({
         oldPassword: '',
         newPassword: '',
@@ -77,7 +77,7 @@ const ChangePasswordForm = ({ onUpdate }) => {
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Limpiar error del campo cuando el usuario empiece a escribir
+    // Clear field error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -88,7 +88,7 @@ const ChangePasswordForm = ({ onUpdate }) => {
       <h2 className="text-lg font-semibold text-gray-900 mb-6">Security settings</h2>
       
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Error general */}
+        {/* General error */}
         {errors.general && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-md">
             <p className="text-sm text-red-600">{errors.general}</p>

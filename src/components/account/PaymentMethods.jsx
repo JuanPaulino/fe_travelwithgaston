@@ -6,8 +6,8 @@ import useProfileUpdate from '../../hooks/useProfileUpdate.js';
 const PaymentMethods = () => {
   const { user } = useAuth();
   const { updateProfile, isUpdating, error: profileError } = useProfileUpdate({
-    autoUpdate: true, // Actualizar automáticamente al montar el componente
-    autoUpdateOnAuth: false // No actualizar automáticamente en autenticación para evitar loops
+    autoUpdate: true, // Automatically update when component mounts
+    autoUpdateOnAuth: false // Don't automatically update on authentication to avoid loops
   });
 
   const handleStripeRedirect = async () => {
@@ -16,7 +16,7 @@ const PaymentMethods = () => {
       window.location.href = response.data.url;
     } catch (error) {
       console.error('Error redirecting to Stripe:', error);
-      alert('Error al conectar con el sistema de pagos. Por favor, inténtalo de nuevo.');
+      alert('Error connecting to the payment system. Please try again.');
     }
   };
 
@@ -24,7 +24,7 @@ const PaymentMethods = () => {
     window.location.href = '/checkout';
   };
 
-  // Verificar si el usuario necesita suscribirse
+  // Check if user needs to subscribe
   const needsSubscription = user && 
     user.role === 'basic' && 
     (!user.stripeCustomerId || user.stripeCustomerId === null);
@@ -65,7 +65,7 @@ const PaymentMethods = () => {
           
           <div className="space-y-4">
             {needsSubscription ? (
-              // Botón de suscripción para usuarios básicos sin Stripe
+              // Subscription button for basic users without Stripe
               <>
                 <button
                   onClick={handleSubscribeToTravelPlan}
@@ -84,7 +84,7 @@ const PaymentMethods = () => {
                 </div>
               </>
             ) : (
-              // Botón de portal de facturación para usuarios con Stripe
+              // Billing portal button for users with Stripe
               <>
                 <button
                   onClick={handleStripeRedirect}

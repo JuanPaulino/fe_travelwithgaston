@@ -43,7 +43,7 @@ export default function JetInquiryForm() {
 
   return (
     <form id="jet-form" onSubmit={handleSubmit} className="space-y-4">
-      {/* Campo oculto para identificar el formulario */}
+      {/* Hidden field to identify the form */}
       <input type="hidden" name="form_id" value="jet_inquiry" />
       
       {/* Name & Contact */}

@@ -11,7 +11,7 @@ function SearchAutocomplete({
   disabled = false 
 }) {
   
-  // Estados del componente
+  // Component states
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -20,13 +20,13 @@ function SearchAutocomplete({
   const [isMobile, setIsMobile] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   
-  // Referencias
+  // References
   const inputRef = useRef(null)
   const suggestionsRef = useRef(null)
   const debounceRef = useRef(null)
   const sideSheetRef = useRef(null)
   
-  // Detectar si es dispositivo móvil
+  // Detect if it's a mobile device
   useEffect(() => {
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth < 1024) // lg breakpoint
@@ -38,7 +38,7 @@ function SearchAutocomplete({
     return () => window.removeEventListener('resize', checkIsMobile)
   }, [])
   
-  // Función para buscar sugerencias
+  // Function to search suggestions
   const searchSuggestions = async (query) => {
     if (!query || query.trim().length < 2) {
       setSuggestions([])
@@ -53,7 +53,7 @@ function SearchAutocomplete({
       setSuggestions(results || [])
       setShowSuggestions(true)
       setSelectedIndex(-1)
-      // Establecer la primera columna visible como seleccionada
+      // Set the first visible column as selected
       const resultsArray = results || []
       const destinations = resultsArray.filter(s => s.type === 'location')
       const hotels = resultsArray.filter(s => s.type === 'hotel')
@@ -70,7 +70,7 @@ function SearchAutocomplete({
     }
   }
   
-  // Separar sugerencias por tipo
+  // Separate suggestions by type
   const getGroupedSuggestions = () => {
     const destinations = suggestions.filter(s => s.type === 'location')
     const hotels = suggestions.filter(s => s.type === 'hotel')
@@ -78,29 +78,29 @@ function SearchAutocomplete({
     return { destinations, hotels, inspirations }
   }
   
-  // Manejar cambios en el input con debounce
+  // Handle input changes with debounce
   const handleInputChange = (e) => {
     const newValue = e.target.value
     onChange(newValue)
     
-    // Limpiar timeout anterior
+    // Clear previous timeout
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)
     }
     
-    // Establecer nuevo timeout para búsqueda
+    // Set new timeout for search
     debounceRef.current = setTimeout(() => {
       searchSuggestions(newValue)
-    }, 300) // 300ms de debounce
+    }, 300) // 300ms debounce
   }
   
-  // Manejar selección de sugerencia
+  // Handle suggestion selection
   const handleSuggestionClick = (suggestion) => {
-    // Actualizar el valor del input con el texto de la sugerencia
+    // Update input value with suggestion text
     const suggestionText = suggestion.text || suggestion.location || ''
     onChange(suggestionText)
     
-    // Llamar al callback de selección con el objeto completo
+    // Call selection callback with complete object
     if (onSelectionChange) {
       onSelectionChange(suggestion)
     }
@@ -111,7 +111,7 @@ function SearchAutocomplete({
     inputRef.current?.focus()
   }
   console.log(showSuggestions)
-  // Manejar teclas del teclado para navegación entre columnas
+  // Handle keyboard keys for navigation between columns
   const handleKeyDown = (e) => {
     if (!showSuggestions || suggestions.length === 0) return
     
@@ -172,10 +172,10 @@ function SearchAutocomplete({
     }
   }
   
-  // Manejar clic fuera del componente
+  // Handle click outside component
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isMobile) return // En móvil manejamos el cierre con el side sheet
+      if (isMobile) return // On mobile we handle closing with the side sheet
       
       if (
         inputRef.current && 
@@ -194,7 +194,7 @@ function SearchAutocomplete({
     }
   }, [isMobile])
   
-  // Limpiar timeout al desmontar
+  // Clear timeout on unmount
   useEffect(() => {
     return () => {
       if (debounceRef.current) {
@@ -204,19 +204,19 @@ function SearchAutocomplete({
   }, [])
   
   
-  // Cerrar side sheet en móvil
+  // Close side sheet on mobile
   const closeMobileSideSheet = () => {
     setIsAnimating(true)
     setTimeout(() => {
       setShowSuggestions(false)
       setSelectedIndex(-1)
       setIsAnimating(false)
-    }, 200) // Duración de la animación
+    }, 200) // Animation duration
   }
 
   const { destinations, hotels, inspirations } = getGroupedSuggestions()
   
-  // Determinar qué columnas mostrar
+  // Determine which columns to show
   const getVisibleColumns = () => {
     const visibleColumns = []
     if (destinations.length > 0) visibleColumns.push('destinations')
@@ -226,13 +226,13 @@ function SearchAutocomplete({
   }
   
   const visibleColumns = getVisibleColumns()
-  // Mobile first: 1 columna en móvil, 2-3 en desktop
+  // Mobile first: 1 column on mobile, 2-3 on desktop
   const gridCols = visibleColumns.length === 1 ? 'grid-cols-1' : 
                    visibleColumns.length === 2 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1 lg:grid-cols-3'
 
   return (
     <div className="relative flex-1">
-      {/* Campo de entrada */}
+      {/* Input field */}
       <div className="relative">
         <input
           ref={inputRef}
@@ -246,7 +246,7 @@ function SearchAutocomplete({
           autoComplete="off"
         />
         
-        {/* Botón para limpiar */}
+        {/* Clear button */}
         {value && (
           <button
             type="button"
@@ -255,7 +255,7 @@ function SearchAutocomplete({
               setSuggestions([])
               setShowSuggestions(false)
               inputRef.current?.focus()
-              // Llamar al callback del componente padre si está disponible
+              // Call parent component callback if available
               if (onClear) {
                 onClear()
               }
@@ -266,7 +266,7 @@ function SearchAutocomplete({
           </button>
         )}
         
-        {/* Indicador de carga */}
+        {/* Loading indicator */}
         {loading && (
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
@@ -274,7 +274,7 @@ function SearchAutocomplete({
         )}
       </div>
       
-      {/* Side Sheet para móvil */}
+      {/* Side Sheet for mobile */}
       {isMobile && showSuggestions && (destinations.length > 0 || hotels.length > 0 || inspirations.length > 0) && (
         <div className="fixed inset-0 z-50 lg:hidden">
           {/* Overlay */}
@@ -293,7 +293,7 @@ function SearchAutocomplete({
             }`}
             style={{ maxHeight: '80vh' }}
           >
-            {/* Header del side sheet */}
+            {/* Side sheet header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 p-4 rounded-t-2xl">
               <div className="flex items-center gap-3">
                 <button
@@ -319,10 +319,10 @@ function SearchAutocomplete({
               </div>
             </div>
 
-            {/* Contenido del side sheet */}
+            {/* Side sheet content */}
             <div className="overflow-y-auto" style={{ maxHeight: 'calc(80vh - 80px)' }}>
               <div className="p-4 space-y-6">
-                {/* Destinos */}
+                {/* Destinations */}
                 {destinations.length > 0 && (
                   <div>
                     <h3 className="text-sm font-semibold text-gray-700 mb-3 px-2">Destinations</h3>
@@ -350,7 +350,7 @@ function SearchAutocomplete({
                   </div>
                 )}
 
-                {/* Hoteles */}
+                {/* Hotels */}
                 {hotels.length > 0 && (
                   <div>
                     <h3 className="text-sm font-semibold text-gray-700 mb-3 px-2">Hotels</h3>
@@ -378,7 +378,7 @@ function SearchAutocomplete({
                   </div>
                 )}
 
-                {/* Inspiraciones */}
+                {/* Inspirations */}
                 {inspirations.length > 0 && (
                   <div>
                     <h3 className="text-sm font-semibold text-gray-700 mb-3 px-2">Inspiration</h3>
@@ -418,14 +418,14 @@ function SearchAutocomplete({
         </div>
       )}
 
-      {/* Dropdown de sugerencias para desktop */}
+      {/* Suggestions dropdown for desktop */}
       {!isMobile && showSuggestions && (destinations.length > 0 || hotels.length > 0 || inspirations.length > 0) && (
         <div 
           ref={suggestionsRef}
           className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl max-h-[400px] overflow-hidden lg:min-w-[900px]"
         >
           <div className={`grid ${gridCols} divide-x divide-gray-200 lg:divide-x`}>
-            {/* Columna de Destinos */}
+            {/* Destinations Column */}
             {visibleColumns.includes('destinations') && (
               <div className="overflow-y-auto max-h-[400px]">
                 <div className="sticky top-0 bg-primary-lighter px-4 py-3 border-b border-primary-lighter">
@@ -464,7 +464,7 @@ function SearchAutocomplete({
               </div>
             )}
 
-            {/* Columna de Hoteles */}
+            {/* Hotels Column */}
             {visibleColumns.includes('hotels') && (
               <div className="overflow-y-auto max-h-[400px]">
                 <div className="sticky top-0 bg-primary-lightest px-4 py-3 border-b border-primary-lightest">
@@ -503,7 +503,7 @@ function SearchAutocomplete({
               </div>
             )}
 
-            {/* Columna de Inspiraciones */}
+            {/* Inspirations Column */}
             {visibleColumns.includes('inspirations') && (
               <div className="overflow-y-auto max-h-[400px]">
                 <div className="sticky top-0 bg-primary-lighter px-4 py-3 border-b border-primary-lighter">
@@ -545,7 +545,7 @@ function SearchAutocomplete({
         </div>
       )}
       
-      {/* Mensaje cuando no hay resultados - solo en desktop */}
+      {/* Message when no results - desktop only */}
       {!isMobile && showSuggestions && !loading && suggestions.length === 0 && value.length >= 2 && (
         <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-6 text-center text-gray-500">
           <div className="text-lg mb-2">🔍</div>

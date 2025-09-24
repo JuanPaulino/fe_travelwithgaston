@@ -157,13 +157,6 @@ export const searchActions = {
   // Verificar si la búsqueda es válida
   isSearchValid: () => {
     const data = searchStore.get();
-    console.log('🔍 isSearchValid - Verificando datos:', {
-      hasSearchText: !!data.searchText,
-      hasSelectedDestinationId: !!data.selectedDestinationId,
-      hasCheckInDate: !!data.checkInDate,
-      hasCheckOutDate: !!data.checkOutDate,
-      selectedDestinationId: data.selectedDestinationId
-    });
     
     // Solo necesitamos destino seleccionado y fechas válidas
     // El searchText puede variar pero no es crítico para la búsqueda
@@ -174,14 +167,11 @@ export const searchActions = {
   executeSearch: async () => {
     const searchData = searchStore.get();
     
-    console.log('🔍 executeSearch - Iniciando búsqueda con datos:', searchData)
     
     if (!searchActions.isSearchValid()) {
-      console.warn('❌ executeSearch - Búsqueda no válida:', searchData);
       return null;
     }
 
-    console.log('✅ executeSearch - Búsqueda válida, procediendo...')
 
     // Actualizar estado de carga
     resultsStore.set({
@@ -217,7 +207,7 @@ export const searchActions = {
       }
 
       if (!destinationId) {
-        throw new Error('No se pudo obtener el ID de ubicación del destino seleccionado');
+        throw new Error('Could not get the location ID of the selected destination');
       }
 
       // Obtener filtros activos del store de filtros
@@ -253,10 +243,8 @@ export const searchActions = {
         }
       });
 
-      console.log('🏨 executeSearch - Parámetros de búsqueda:', searchParams)
       // Llamar a la API de disponibilidad
       const results = await hotelsApi.getAvailability(searchParams);
-      console.log('🏨 executeSearch - Resultados recibidos:', results?.length || 0, 'hoteles')
       
       // Actualizar resultados
       resultsStore.set({
@@ -280,7 +268,7 @@ export const searchActions = {
       resultsStore.set({
         ...resultsStore.get(),
         loading: false,
-        error: error.message || 'Error al buscar hoteles. Intenta nuevamente.'
+        error: error.message || 'Error searching for hotels. Try again.'
       });
 
       return null;

@@ -43,7 +43,7 @@ export default function AssistantInquiryForm() {
 
   return (
     <form id="assistant-form" onSubmit={handleSubmit} className="space-y-4">
-      {/* Campo oculto para identificar el formulario */}
+      {/* Hidden field to identify the form */}
       <input type="hidden" name="form_id" value="assistant_inquiry" />
       
       {/* Name & Contact */}
