@@ -26,6 +26,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   // Estados locales para control de UI
   const [showAdditionalFields, setShowAdditionalFields] = useState(false)
   const [showGuestsDropdown, setShowGuestsDropdown] = useState(false)
+  const [showCollapsibleSection, setShowCollapsibleSection] = useState(false)
   const [minCheckOutDate, setMinCheckOutDate] = useState('')
   const [isFormActive, setIsFormActive] = useState(false)
   const dropdownRef = useRef(null)
@@ -34,6 +35,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   useEffect(() => {
     if (Object.keys(urlParams).length > 0 && urlParams.destinationId) {
       setShowAdditionalFields(true)
+      setShowCollapsibleSection(true)
     }
   }, [urlParams])
 
@@ -174,6 +176,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     // En móvil, mostrar campos adicionales después de seleccionar destino
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setShowAdditionalFields(true)
+      setShowCollapsibleSection(true)
     }
   }
 
@@ -183,12 +186,14 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     // Mostrar campos adicionales cuando el usuario empiece a escribir
     if (text && !showAdditionalFields) {
       setShowAdditionalFields(true)
+      setShowCollapsibleSection(true)
     }
     if (searchData.selectedDestinationId && text !== searchData.selectedDestinationText) {
       setSelectedDestination(null)
       // En móvil, ocultar campos adicionales si se borra la selección
       if (typeof window !== 'undefined' && window.innerWidth < 1024 && !text) {
         setShowAdditionalFields(false)
+        setShowCollapsibleSection(false)
       }
     }
   }
@@ -259,6 +264,10 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     if (isOnHomePage()) {
       setIsFormActive(true)
     }
+    // Mostrar sección colapsable cuando se activa el SearchAutocomplete en móvil
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setShowCollapsibleSection(true)
+    }
   }
 
   // Manejar cuando el formulario pierde el foco
@@ -314,13 +323,18 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
       return
     }
 
-    // 2. Preparar parámetros URL
+    // 2. Ocultar sección colapsable en móvil después del envío
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setShowCollapsibleSection(false)
+    }
+
+    // 3. Preparar parámetros URL
     updateUrl(searchData);
     
     // Hacer scroll a resultados en móvil antes de ejecutar búsqueda
-    scrollToResults();
+    // scrollToResults();
     
-    // 3. Redirecciones
+    // 4. Redirecciones
     // Si la búsqueda es a hotel y estamos en la página search.astro o home
     if (searchData.selectedDestinationType === 'hotel' && (isOnSearchPage() || isOnHomePage())) {
       window.location.href = `/hotels/${searchData.selectedDestinationId}${buildSearchUrl(searchData)}`;
@@ -339,7 +353,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
       return;
     }
 
-    // 4. Si ninguna coincide, continuamos y se realiza la búsqueda
+    // 5. Si ninguna coincide, continuamos y se realiza la búsqueda
     const response = await executeSearch();
     
     if (response.results) {
@@ -358,10 +372,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     
     return 'opacity-90 hover:opacity-100';
   })();
-  console.log(isOnHomePage());
-  console.log(getFieldValue(searchData.searchText));
-  console.log(searchData.searchText);
-  console.log(opacityClasses);
+
   return (
     <div className={className}>
       <form 
@@ -392,118 +403,130 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
               </div>
             </div>
 
-            {/* Fechas - Check In y Check Out en filas separadas para móvil */}
-            <div className="space-y-4">
-              {/* Check In */}
-              <div className="w-full">
-                <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK IN</div>
-                <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <input
-                    type="date"
-                    value={getFieldValue(searchData.checkInDate)}
-                    onChange={(e) => setCheckInDate(e.target.value)}
-                    disabled={disabled}
-                    className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
-                    min={(() => {
-                      const tomorrow = new Date();
-                      tomorrow.setDate(tomorrow.getDate() + 1);
-                      return tomorrow.toISOString().split('T')[0];
-                    })()}
-                  />
+            {/* Sección colapsable de fechas y huéspedes */}
+            <div className={`w-full space-y-4 transition-all duration-300 ease-in-out ${
+              showCollapsibleSection 
+                ? 'max-h-[1000px] opacity-100' 
+                : 'max-h-0 opacity-0'
+            }`}>
+              {/* Fechas - Check In y Check Out en la misma fila para móvil */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Check In */}
+                <div className="w-full">
+                  <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide flex items-center gap-2">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>CHECK IN</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
+                    
+                    <input
+                      type="date"
+                      value={getFieldValue(searchData.checkInDate)}
+                      onChange={(e) => setCheckInDate(e.target.value)}
+                      disabled={disabled}
+                      className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
+                      min={(() => {
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        return tomorrow.toISOString().split('T')[0];
+                      })()}
+                    />
+                  </div>
+                </div>
+
+                {/* Check Out */}
+                <div className="w-full">
+                  <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide flex items-center gap-2">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>CHECK OUT</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
+                    <input
+                      type="date"
+                      value={getFieldValue(searchData.checkOutDate)}
+                      onChange={(e) => setCheckOutDate(e.target.value)}
+                      disabled={disabled}
+                      className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
+                      min={minCheckOutDate}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Check Out */}
-              <div className="w-full">
-                <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK OUT</div>
-                <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
+              {/* Selector de huéspedes - 100% */}
+              <div className="w-full relative" ref={dropdownRef} data-dropdown="guests">
+                <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
+                <button
+                  type="button"
+                  onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
+                  disabled={disabled}
+                  className="w-full flex items-center justify-between gap-2 text-base font-medium text-gray-900 p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+                >
+                  <span>
+                    {shouldShowStoreValues() 
+                      ? `${searchData.adults} Adults, ${searchData.children} child, ${searchData.rooms} rooms`
+                      : 'Select guests'
+                    }
+                  </span>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                  <input
-                    type="date"
-                    value={getFieldValue(searchData.checkOutDate)}
-                    onChange={(e) => setCheckOutDate(e.target.value)}
-                    disabled={disabled}
-                    className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
-                    min={minCheckOutDate}
-                  />
-                </div>
+                </button>
+
+                {/* Dropdown de huéspedes para móvil */}
+                {showGuestsDropdown && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-[99999] p-4" data-dropdown="guests">
+                    <h3 className="font-medium text-gray-900 mb-4">Configure guests</h3>
+                    
+                    <GuestSelector
+                      adults={searchData.adults}
+                      children={searchData.children}
+                      rooms={searchData.rooms}
+                      childrenAges={searchData.childrenAges}
+                      onAdultsChange={handleAdultsChange}
+                      onChildrenChange={handleChildrenChange}
+                      onRoomsChange={handleRoomsChange}
+                      onChildrenAgesChange={handleChildrenAgesChange}
+                      disabled={disabled}
+                      forceSingleRoom={shouldForceSingleRoom()}
+                    />
+                    
+                    {shouldForceSingleRoom() && (
+                      <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                        <p className="text-sm text-orange-800">
+                          <span className="font-medium">Note:</span> When including children in the reservation, only one room can be booked at a time.
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => setShowGuestsDropdown(false)}
+                      className="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded text-sm font-medium"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
 
-            {/* Selector de huéspedes - 100% */}
-            <div className="w-full relative" ref={dropdownRef} data-dropdown="guests">
-              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
-              <button
-                type="button"
-                onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
-                disabled={disabled}
-                className="w-full flex items-center justify-between gap-2 text-base font-medium text-gray-900 p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
-              >
-                <span>
-                  {shouldShowStoreValues() 
-                    ? `${searchData.adults} Adults, ${searchData.children} child, ${searchData.rooms} rooms`
-                    : 'Select guests'
-                  }
-                </span>
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {/* Dropdown de huéspedes para móvil */}
-              {showGuestsDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-50 p-4" data-dropdown="guests">
-                  <h3 className="font-medium text-gray-900 mb-4">Configure guests</h3>
-                  
-                  <GuestSelector
-                    adults={searchData.adults}
-                    children={searchData.children}
-                    rooms={searchData.rooms}
-                    childrenAges={searchData.childrenAges}
-                    onAdultsChange={handleAdultsChange}
-                    onChildrenChange={handleChildrenChange}
-                    onRoomsChange={handleRoomsChange}
-                    onChildrenAgesChange={handleChildrenAgesChange}
-                    disabled={disabled}
-                    forceSingleRoom={shouldForceSingleRoom()}
-                  />
-                  
-                  {shouldForceSingleRoom() && (
-                    <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                      <p className="text-sm text-orange-800">
-                        <span className="font-medium">Note:</span> When including children in the reservation, only one room can be booked at a time.
-                      </p>
-                    </div>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={() => setShowGuestsDropdown(false)}
-                    className="w-full mt-4 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded text-sm font-medium"
-                  >
-                    Apply
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Botón de búsqueda - 100% */}
-            <div className="w-full">
-              <button
-                type="submit"
-                disabled={disabled || !searchData.checkInDate || !searchData.checkOutDate}
-                className="w-full cursor-pointer bg-primary hover:bg-primary-dark text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 py-3 px-4 rounded-lg"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                Search
-              </button>
+              {/* Botón de búsqueda - 100% */}
+              <div className="w-full">
+                <button
+                  type="submit"
+                  disabled={disabled || !searchData.checkInDate || !searchData.checkOutDate}
+                  className="w-full cursor-pointer bg-primary hover:bg-primary-dark text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 py-3 px-4 rounded-lg"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  Search
+                </button>
+              </div>
             </div>
           </div>
 

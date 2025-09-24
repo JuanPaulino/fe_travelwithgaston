@@ -303,9 +303,6 @@ function SearchAutocomplete({
                   <span className="text-xl">✕</span>
                 </button>
                 <div className="flex-1 relative">
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    🔍
-                  </div>
                   <input
                     type="text"
                     value={value}
