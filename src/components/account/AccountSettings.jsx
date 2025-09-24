@@ -25,7 +25,7 @@ const AccountSettings = () => {
     try {
       // Verificar que el usuario esté autenticado
       if (!token || !user) {
-        throw new Error('Usuario no autenticado');
+        throw new Error('User not authenticated');
       }
 
       // Preparar los datos para enviar al backend
@@ -40,17 +40,17 @@ const AccountSettings = () => {
       
       if (response.success) {
         // Mostrar mensaje de éxito
-        showSuccess('Datos personales actualizados exitosamente!', { autoHide: true });
+        showSuccess('Personal details updated successfully!', { autoHide: true });
         
         // Aquí podrías actualizar el store local si es necesario
         // o recargar los datos del usuario
-        console.log('Datos actualizados:', response.data);
+        console.log('Data updated:', response.data);
       } else {
-        throw new Error(response.message || 'Error al actualizar los datos');
+        throw new Error(response.message || 'Error updating data');
       }
     } catch (error) {
       console.error('Error updating personal details:', error);
-      showError(`Error al actualizar los datos: ${error.message}`, { autoHide: true });
+      showError(`Error updating data: ${error.message}`, { autoHide: true });
       throw error; // Re-lanzar el error para que el formulario lo maneje
     }
   };
@@ -58,16 +58,24 @@ const AccountSettings = () => {
   // Función para manejar el cambio de contraseña
   const handlePasswordUpdate = async (data) => {
     try {
-      // Aquí iría la lógica para cambiar la contraseña en el backend
-      console.log('Cambiando contraseña:', data);
+      // Verificar que el usuario esté autenticado
+      if (!token || !user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Llamar al endpoint para cambiar la contraseña
+      const response = await userAPI.changePassword(data);
       
-      // Simular llamada a API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mostrar mensaje de éxito
-      showSuccess('Contraseña cambiada exitosamente!', { autoHide: true });
+      if (response.success) {
+        // Mostrar mensaje de éxito
+        showSuccess('Password changed successfully!', { autoHide: true });
+        console.log('Password updated:', response.message);
+      } else {
+        throw new Error(response.message || 'Error changing password');
+      }
     } catch (error) {
       console.error('Error changing password:', error);
+      showError(`Error changing password: ${error.message}`, { autoHide: true });
       throw error; // Re-lanzar el error para que el formulario lo maneje
     }
   };
@@ -93,6 +101,7 @@ const AccountSettings = () => {
       />
       
       {/* Delete Account Button */}
+      {/*
       <div className="pt-6 border-t border-gray-200">
         <button
           onClick={handleDeleteAccount}
@@ -101,6 +110,7 @@ const AccountSettings = () => {
           Delete account
         </button>
       </div>
+      */}
     </div>
   );
 };

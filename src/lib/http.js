@@ -235,6 +235,12 @@ export const userAPI = {
   updateUserById: async (userId, userData) => {
     const response = await http.put(`/api/users/${userId}`, userData);
     return response.data;
+  },
+
+  // Cambiar contraseña del usuario autenticado
+  changePassword: async (passwordData) => {
+    const response = await http.put('/api/users/change-password', passwordData);
+    return response.data;
   }
 };
 
