@@ -62,16 +62,16 @@ const AuthActionsMobile = ({ onButtonClick = null, onCloseMenu = null }) => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center gap-4">
+    <div className="flex flex-col gap-4">
       <button 
         onClick={() => handleButtonClick('join')}
-        className="text-neutral hover:text-primary transition-colors px-3 py-2 rounded text-lg"
+        className="text-left text-neutral hover:text-primary transition-colors px-3 py-2 rounded text-base w-max bg-white border border-neutral-light"
       >
         Join us
       </button>
       <button 
         onClick={() => handleButtonClick('signin')}
-        className="bg-neutral hover:text-primary transition-colors px-3 py-2 rounded text-lg"
+        className="text-left hover:text-primary transition-colors px-3 py-2 rounded text-base w-max bg-black text-white border border-black"
       >
         Sign in
       </button>

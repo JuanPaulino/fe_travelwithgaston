@@ -1,9 +1,9 @@
 /// <reference types="vite/client" />
 import { createDirectus, readItems, createItem, rest, staticToken } from "@directus/sdk";
 
-const DIRECTUS_URL = import.meta.env.DIRECTUS_URL || 'http://localhost:8055';
-const DIRECTUS_TOKEN = import.meta.env.DIRECTUS_TOKEN || 'bxgS89n_EZlT2TZ8XNEvLX-0Tt_pPmfi';
-
+const DIRECTUS_URL = import.meta.env.DIRECTUS_URL;
+const DIRECTUS_TOKEN = import.meta.env.DIRECTUS_TOKEN;
+console.log(DIRECTUS_TOKEN)
 // Cliente para operaciones de solo lectura (sin autenticación)
 const client = createDirectus(DIRECTUS_URL).with(rest());
 

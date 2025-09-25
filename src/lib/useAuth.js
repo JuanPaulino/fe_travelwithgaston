@@ -35,6 +35,11 @@ export const useAuth = () => {
     clearError: authActions.clearError,
     updateProfile: authActions.updateProfile,
     
+    // Forgot password actions
+    forgotPassword: authActions.forgotPassword,
+    resetPassword: authActions.resetPassword,
+    validateResetToken: authActions.validateResetToken,
+    
     // Utilidades
     checkAuth: authActions.checkAuth
   };

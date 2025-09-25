@@ -135,6 +135,24 @@ export const authAPI = {
   verifyToken: async () => {
     const response = await http.get('/api/auth/verify');
     return response.data;
+  },
+
+  // Solicitar reseteo de contraseña
+  forgotPassword: async (email) => {
+    const response = await http.post('/api/auth/forgot-password', { email });
+    return response.data;
+  },
+
+  // Resetear contraseña
+  resetPassword: async (token, newPassword) => {
+    const response = await http.post('/api/auth/reset-password', { token, newPassword });
+    return response.data;
+  },
+
+  // Validar token de reseteo
+  validateResetToken: async (token) => {
+    const response = await http.get(`/api/auth/validate-reset-token/${token}`);
+    return response.data;
   }
 };
 

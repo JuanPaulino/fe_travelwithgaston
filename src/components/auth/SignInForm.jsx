@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../lib/useAuth';
 import { handleAPIError } from '../../lib/http';
 
-const SignInForm = ({ onLoginSuccess }) => {
+const SignInForm = ({ onLoginSuccess, onShowForgotPassword }) => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -166,9 +166,13 @@ const SignInForm = ({ onLoginSuccess }) => {
             Keep me signed in
           </label>
         </div>
-        <a href="#" className="font-body text-sm text-gray-500 hover:text-gray-700 transition-colors">
+        <button
+          type="button"
+          onClick={onShowForgotPassword}
+          className="font-body text-sm text-gray-500 hover:text-gray-700 transition-colors underline"
+        >
           Forgot password?
-        </a>
+        </button>
       </div>
 
       <button

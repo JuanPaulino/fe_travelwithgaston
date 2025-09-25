@@ -15,9 +15,18 @@ const ReturnPageComponent = () => {
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const sessionId = urlParams.get('session_id');
+      const debug = urlParams.get('debug');
+
+      // Modo debug - usar datos mock
+      if (debug) {
+        const mockData = getMockData(debug);
+        setSession(mockData);
+        setLoading(false);
+        return;
+      }
 
       if (!sessionId) {
-        setError('No se encontró ID de sesión');
+        setError('Session ID not found');
         setLoading(false);
         return;
       }
@@ -29,10 +38,30 @@ const ReturnPageComponent = () => {
       setSession(sessionData);
       setLoading(false);
     } catch (err) {
-      console.error('Error al obtener el estado de la sesión:', err);
-      setError('Error al verificar el estado del pago');
+      console.error('Error getting session status:', err);
+      setError('Error verifying payment status');
       setLoading(false);
     }
+  };
+
+  const getMockData = (debugType) => {
+    const mockData = {
+      'success': {
+        status: 'complete',
+        payment_status: 'paid',
+        customer_email: 'test@example.com'
+      },
+      'pending': {
+        status: 'open',
+        payment_status: 'unpaid'
+      },
+      'error': {
+        status: 'open',
+        payment_status: 'failed'
+      }
+    };
+
+    return mockData[debugType] || mockData['success'];
   };
 
   const handleRetryPayment = () => {
@@ -51,8 +80,8 @@ const ReturnPageComponent = () => {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Verificando estado del pago...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Verifying payment status...</p>
         </div>
       </div>
     );
@@ -62,15 +91,15 @@ const ReturnPageComponent = () => {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-md mx-auto">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-100 text-red-700 px-4 py-3 mb-4">
             <p className="font-bold">Error</p>
             <p>{error}</p>
           </div>
           <button
             onClick={handleGoHome}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4"
           >
-            Volver al inicio
+            Back to Home
           </button>
         </div>
       </div>
@@ -81,12 +110,12 @@ const ReturnPageComponent = () => {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">No se pudo obtener información de la sesión</p>
+          <p className="text-gray-600 mb-4">Could not retrieve session information</p>
           <button
             onClick={handleGoHome}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4"
           >
-            Volver al inicio
+            Back to Home
           </button>
         </div>
       </div>
@@ -98,29 +127,29 @@ const ReturnPageComponent = () => {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center max-w-md mx-auto">
-          <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6">
-            <p className="font-bold">Pago Pendiente</p>
-            <p>El pago no se completó o fue cancelado.</p>
+          <div className="bg-primary-lighter text-black px-4 py-3 mb-6">
+            <p className="font-bold">Payment Pending</p>
+            <p>The payment was not completed or was cancelled.</p>
           </div>
           
           <div className="space-y-4">
-            <p className="text-gray-600">
-              Estado del pago: <span className="font-semibold">{session.payment_status || 'Pendiente'}</span>
+            <p className="text-black">
+              Payment Status: <span className="font-semibold">{session.payment_status || 'Pending'}</span>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={handleRetryPayment}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                className="bg-primary hover:bg-primary/90 text-white py-3 px-6 transition-colors"
               >
-                Intentar Pago Nuevamente
+                Try Payment Again
               </button>
               
               <button
                 onClick={handleGoHome}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                className="bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 transition-colors"
               >
-                Volver al Inicio
+                Back to Home
               </button>
             </div>
           </div>
@@ -135,7 +164,7 @@ const ReturnPageComponent = () => {
         <div className="text-center max-w-2xl mx-auto">
           {/* Icono de éxito */}
           <div className="mb-6">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-primary-lighter mb-4">
               <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
               </svg>
@@ -144,24 +173,24 @@ const ReturnPageComponent = () => {
 
           {/* Título y mensaje */}
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            ¡Pago Completado Exitosamente!
+            Payment Completed Successfully!
           </h1>
           
           <p className="text-lg text-gray-600 mb-8">
-            Tu suscripción ha sido activada. Recibirás un correo de confirmación pronto.
+            Your subscription has been activated. You will receive a confirmation email soon.
           </p>
 
           {/* Detalles del pago */}
-          <div className="bg-gray-50 rounded-lg p-6 mb-8 text-left max-w-md mx-auto">
-            <h3 className="font-semibold text-gray-900 mb-3">Detalles del Pago:</h3>
+          <div className="bg-primary-lighter p-6 mb-8 text-left max-w-md mx-auto">
+            <h3 className="font-semibold font-body text-gray-900 mb-3">Payment Details:</h3>
             <div className="space-y-2 text-sm text-gray-600">
               <div className="flex justify-between">
-                <span>Estado:</span>
-                <span className="font-medium text-green-600">Completado</span>
+                <span>Status:</span>
+                <span className="font-medium text-green-600">Completed</span>
               </div>
               <div className="flex justify-between">
-                <span>Estado del Pago:</span>
-                <span className="font-medium">{session.payment_status || 'Pagado'}</span>
+                <span>Payment Status:</span>
+                <span className="font-medium">{session.payment_status || 'Paid'}</span>
               </div>
               {session.customer_email && (
                 <div className="flex justify-between">
@@ -176,22 +205,22 @@ const ReturnPageComponent = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={handleGoHome}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors"
+              className="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 transition-colors"
             >
-              Continuar Navegando
+              Go to Home
             </button>
             
             <button
               onClick={handleGoSearch}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg transition-colors"
+              className="bg-black hover:bg-gray-800 text-white font-bold py-3 px-8 transition-colors"
             >
-              Buscar Hoteles
+              Search Hotels
             </button>
           </div>
 
           {/* Información adicional */}
           <div className="mt-8 text-sm text-gray-500">
-            <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+            <p>If you have any questions, please don't hesitate to contact us.</p>
           </div>
         </div>
       </div>
@@ -202,24 +231,24 @@ const ReturnPageComponent = () => {
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
       <div className="text-center max-w-md mx-auto">
-        <div className="bg-gray-100 border border-gray-400 text-gray-700 px-4 py-3 rounded mb-4">
-          <p className="font-bold">Estado Desconocido</p>
-          <p>El estado de la sesión no es reconocido: {session.status}</p>
+        <div className="bg-gray-100 text-gray-700 px-4 py-3 mb-4">
+          <p className="font-bold">Unknown Status</p>
+          <p>Session status is not recognized: {session.status}</p>
         </div>
         
         <div className="space-y-3">
           <button
             onClick={handleGoHome}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+            className="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 w-full"
           >
-            Volver al Inicio
+            Back to Home
           </button>
           
           <button
             onClick={handleRetryPayment}
-            className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded w-full"
+            className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 w-full"
           >
-            Intentar Pago Nuevamente
+            Try Payment Again
           </button>
         </div>
       </div>

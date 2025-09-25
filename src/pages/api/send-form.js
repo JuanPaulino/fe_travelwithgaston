@@ -33,7 +33,7 @@ const sendToWebhook = async (formData) => {
       throw new Error(`Webhook failed: ${response.status}`);
     }
 
-    return await response.json();
+    return response;
   } catch (error) {
     console.error('Webhook error:', error);
     throw new Error('Failed to submit form data');
@@ -54,14 +54,14 @@ export async function POST({ request }) {
 
     return createResponse({
       success: true,
-      message: 'Formulario enviado correctamente'
+      message: 'Application submitted successfully'
     });
 
   } catch (error) {
     console.error('Error en send-form:', error);
     return createResponse({
       success: false,
-      error: 'Error al procesar el formulario'
+      error: 'Error sending the form. Please try again later.'
     }, 500);
   }
 }

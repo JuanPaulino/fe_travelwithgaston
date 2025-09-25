@@ -243,6 +243,111 @@ export const authActions = {
       })
       return { success: false, error: errorData.message }
     }
+  },
+
+  // Solicitar reseteo de contraseña
+  forgotPassword: async (email) => {
+    authStore.set({ ...authStore.get(), loading: true, error: null })
+    
+    try {
+      const response = await authAPI.forgotPassword(email)
+      
+      if (response.success) {
+        authStore.set({
+          ...authStore.get(),
+          loading: false,
+          error: null
+        })
+        return { success: true, message: response.message }
+      } else {
+        const errorMessage = response.message || 'Error requesting password reset'
+        authStore.set({
+          ...authStore.get(),
+          loading: false,
+          error: errorMessage
+        })
+        return { success: false, error: errorMessage }
+      }
+    } catch (error) {
+      console.error('Error requesting password reset:', error)
+      const errorData = handleAPIError(error)
+      authStore.set({
+        ...authStore.get(),
+        loading: false,
+        error: errorData.message
+      })
+      return { success: false, error: errorData.message }
+    }
+  },
+
+  // Resetear contraseña
+  resetPassword: async (token, newPassword) => {
+    authStore.set({ ...authStore.get(), loading: true, error: null })
+    
+    try {
+      const response = await authAPI.resetPassword(token, newPassword)
+      
+      if (response.success) {
+        authStore.set({
+          ...authStore.get(),
+          loading: false,
+          error: null
+        })
+        return { success: true, message: response.message }
+      } else {
+        const errorMessage = response.message || 'Error resetting password'
+        authStore.set({
+          ...authStore.get(),
+          loading: false,
+          error: errorMessage
+        })
+        return { success: false, error: errorMessage }
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error)
+      const errorData = handleAPIError(error)
+      authStore.set({
+        ...authStore.get(),
+        loading: false,
+        error: errorData.message
+      })
+      return { success: false, error: errorData.message }
+    }
+  },
+
+  // Validar token de reseteo
+  validateResetToken: async (token) => {
+    authStore.set({ ...authStore.get(), loading: true, error: null })
+    
+    try {
+      const response = await authAPI.validateResetToken(token)
+      
+      if (response.success) {
+        authStore.set({
+          ...authStore.get(),
+          loading: false,
+          error: null
+        })
+        return { success: true, data: response.data }
+      } else {
+        const errorMessage = response.message || 'Invalid reset token'
+        authStore.set({
+          ...authStore.get(),
+          loading: false,
+          error: errorMessage
+        })
+        return { success: false, error: errorMessage }
+      }
+    } catch (error) {
+      console.error('Error validating reset token:', error)
+      const errorData = handleAPIError(error)
+      authStore.set({
+        ...authStore.get(),
+        loading: false,
+        error: errorData.message
+      })
+      return { success: false, error: errorData.message }
+    }
   }
 }
 

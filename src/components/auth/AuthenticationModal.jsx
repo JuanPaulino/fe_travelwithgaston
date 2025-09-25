@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import SignInForm from './SignInForm';
 import JoinUsSteps from './JoinUsSteps';
+import ForgotPasswordForm from './ForgotPasswordForm';
 
 const AuthenticationModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
   const [currentTab, setCurrentTab] = useState(initialTab);
+  const [currentView, setCurrentView] = useState('main'); // 'main', 'forgot-password'
 
   // Actualizar el tab cuando cambie la prop initialTab
   useEffect(() => {
     setCurrentTab(initialTab);
+    setCurrentView('main'); // Reset view when tab changes
   }, [initialTab]);
 
   // Cerrar modal con Escape
@@ -39,6 +42,20 @@ const AuthenticationModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
 
   const switchTab = (tab) => {
     setCurrentTab(tab);
+    setCurrentView('main'); // Reset view when switching tabs
+  };
+
+  const handleShowForgotPassword = () => {
+    setCurrentView('forgot-password');
+  };
+
+  const handleBackToSignIn = () => {
+    setCurrentView('main');
+  };
+
+  const handleEmailSent = (email) => {
+    // Optional: You could show a toast notification here
+    console.log(`Password reset email sent to ${email}`);
   };
 
   if (!isOpen) return null;
@@ -92,9 +109,15 @@ const AuthenticationModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
 
         {/* Content */}
         <div className="pb-8 px-8">
-          {currentTab === 'signin' ? (
+          {currentView === 'forgot-password' ? (
+            <ForgotPasswordForm
+              onBackToSignIn={handleBackToSignIn}
+              onEmailSent={handleEmailSent}
+            />
+          ) : currentTab === 'signin' ? (
             <SignInForm 
               onLoginSuccess={onClose}
+              onShowForgotPassword={handleShowForgotPassword}
             />
           ) : (
             <JoinUsSteps 
@@ -104,8 +127,8 @@ const AuthenticationModal = ({ isOpen, onClose, initialTab = 'signin' }) => {
           )}
         </div>
 
-        {/* Footer link - solo mostrar en el tab de signin */}
-        {currentTab === 'signin' && (
+        {/* Footer link - solo mostrar en el tab de signin y cuando no estamos en forgot-password */}
+        {currentTab === 'signin' && currentView === 'main' && (
           <div className="p-8 pt-0 text-center">
             <p className="font-body text-sm text-gray-600">
               Not a member?{' '}
