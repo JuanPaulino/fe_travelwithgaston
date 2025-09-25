@@ -233,6 +233,60 @@ export const hotelsApi = {
       return null
     }
   },
+
+  // Obtener lista de hoteles (endpoint público)
+  getHotels: async (searchParams = {}) => {
+    try {
+      const params = new URLSearchParams()
+      
+      // Agregar parámetros de paginación
+      if (searchParams.page) params.append('page', searchParams.page)
+      if (searchParams.per_page) params.append('per_page', searchParams.per_page)
+      
+      // Agregar parámetros de filtrado
+      if (searchParams.location_id) params.append('location_id', searchParams.location_id)
+      if (searchParams.inspiration_id) params.append('inspiration_id', searchParams.inspiration_id)
+      
+      // Agregar arrays de filtros
+      if (searchParams.hotel_group_ids) {
+        searchParams.hotel_group_ids.forEach(id => params.append('hotel_group_ids[]', id))
+      }
+      if (searchParams.activities_ids) {
+        searchParams.activities_ids.forEach(id => params.append('activities_ids[]', id))
+      }
+      if (searchParams.family_facilities_ids) {
+        searchParams.family_facilities_ids.forEach(id => params.append('family_facilities_ids[]', id))
+      }
+      if (searchParams.hotel_facilities_ids) {
+        searchParams.hotel_facilities_ids.forEach(id => params.append('hotel_facilities_ids[]', id))
+      }
+      if (searchParams.property_types_ids) {
+        searchParams.property_types_ids.forEach(id => params.append('property_types_ids[]', id))
+      }
+      if (searchParams.location_types_ids) {
+        searchParams.location_types_ids.forEach(id => params.append('location_types_ids[]', id))
+      }
+      if (searchParams.trip_types_ids) {
+        searchParams.trip_types_ids.forEach(id => params.append('trip_types_ids[]', id))
+      }
+      if (searchParams.wellness_ids) {
+        searchParams.wellness_ids.forEach(id => params.append('wellness_ids[]', id))
+      }
+
+      const response = await http.get(`/api/hotels?${params}`)
+      const data = response.data
+
+      // Si la respuesta es exitosa, retornar los resultados
+      if (data.success && data.data) {
+        return data.data
+      }
+      
+      return []
+    } catch (error) {
+      console.error('Error getting hotels:', error)
+      return []
+    }
+  },
 };
 
 // API de usuarios

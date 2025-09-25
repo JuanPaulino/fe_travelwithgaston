@@ -82,7 +82,6 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   // Hook de debounce para auto search
   const { debouncedCallback: debouncedAutoSearch } = useDebounce(
     async () => {
-      console.log('🚀 Ejecutando búsqueda automática con parámetros de URL');
       await executeSearch();
     },
     500,

@@ -9,12 +9,6 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
   const [isVisible, setIsVisible] = useState(false)
   const cardRef = useRef(null)
 
-  // Logs de depuración
-  console.log('🏨 HotelAvailabilityCard - Props recibidas:', {
-    hotelData,
-    rooms,
-  })
-
   // Intersection Observer para detectar cuando la tarjeta es visible
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -44,7 +38,6 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
     lowest_rate: hotelData.lowest_rate || null
   }
 
-  console.log('🏨 HotelAvailabilityCard - Datos extraídos:', hotel)
 
   // Si el usuario no está autenticado, mostrar todos los hoteles como disponibles
   const isAvailable = isAuthenticated ? hotelData.is_available : true
@@ -67,7 +60,6 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
     // Aquí podrías abrir un modal con la imagen en tamaño completo
   }
 
-  console.log('🏨 HotelAvailabilityCard - Renderizando hotel:', hotel.name, 'Disponible:', isAvailable, 'Usuario autenticado:', isAuthenticated)
 
   return (
     <div ref={cardRef} className="overflow-hidden min-w-80 relative">
@@ -95,7 +87,6 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
             ) : (
               <div className={`w-full h-full bg-gray-200 flex items-center justify-center aspect-[3/2] ${!isAvailable ? 'opacity-60' : ''}`}>
                 <div className="text-gray-500 text-center p-8">
-                  <div className="text-4xl mb-2">🏨</div>
                   <p>Loading...</p>
                 </div>
               </div>

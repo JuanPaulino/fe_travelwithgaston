@@ -73,19 +73,19 @@ export const useUrlParams = () => {
       params.set('checkOut', searchData.checkOutDate);
     }
     
-    if (searchData.adults !== 2) {
+    if (searchData.adults && searchData.adults !== 2) {
       params.set('adults', searchData.adults.toString());
     }
     
-    if (searchData.children !== 0) {
+    if (searchData.children && searchData.children !== 0) {
       params.set('children', searchData.children.toString());
     }
     
-    if (searchData.rooms !== 1) {
+    if (searchData.rooms && searchData.rooms !== 1) {
       params.set('rooms', searchData.rooms.toString());
     }
     
-    if (searchData.childrenAges.length > 0) {
+    if (searchData.childrenAges && searchData.childrenAges.length > 0) {
       params.set('childrenAges', searchData.childrenAges.join(','));
     }
     

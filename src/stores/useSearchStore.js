@@ -4,6 +4,7 @@ import { hotelsApi } from '../lib/http.js';
 import { config } from '../config/config.js';
 import { filtersStore } from './useFiltersStore.js';
 import { persistentMap } from '@nanostores/persistent'
+import { isAuthenticated } from './authStore.js';
 
 // Estado inicial de la búsqueda
 const initialSearchData = {
@@ -243,8 +244,36 @@ export const searchActions = {
         }
       });
 
-      // Llamar a la API de disponibilidad
-      const results = await hotelsApi.getAvailability(searchParams);
+      // Check authentication status
+      const userIsAuthenticated = isAuthenticated();
+      
+      let results;
+      
+      if (userIsAuthenticated) {
+        // User is authenticated - call availability endpoint
+        results = await hotelsApi.getAvailability(searchParams);
+      } else {
+        // User is not authenticated - call hotels endpoint
+        // Transform searchParams to match hotels endpoint format
+        const hotelsParams = {
+          page: 1,
+          per_page: 50, // Default limit for non-authenticated users
+          ...(searchParams.location_id && { location_id: searchParams.location_id }),
+          ...(searchParams.inspiration_id && { inspiration_id: searchParams.inspiration_id }),
+          ...(searchParams.hotel_group_ids && { hotel_group_ids: searchParams.hotel_group_ids }),
+          ...(searchParams.activities_ids && { activities_ids: searchParams.activities_ids }),
+          ...(searchParams.family_facilities_ids && { family_facilities_ids: searchParams.family_facilities_ids }),
+          ...(searchParams.hotel_facilities_ids && { hotel_facilities_ids: searchParams.hotel_facilities_ids }),
+          ...(searchParams.property_types_ids && { property_types_ids: searchParams.property_types_ids }),
+          ...(searchParams.location_types_ids && { location_types_ids: searchParams.location_types_ids }),
+          ...(searchParams.trip_types_ids && { trip_types_ids: searchParams.trip_types_ids }),
+          ...(searchParams.wellness_ids && { wellness_ids: searchParams.wellness_ids })
+        };
+        
+        const hotelsResponse = await hotelsApi.getHotels(hotelsParams);
+        // Transform hotels response to match availability format
+        results = hotelsResponse.content || [];
+      }
       
       // Actualizar resultados
       resultsStore.set({
@@ -258,10 +287,10 @@ export const searchActions = {
           children: searchData.children,
           totalGuests: searchData.totalGuests
         },
-        search_type: selectedDestination.type,
+        search_type: userIsAuthenticated ? selectedDestination.type : 'hotels_list',
       });
 
-      return {results, search_type: selectedDestination.type};
+      return {results, search_type: userIsAuthenticated ? selectedDestination.type : 'hotels_list'};
     } catch (error) {
       
       // Actualizar estado de error

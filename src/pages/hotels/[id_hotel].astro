@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import AuthModalWrapper from '../../components/auth/AuthModalWrapper.jsx';
 import StoreDebuggerWrapper from '../../components/StoreDebuggerWrapper.jsx';
-import SearchForm from '../../components/SearchForm.jsx';
+import SearchFormWrapper from '../../components/SearchFormWrapper.jsx';
 import AvailableHotelRooms from '../../components/AvailableHotelRooms.jsx';
 import HotelImageGallery from '../../components/HotelImageGallery.astro';
 import HotelMap from '../../components/HotelMap.jsx';
@@ -83,7 +83,23 @@ const getIconForTitle = (title: string) => {
   const normalizedTitle: string = title.toLowerCase().trim();
   return iconMap[normalizedTitle] || 'hotel'; // Icono por defecto
 };
+// Obtener parámetros de la URL para pasarlos al componente
+const url = new URL(Astro.request.url);
+const searchParams = url.searchParams;
 
+// Construir objeto de datos iniciales desde los parámetros de URL
+const initialSearchData = {
+  destination: searchParams.get('destination') || '',
+  destinationId: searchParams.get('destinationId') || '',
+  destinationType: searchParams.get('destinationType') || '',
+  destinationLocation: searchParams.get('destinationLocation') || '',
+  checkIn: searchParams.get('checkIn') || '',
+  checkOut: searchParams.get('checkOut') || '',
+  adults: searchParams.get('adults') || '2',
+  children: searchParams.get('children') || '0',
+  rooms: searchParams.get('rooms') || '1',
+  childrenAges: searchParams.get('childrenAges') || ''
+};
 const title = `Hotel ${hotelData.name}`;
 ---
 
@@ -92,7 +108,7 @@ const title = `Hotel ${hotelData.name}`;
 	<!-- Contenido principal -->
 	<main class="container mx-auto px-4 py-8">
 		<div class="bg-neutral-darkest px-10 py-6 mb-8">
-			<SearchForm client:load initialData={{}} />
+			<SearchFormWrapper client:load initialData={initialSearchData} />
 		</div>
 		<div class="w-full h-[1px] bg-neutral-lighter mb-8"></div>
 		<div class="flex flex-col max-w-7xl mx-auto mb-8">

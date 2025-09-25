@@ -4,7 +4,7 @@ import Header from '../components/Header.astro';
 import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
 import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
 import SearchFiltersWrapper from '../components/SearchFiltersWrapper.jsx';
-import SearchForm from '../components/SearchForm.jsx';
+import SearchFormWrapper from '../components/SearchFormWrapper.jsx';
 import SearchResults from '../components/SearchResults.jsx';
 
 // Obtener parámetros de la URL para pasarlos al componente
@@ -34,7 +34,7 @@ const title = 'Search';
 	<!-- Contenido principal -->
 	<main class="container mx-auto px-4 py-8">
 		<div class="bg-neutral-darkest px-10 py-6 mb-8">
-			<SearchForm client:load initialData={initialSearchData} />
+			<SearchFormWrapper client:load initialData={initialSearchData} />
 		</div>
 		<div class="w-full h-[1px] bg-neutral-lighter mb-8"></div>
 		<div class="flex flex-col md:flex-row gap-6 mb-8">

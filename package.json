@@ -1,7 +1,7 @@
 {
   "name": "fe-traverwithgaston",
   "type": "module",
-  "version": "1.0.19",
+  "version": "1.0.25",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

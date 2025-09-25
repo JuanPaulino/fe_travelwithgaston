@@ -1,5 +1,5 @@
 ---
-import SearchForm from '../SearchForm.jsx';
+import SearchFormWrapper from '../SearchFormWrapper.jsx';
 
 // Props que recibe el componente
 const { data } = Astro.props;
@@ -81,7 +81,7 @@ const carruselImages = images ? images.map((img: any) => `${import.meta.env.DIRE
 
       <!-- Formulario de búsqueda -->
       <div class="w-full max-w-full z-10">
-        <SearchForm client:load />
+        <SearchFormWrapper client:load isMain={true} />
       </div>
     </div>
   </section>
@@ -126,7 +126,7 @@ const carruselImages = images ? images.map((img: any) => `${import.meta.env.DIRE
 
       <!-- Formulario de búsqueda -->
       <div class="w-full max-w-full z-10">
-        <SearchForm client:load isMain={true} />
+        <SearchFormWrapper client:load isMain={true} />
       </div>
     </div>
   </section>
