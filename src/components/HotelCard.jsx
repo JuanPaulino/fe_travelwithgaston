@@ -94,14 +94,14 @@ function HotelCard({ hotelData }) {
           </div>
 
           <div className='flex flex-col'>
-            <p className='text-gray-700 text-sm mb-4 line-clamp-3'>
+            <p className='text-gray-700 text-sm mb-2 line-clamp-3'>
               {hotel.description}
             </p>
           </div>
 
           {/* Benefits */}
           {hotel.benefits && hotel.benefits.length > 0 && (
-            <div className="space-y-1 mb-4">
+            <div className="space-y-1 mb-2">
               <h6 className="text-sm font-medium text-gray-900 mb-2">Benefits</h6>
               {hotel.benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center gap-2 text-xs text-neutral-darker">
@@ -113,17 +113,15 @@ function HotelCard({ hotelData }) {
           )}
 
           {/* Benefits footnotes */}
-          {/*
           {hotel.benefits_footnotes && hotel.benefits_footnotes.length > 0 && (
-            <div className="text-sm mb-4">
+            <div className="text-xs">
               {hotel.benefits_footnotes.map((footnote, index) => (
-                <span key={index} className='text-neutral-DEFAULT font-thin'>
+                <span key={index} className='text-neutral-dark'>
                   {footnote}
                 </span>
               ))}
             </div>
           )}
-          */}
           {/* Amenities */}
           {/*
           {hotel.amenities && hotel.amenities.length > 0 && (
@@ -146,7 +144,7 @@ function HotelCard({ hotelData }) {
         {/* Action section - 3 of 12 */}
         <div className='w-full md:w-3/12 flex flex-col justify-end'>
           {/* Check-in/out times */}
-          {(hotel.short_info.check_in_time || hotel.short_info.check_out_time) && (
+          {/*(hotel.short_info.check_in_time || hotel.short_info.check_out_time) && (
             <div className="mb-2 text-sm text-gray-600">
               {hotel.short_info.check_in_time && (
                 <p>Check-in: {hotel.short_info.check_in_time}</p>
@@ -155,15 +153,15 @@ function HotelCard({ hotelData }) {
                 <p>Check-out: {hotel.short_info.check_out_time}</p>
               )}
             </div>
-          )}
+          )*/}
 
           {/* Hotel status badges */}
           <div className="flex flex-wrap gap-2 text-xs mb-2">
-            {hotel.short_info.guest_rooms_count && (
+            {/*hotel.short_info.guest_rooms_count && (
               <span className="text-primary-dark font-medium border border-primary-dark px-2 py-1">
                 {hotel.short_info.guest_rooms_count} rooms
               </span>
-            )}
+            )*/}
             {hotel.short_info.opened && (
               <span className="text-primary-dark font-medium border border-primary-dark px-2 py-1">
                 Opened {hotel.short_info.opened}

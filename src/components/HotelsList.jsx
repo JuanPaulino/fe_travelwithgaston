@@ -56,18 +56,20 @@ const HotelsList = ({
 
   return (
     <div className="space-y-6">
-      {shouldShowMembershipCard && (
-        <div className="my-8">
-          <MembershipCard />
-        </div>
-      )}
-
       {/* Render all hotels */}
       {memoizedHotels.map((hotel, index) => (
         <React.Fragment key={hotel.id}>
           <HotelCard
             hotelData={hotel}
           />
+          
+          {/* Show MembershipCard after the first hotel */}
+          {shouldShowMembershipCard && index === 0 && (
+            <div className="my-8">
+              <MembershipCard />
+            </div>
+          )}
+          
           {/* Add separator between hotels except for the last one */}
           {index < memoizedHotels.length - 1 && (
             <div className='w-[80%] h-[1px] bg-neutral-300 mx-auto'></div>
