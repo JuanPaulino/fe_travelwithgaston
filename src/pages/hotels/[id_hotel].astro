@@ -5,7 +5,7 @@ import AuthModalWrapper from '../../components/auth/AuthModalWrapper.jsx';
 import StoreDebuggerWrapper from '../../components/StoreDebuggerWrapper.jsx';
 import SearchFormWrapper from '../../components/SearchFormWrapper.jsx';
 import AvailableHotelRooms from '../../components/AvailableHotelRooms.jsx';
-import HotelImageGallery from '../../components/HotelImageGallery.astro';
+import HotelImageGalleryAuto from '../../components/HotelImageGalleryAuto.astro';
 import HotelMap from '../../components/HotelMap.jsx';
 import { hotelsApi } from '../../lib/http.js';
 
@@ -139,7 +139,7 @@ const title = `Hotel ${hotelData.name}`;
         </div>
       </div>
       <div class="mb-4">
-        <HotelImageGallery client:load images={hotelImages} />
+        <HotelImageGalleryAuto client:load images={hotelImages} />
       </div>
       <div class="flex flex-col gap-2 mb-8">
         <h2 class="text-h2 font-heading text-neutral-darkest">About this hotel</h2>

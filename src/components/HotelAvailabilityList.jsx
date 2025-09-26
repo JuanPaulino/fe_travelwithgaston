@@ -1,12 +1,11 @@
 import React, { useMemo, useEffect, useState } from 'react'
 import { getUser, isAuthenticated as checkIsAuthenticated } from '../stores/authStore'
-
 import HotelAvailabilityCard from './HotelAvailabilityCard.jsx'
 import EmptyState from './common/EmptyState.jsx'
 import MembershipCard from './MembershipCard.jsx'
 
-const HotelAvailabilityList = ({ 
-  hotels = [], 
+const HotelAvailabilityList = ({
+  hotels = [],
   rooms = 1,
   isAuthenticated = false,
 }) => {
@@ -132,4 +131,4 @@ const HotelAvailabilityList = ({
   )
 }
 
-export default React.memo(HotelAvailabilityList) 
+export default React.memo(HotelAvailabilityList)

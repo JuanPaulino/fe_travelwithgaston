@@ -321,9 +321,10 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
               </div>
             ))}
           </>
-        : null}
+        : null
+      }
 
-      {isAuthenticated && user?.role === 'basic' && (
+      {(!isAuthenticated || ( isAuthenticated && user?.role === 'basic' )) && (
         <div className="mt-8">
           <MembershipCard />
         </div>

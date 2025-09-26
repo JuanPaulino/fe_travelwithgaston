@@ -1,10 +1,44 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect, useState } from 'react'
+import { getUser, isAuthenticated as checkIsAuthenticated } from '../stores/authStore'
 import HotelCard from './HotelCard.jsx'
 import EmptyState from './common/EmptyState.jsx'
+import MembershipCard from './MembershipCard.jsx'
 
-const HotelsList = ({ 
+const HotelsList = ({
   hotels = [], 
 }) => {
+  const [authStatus, setAuthStatus] = useState(false);
+
+  // Verificar estado de autenticación y rol
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      const currentUser = getUser();
+      const currentAuthStatus = checkIsAuthenticated();
+      setAuthStatus(currentAuthStatus);
+    };
+
+    // Verificar estado inicial
+    checkAuthStatus();
+
+    // Escuchar cambios en el estado de autenticación
+    const handleAuthChange = () => {
+      checkAuthStatus();
+    };
+
+    window.addEventListener('auth:login', handleAuthChange);
+    window.addEventListener('auth:logout', handleAuthChange);
+    window.addEventListener('auth:tokenUpdated', handleAuthChange);
+
+    return () => {
+      window.removeEventListener('auth:login', handleAuthChange);
+      window.removeEventListener('auth:logout', handleAuthChange);
+      window.removeEventListener('auth:tokenUpdated', handleAuthChange);
+    };
+  }, []);
+
+  // Verificar si el usuario no está autenticado para mostrar MembershipCard
+  const shouldShowMembershipCard = !authStatus
+
   // Memoize the hotels list for performance optimization
   const memoizedHotels = useMemo(() => {
     return hotels
@@ -22,6 +56,12 @@ const HotelsList = ({
 
   return (
     <div className="space-y-6">
+      {shouldShowMembershipCard && (
+        <div className="my-8">
+          <MembershipCard />
+        </div>
+      )}
+
       {/* Render all hotels */}
       {memoizedHotels.map((hotel, index) => (
         <React.Fragment key={hotel.id}>

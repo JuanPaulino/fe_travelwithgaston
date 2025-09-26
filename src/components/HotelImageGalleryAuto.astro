@@ -1,0 +1,269 @@
+---
+// Props del componente
+export interface Props {
+  images?: Array<{
+    url: string;
+    thumbnail_url?: string;
+    description?: string;
+  }>;
+  className?: string;
+  autoSlideInterval?: number; // Intervalo en milisegundos (por defecto 7000ms = 7 segundos)
+}
+
+const { 
+  images = [], 
+  className = '', 
+  autoSlideInterval = 7000 
+} = Astro.props;
+---
+
+<div class={`relative ${className}`}>
+  <div class="relative overflow-hidden">
+    <img
+      src={images[0]?.url}
+      alt={images[0]?.description || 'Imagen del hotel'}
+      class="w-full h-64 md:h-[500px] object-cover cursor-pointer hover:scale-105 transition-transform duration-300"
+      id="hotel-main-image-auto"
+    />
+    
+    <!-- Indicador de imagen actual -->
+    <div class="absolute bottom-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+      1 / {images.length}
+    </div>
+
+    <!-- Indicador de auto-slide -->
+    {images.length > 1 && (
+      <div class="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-xs">
+        <span id="auto-slide-indicator">Auto</span>
+      </div>
+    )}
+  </div>
+</div>
+
+<!-- Vista completa (se mostrará con JavaScript) -->
+<div
+  id="fullscreen-gallery-auto"
+  class="fixed inset-0 bg-black bg-opacity-95 z-50 items-center justify-center hidden"
+>
+  <!-- Botón cerrar -->
+  <button
+    id="close-gallery-auto"
+    class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10"
+    aria-label="Cerrar galería"
+  >
+    ✕
+  </button>
+
+  <!-- Imagen principal -->
+  <div class="relative max-w-4xl max-h-full p-4">
+    <img
+      id="fullscreen-image-auto"
+      src={images[0]?.url}
+      alt={images[0]?.description || 'Imagen del hotel'}
+      class="max-w-full max-h-full object-contain"
+    />
+    
+    <!-- Descripción de la imagen -->
+    {images[0]?.description && (
+      <div id="image-description-auto" class="absolute bottom-4 left-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded">
+        {images[0].description}
+      </div>
+    )}
+  </div>
+
+  <!-- Botones de navegación -->
+  {images.length > 1 && (
+    <>
+      <button
+        id="prev-image-auto"
+        class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+        aria-label="Imagen anterior"
+      >
+        ‹
+      </button>
+      
+      <button
+        id="next-image-auto"
+        class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-all"
+        aria-label="Siguiente imagen"
+      >
+        ›
+      </button>
+    </>
+  )}
+
+  <!-- Indicador de imagen actual en vista completa -->
+  <div id="fullscreen-counter-auto" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full">
+    1 / {images.length}
+  </div>
+</div>
+
+<script define:vars={{ images, autoSlideInterval }}>
+  let currentImageIndex = 0;
+  let autoSlideTimer = null;
+  let isFullscreen = false;
+
+  // Elementos del DOM
+  const mainImage = document.getElementById('hotel-main-image-auto');
+  const fullscreenGallery = document.getElementById('fullscreen-gallery-auto');
+  const fullscreenImage = document.getElementById('fullscreen-image-auto');
+  const imageDescription = document.getElementById('image-description-auto');
+  const fullscreenCounter = document.getElementById('fullscreen-counter-auto');
+  const closeGallery = document.getElementById('close-gallery-auto');
+  const prevButton = document.getElementById('prev-image-auto');
+  const nextButton = document.getElementById('next-image-auto');
+  const autoSlideIndicator = document.getElementById('auto-slide-indicator');
+
+  // Funciones de navegación
+  const updateImage = (index) => {
+    currentImageIndex = index;
+    const image = images[index];
+    
+    if (mainImage) {
+      mainImage.src = image.url;
+      mainImage.alt = image.description || 'Imagen del hotel';
+    }
+    
+    if (fullscreenImage) {
+      fullscreenImage.src = image.url;
+      fullscreenImage.alt = image.description || 'Imagen del hotel';
+    }
+    
+    if (imageDescription) {
+      if (image.description) {
+        imageDescription.textContent = image.description;
+        imageDescription.style.display = 'block';
+      } else {
+        imageDescription.style.display = 'none';
+      }
+    }
+    
+    if (fullscreenCounter) {
+      fullscreenCounter.textContent = `${index + 1} / ${images.length}`;
+    }
+
+    // Actualizar indicador en la imagen principal
+    const mainCounter = document.querySelector('#hotel-main-image-auto').parentElement.querySelector('.absolute.bottom-4.right-4');
+    if (mainCounter) {
+      mainCounter.textContent = `${index + 1} / ${images.length}`;
+    }
+  };
+
+  const nextImage = () => {
+    const nextIndex = (currentImageIndex + 1) % images.length;
+    updateImage(nextIndex);
+  };
+
+  const previousImage = () => {
+    const prevIndex = (currentImageIndex - 1 + images.length) % images.length;
+    updateImage(prevIndex);
+  };
+
+  // Función para iniciar el auto-slide
+  const startAutoSlide = () => {
+    if (images.length <= 1) return;
+    
+    stopAutoSlide(); // Limpiar timer existente
+    
+    autoSlideTimer = setInterval(() => {
+      if (!isFullscreen) {
+        nextImage();
+      }
+    }, autoSlideInterval);
+  };
+
+  // Función para detener el auto-slide
+  const stopAutoSlide = () => {
+    if (autoSlideTimer) {
+      clearInterval(autoSlideTimer);
+      autoSlideTimer = null;
+    }
+  };
+
+  const openFullscreen = () => {
+    if (fullscreenGallery) {
+      fullscreenGallery.classList.remove('hidden');
+      fullscreenGallery.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      isFullscreen = true;
+      stopAutoSlide(); // Pausar auto-slide en vista completa
+    }
+  };
+
+  const closeFullscreen = () => {
+    if (fullscreenGallery) {
+      fullscreenGallery.classList.add('hidden');
+      fullscreenGallery.classList.remove('flex');
+      document.body.style.overflow = '';
+      isFullscreen = false;
+      startAutoSlide(); // Reanudar auto-slide al cerrar vista completa
+    }
+  };
+
+  // Event listeners
+  if (mainImage) {
+    mainImage.addEventListener('click', openFullscreen);
+    
+    // Pausar auto-slide al hacer hover
+    mainImage.addEventListener('mouseenter', stopAutoSlide);
+    mainImage.addEventListener('mouseleave', () => {
+      if (!isFullscreen) {
+        startAutoSlide();
+      }
+    });
+  }
+
+  if (closeGallery) {
+    closeGallery.addEventListener('click', closeFullscreen);
+  }
+
+  if (fullscreenGallery) {
+    fullscreenGallery.addEventListener('click', (e) => {
+      if (e.target === fullscreenGallery) {
+        closeFullscreen();
+      }
+    });
+  }
+
+  if (prevButton) {
+    prevButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      previousImage();
+    });
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener('click', (e) => {
+      e.stopPropagation();
+      nextImage();
+    });
+  }
+
+  // Controles de teclado
+  document.addEventListener('keydown', (e) => {
+    if (fullscreenGallery && !fullscreenGallery.classList.contains('hidden')) {
+      if (e.key === 'Escape') {
+        closeFullscreen();
+      } else if (e.key === 'ArrowLeft') {
+        previousImage();
+      } else if (e.key === 'ArrowRight') {
+        nextImage();
+      }
+    }
+  });
+
+  // Iniciar auto-slide cuando la página esté lista
+  document.addEventListener('DOMContentLoaded', () => {
+    startAutoSlide();
+  });
+
+  // Iniciar auto-slide inmediatamente si el DOM ya está listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startAutoSlide);
+  } else {
+    startAutoSlide();
+  }
+
+  // Limpiar timer cuando la página se descarga
+  window.addEventListener('beforeunload', stopAutoSlide);
+</script>
