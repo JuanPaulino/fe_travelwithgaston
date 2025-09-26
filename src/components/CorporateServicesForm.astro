@@ -524,40 +524,91 @@ const formFields = {
       });
     });
 
-    // Function to collect form data
+    // Function to collect form data as questions and answers array
     function collectFormData() {
-      const formData: Record<string, any> = {};
+      const questionsAndAnswers: Array<{question: string, answer: string}> = [];
       
-      if (!form) return formData;
+      if (!form) return { form_id: 'corporate_services', questions: questionsAndAnswers };
+      
+      // Define question mappings for each field
+      const questionMappings: Record<string, string> = {
+        'companyName': 'Company Name',
+        'contactPerson': 'Contact Person',
+        'position': 'Position',
+        'email': 'Email',
+        'phone': 'Phone Number',
+        'services': 'What services do you require?',
+        'destinations': 'Destination(s)',
+        'startDate': 'Start Date',
+        'endDate': 'End Date',
+        'datesNotConfirmed': 'Dates not confirmed yet',
+        'numberOfTravelers': 'Number of Travelers',
+        'flightClass': 'Preferred Flight Class',
+        'hotelCategory': 'Preferred Hotel Category',
+        'meetingSpaceType': 'Type of space',
+        'numberOfParticipants': 'Number of participants',
+        'eventType': 'Type of event',
+        'spaceDates': 'Dates that space will be needed',
+        'groundTransportation': 'Ground Transportation Needs',
+        'budgetCurrency': 'Currency',
+        'budgetAmount': 'Estimated Budget',
+        'specialRequests': 'Special Requests or Notes',
+        'howDidYouHear': 'How did you hear about Travel with Gaston?',
+        'newsletter': 'Subscribe to newsletter',
+        'privacy': 'Privacy Policy acceptance'
+      };
       
       // Collect data from all form elements
       const formElements = form.querySelectorAll('input, select, textarea');
+      const processedFields = new Set<string>();
+      
       formElements.forEach((element: any) => {
+        const fieldName = element.name;
+        const question = questionMappings[fieldName];
+        
+        if (!question || processedFields.has(fieldName)) return;
+        
+        let answer = '';
+        
         if (element.type === 'checkbox') {
-          // Handle individual checkboxes (newsletter, privacy, datesNotConfirmed)
-          if (element.name === 'newsletter' || element.name === 'privacy' || element.name === 'datesNotConfirmed') {
-            formData[element.name] = element.checked;
+          // Handle individual checkboxes
+          if (fieldName === 'newsletter' || fieldName === 'privacy' || fieldName === 'datesNotConfirmed') {
+            answer = element.checked ? 'Yes' : 'No';
+            processedFields.add(fieldName);
           }
-          // Handle service checkboxes
-          else if (element.name === 'services') {
-            if (!formData.services) {
-              formData.services = [];
-            }
-            if (element.checked) {
-              formData.services.push(element.value);
-            }
+          // Handle service checkboxes - collect all selected services
+          else if (fieldName === 'services') {
+            const selectedServices: string[] = [];
+            const serviceCheckboxes = document.querySelectorAll(`input[name="${fieldName}"]:checked`);
+            serviceCheckboxes.forEach((checkbox: any) => {
+              selectedServices.push(checkbox.value);
+            });
+            answer = selectedServices.length > 0 ? selectedServices.join(', ') : 'None selected';
+            processedFields.add(fieldName);
           }
         } else {
-          formData[element.name] = element.value;
+          // Handle text, email, tel, date, select, textarea
+          answer = element.value ? element.value.trim() : '';
+        }
+        
+        // Only add to array if there's an answer or it's a required field
+        if (answer || ['companyName', 'contactPerson', 'email', 'phone', 'privacy'].includes(fieldName)) {
+          questionsAndAnswers.push({
+            question: question,
+            answer: answer || 'Not provided'
+          });
         }
       });
       
-      return formData;
+      return {
+        form_id: 'corporate_services',
+        questions: questionsAndAnswers
+      };
     }
 
     // Function to send data to API
     async function sendToAPI(formData: Record<string, any>) {
-      const apiUrl = '/api/send-form';
+      const apiUrl = '/api/forms/send-form';
       
       try {
         const response = await fetch(apiUrl, {

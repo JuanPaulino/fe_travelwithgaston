@@ -5,10 +5,11 @@ import {
   EmbeddedCheckout
 } from '@stripe/react-stripe-js';
 import http from '../lib/http.js';
+import { config } from '../config/config.js';
 
 // Make sure to call `loadStripe` outside of a component’s render to avoid
 // recreating the `Stripe` object on every render.
-const stripePromise = loadStripe('pk_test_51RtrSPDBydDumFNfyxCpaCRdIjMe0l8R33MFKQp1cxbahEB5CV1fCFosTyAJmKhLE4Ui8wrYeVtu7RbFDgfCRxAR00zEOIoMpo', {
+const stripePromise = loadStripe(config.stripe.publishableKey, {
 });
 
 const CheckoutComponent = ({}) => {

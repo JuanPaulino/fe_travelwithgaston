@@ -258,6 +258,20 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     return (Object.keys(urlParams).length > 0 && urlParams.destinationId) || showAdditionalFields;
   }
 
+  // Función específica para el campo de destino
+  const shouldShowDestinationValue = () => {
+    return (Object.keys(urlParams).length > 0 && urlParams.destinationId) || 
+           (searchData.searchText && searchData.searchText.trim().length > 0) ||
+           showAdditionalFields;
+  }
+
+  // Función específica para campos de fechas y huéspedes
+  const shouldShowDateAndGuestValues = () => {
+    return (Object.keys(urlParams).length > 0 && urlParams.destinationId) || 
+           (searchData.selectedDestinationId && typeof searchData.selectedDestinationId === 'string' && searchData.selectedDestinationId.trim().length > 0) ||
+           showAdditionalFields;
+  }
+
   // Manejar cuando el formulario se vuelve activo
   const handleFormFocus = () => {
     if (isOnHomePage()) {
@@ -286,6 +300,16 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   // Función para obtener el valor a mostrar en los campos
   const getFieldValue = (storeValue, emptyValue = '') => {
     return shouldShowStoreValues() ? storeValue : emptyValue;
+  }
+
+  // Función específica para obtener valor del campo de destino
+  const getDestinationValue = (storeValue, emptyValue = '') => {
+    return shouldShowDestinationValue() ? storeValue : emptyValue;
+  }
+
+  // Función específica para obtener valor de campos de fechas y huéspedes
+  const getDateAndGuestValue = (storeValue, emptyValue = '') => {
+    return shouldShowDateAndGuestValues() ? storeValue : emptyValue;
   }
 
   // Función para hacer scroll a los resultados en móvil
@@ -364,7 +388,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     if (!isOnHomePage()) {
       return 'opacity-100';
     }
-    const text = getFieldValue(searchData.searchText);
+    const text = getDestinationValue(searchData.searchText);
     if (text && text.trim().length > 0) {
       return 'opacity-100';
     }
@@ -389,7 +413,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
               <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
                 <SearchAutocomplete
-                  value={getFieldValue(searchData.searchText)}
+                  value={getDestinationValue(searchData.searchText)}
                   onChange={handleSearchTextChange}
                   onSelectionChange={handleDestinationSelection}
                   onClear={() => {
@@ -419,10 +443,9 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                     <span>CHECK IN</span>
                   </div>
                   <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
-                    
                     <input
                       type="date"
-                      value={getFieldValue(searchData.checkInDate)}
+                      value={getDateAndGuestValue(searchData.checkInDate)}
                       onChange={(e) => setCheckInDate(e.target.value)}
                       disabled={disabled}
                       className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
@@ -446,7 +469,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                   <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
                     <input
                       type="date"
-                      value={getFieldValue(searchData.checkOutDate)}
+                      value={getDateAndGuestValue(searchData.checkOutDate)}
                       onChange={(e) => setCheckOutDate(e.target.value)}
                       disabled={disabled}
                       className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
@@ -466,7 +489,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                   className="w-full flex items-center justify-between gap-2 text-base font-medium text-gray-900 p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
                 >
                   <span>
-                    {shouldShowStoreValues() 
+                    {shouldShowDateAndGuestValues() 
                       ? `${searchData.adults} Adults, ${searchData.children} child, ${searchData.rooms} rooms`
                       : 'Select guests'
                     }
@@ -536,7 +559,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
               <div className="flex items-center gap-2">
                 <SearchAutocomplete
-                  value={getFieldValue(searchData.searchText)}
+                  value={getDestinationValue(searchData.searchText)}
                   onChange={handleSearchTextChange}
                   onSelectionChange={handleDestinationSelection}
                   onClear={() => {
@@ -558,7 +581,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                 </svg>
                 <input
                   type="date"
-                  value={getFieldValue(searchData.checkInDate)}
+                  value={getDateAndGuestValue(searchData.checkInDate)}
                   onChange={(e) => setCheckInDate(e.target.value)}
                   disabled={disabled}
                   className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 bg-transparent cursor-pointer"
@@ -580,7 +603,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                 </svg>
                 <input
                   type="date"
-                  value={getFieldValue(searchData.checkOutDate)}
+                  value={getDateAndGuestValue(searchData.checkOutDate)}
                   onChange={(e) => setCheckOutDate(e.target.value)}
                   disabled={disabled}
                   className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 bg-transparent cursor-pointer"
@@ -599,7 +622,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                 className=" flex items-center gap-2 text-base font-medium text-gray-900 hover:text-gray-700 transition-colors"
               >
                 <span>
-                  {shouldShowStoreValues() 
+                  {shouldShowDateAndGuestValues() 
                     ? `${searchData.adults} Adults, ${searchData.children} child, ${searchData.rooms} rooms`
                     : 'Select guests'
                   }

@@ -111,8 +111,11 @@ export const searchActions = {
     
     // Ajustar el array de edades según el número de niños
     if (children > currentData.children) {
-      // Agregar niños: agregar edades por defecto (8 años)
-      const newAges = Array(children).fill(8);
+      // Agregar niños: mantener edades existentes y agregar 0 para nuevos niños
+      const existingAges = currentData.childrenAges || [];
+      const newAges = Array(children).fill(0).map((_, index) => {
+        return existingAges[index] !== undefined ? existingAges[index] : 0;
+      });
       newChildrenAges = newAges;
     } else if (children < currentData.children) {
       // Remover niños: mantener solo las edades necesarias

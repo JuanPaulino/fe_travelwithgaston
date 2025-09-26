@@ -1,5 +1,6 @@
 // Configuración de la aplicación
 console.log(import.meta.env.PUBLIC_API_URL);
+console.log(import.meta.env.STRIPE_PUBLISHABLE_KEY);
 export const config = {
   // URLs de la API
   api: {
@@ -23,6 +24,9 @@ export const config = {
     maxChildren: 10,
     defaultCurrency: import.meta.env.VITE_DEFAULT_CURRENCY || 'EUR',
     defaultLanguage: import.meta.env.VITE_DEFAULT_LANGUAGE || 'es'
+  },
+  stripe: {
+    publishableKey: 'pk_live_51RpqotDRuwgsRH9XgHRQGsBKCykp48kLV4RXY2SuOQkzroLywg7BMjRJoGrigkErVWOUQ2NRiElHcucPy0G7BmeU00Vl4yjHPc'
   }
 }
 

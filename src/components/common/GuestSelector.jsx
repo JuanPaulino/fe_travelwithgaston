@@ -42,7 +42,7 @@ const GuestSelector = ({
   }
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-2 ${className}`}>
       {/* Adultos */}
       <div className="flex items-center justify-between">
         <span className="text-neutral-darker font-medium font-body">Adults</span>
@@ -115,11 +115,6 @@ const GuestSelector = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-neutral-darker font-medium font-body">Rooms</span>
-          {forceSingleRoom && (
-            <span className="text-xs text-secondary-dark bg-secondary-lightest px-2 py-1 rounded-full font-body">
-              Only 1 room
-            </span>
-          )}
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -151,7 +146,13 @@ const GuestSelector = ({
           </button>
         </div>
       </div>
-      
+      {forceSingleRoom && (
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-secondary-dark bg-secondary-lightest px-2 py-1 rounded-full font-body mb-4">
+            Only 1 room
+          </span>
+        </div>
+      )}
       {/* Selector de edades de niños */}
       {numChildren > 0 && onChildrenAgesChange && (
         <ChildrenAgeSelector
