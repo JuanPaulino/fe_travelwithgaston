@@ -22,8 +22,7 @@ export const config = {
     maxRooms: 10,
     maxAdults: 10,
     maxChildren: 10,
-    defaultCurrency: import.meta.env.VITE_DEFAULT_CURRENCY || 'EUR',
-    defaultLanguage: import.meta.env.VITE_DEFAULT_LANGUAGE || 'es'
+    defaultLanguage: import.meta.env.VITE_DEFAULT_LANGUAGE || 'en'
   },
   stripe: {
     publishableKey: 'pk_live_51RpqotDRuwgsRH9XgHRQGsBKCykp48kLV4RXY2SuOQkzroLywg7BMjRJoGrigkErVWOUQ2NRiElHcucPy0G7BmeU00Vl4yjHPc'

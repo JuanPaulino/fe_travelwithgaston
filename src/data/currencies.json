@@ -1,0 +1,32 @@
+[
+  {
+    "name": "British Pound",
+    "symbol": "£",
+    "iso_code": "GBP"
+  },
+  {
+    "name": "Euro",
+    "symbol": "€",
+    "iso_code": "EUR"
+  },
+  {
+    "name": "US Dollar",
+    "symbol": "$",
+    "iso_code": "USD"
+  },
+  {
+    "name": "Hong Kong Dollar",
+    "symbol": "HK$",
+    "iso_code": "HKD"
+  },
+  {
+    "name": "Australian Dollar",
+    "symbol": "AU$",
+    "iso_code": "AUD"
+  },
+  {
+    "name": "Hotel currency",
+    "symbol": "king_bed",
+    "iso_code": "USD"
+  }
+]

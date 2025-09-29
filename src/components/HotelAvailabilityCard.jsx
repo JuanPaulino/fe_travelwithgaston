@@ -2,12 +2,19 @@ import React, { useRef, useEffect, useState } from 'react'
 import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 import { useAuth } from '../lib/useAuth.js'
+import currencies from '../data/currencies.json'
 
 function HotelAvailabilityCard({ hotelData, rooms }) {
   const { setSelectedDestination } = useSearchStore()
   const { isAuthenticated } = useAuth()
   const [isVisible, setIsVisible] = useState(false)
   const cardRef = useRef(null)
+
+  // Función para obtener el símbolo de la moneda
+  const getCurrencySymbol = (currencyCode) => {
+    const currency = currencies.find(c => c.iso_code === currencyCode)
+    return currency ? currency.symbol : currencyCode
+  }
 
   // Intersection Observer para detectar cuando la tarjeta es visible
   useEffect(() => {
@@ -155,13 +162,14 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
                     {hotel.lowest_rate ? (
                       <>
                         <div className="text-3xl font-bold text-gray-900">
-                          €{hotel.lowest_rate.total_to_book_in_requested_currency}
+                          
+                          <span className="text-xl">{getCurrencySymbol(hotel.lowest_rate.requested_currency_code)}</span> {hotel.lowest_rate.total_to_book_in_requested_currency}
                         </div>
                         <div className="text-sm text-gray-600">
                           Total for {rooms} {rooms === 1 ? 'room' : 'rooms'} {hotel.lowest_rate.is_tax_included ? 'with taxes included' : 'without taxes'}
                         </div>
                         <div className="text-sm text-gray-600 mt-1">
-                          Average per night €{hotel.lowest_rate.rate_in_requested_currency}
+                          Average per night {getCurrencySymbol(hotel.lowest_rate.requested_currency_code)}{hotel.lowest_rate.rate_in_requested_currency}
                         </div>
                         
                       </>

@@ -27,7 +27,8 @@ const initialSearchData = {
   adults: 2,
   children: 0,
   childrenAges: [],
-  totalGuests: 2
+  totalGuests: 2,
+  selectedCurrency: 'USD' // Moneda por defecto
 };
 
 // Estado inicial de los resultados
@@ -139,6 +140,14 @@ export const searchActions = {
     });
   },
 
+  // Actualizar moneda seleccionada
+  setSelectedCurrency: (currency) => {
+    searchStore.set({
+      ...searchStore.get(),
+      selectedCurrency: currency
+    });
+  },
+
   // Actualizar todos los datos de búsqueda
   setSearchData: (searchData) => {
     searchStore.set({
@@ -230,7 +239,7 @@ export const searchActions = {
             })
           }
         ],
-        currency: config.search.defaultCurrency,
+        currency: searchData.selectedCurrency || config.search.defaultCurrency,
         language: config.search.defaultLanguage
       };
 

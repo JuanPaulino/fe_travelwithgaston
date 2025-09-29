@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { isAuthenticated, authActions } from '../stores/authStore';
+import CurrencyDropdown from './CurrencyDropdown';
 
 const AuthActionsMobile = ({ onButtonClick = null, onCloseMenu = null }) => {
   const [authenticated, setAuthenticated] = useState(false);
@@ -45,6 +46,7 @@ const AuthActionsMobile = ({ onButtonClick = null, onCloseMenu = null }) => {
   if (authenticated) {
     return (
       <div className="flex flex-col gap-4">
+        <CurrencyDropdown isMobile={true} />
         <a 
           href="/account"
           className="border border-neutral-light text-black hover:border-primary transition-colors px-3 py-1 w-max"
