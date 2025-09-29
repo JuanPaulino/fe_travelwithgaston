@@ -12,7 +12,7 @@ const Booking = ({ className = '' }) => {
   const [processingBooking, setProcessingBooking] = useState(false);
   const [bookingError, setBookingError] = useState(null);
   const { bookingData, updateCreditCard } = useBookingStore();
-  console.log('Booking Component',bookingData);
+
   useEffect(() => {
     const checkAccess = () => {
       // Verificar autenticación
@@ -63,14 +63,12 @@ const Booking = ({ className = '' }) => {
 
     // Extraer datos de la habitación seleccionada
     const selectedRoom = bookingData.selected_room;
+    const selectedRate = bookingData.selected_rate;
     
     if (!selectedRoom) {
       throw new Error('No room has been selected');
     }
 
-    // Extraer la primera tarifa de la habitación (asumiendo que es la seleccionada)
-    const selectedRate = selectedRoom.rates && selectedRoom.rates.length > 0 ? selectedRoom.rates[0] : null;
-    
     if (!selectedRate) {
       throw new Error('No valid rate found for the room');
     }
@@ -87,7 +85,12 @@ const Booking = ({ className = '' }) => {
       hotelName: bookingData.hotel_name,
       checkIn: bookingData.start_date,
       checkOut: bookingData.end_date,
-      totalPrice: selectedRate.total_to_book
+      totalPrice: selectedRate.total_to_book,
+      rateIndex: selectedRate.rate_index,
+      sessionId: bookingData.session_id,
+      guestName: bookingData.guest_name,
+      guestEmail: bookingData.guest_email,
+      creditCard: bookingData.credit_card
     };
 
     const missingFields = Object.entries(requiredFields)
@@ -174,20 +177,28 @@ const Booking = ({ className = '' }) => {
     );
   }
 
-
   // Si cumple los requisitos, mostrar el contenido normal
   return (
     <div className={`w-full ${className}`}>
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-col lg:flex-row gap-4">
         {/* Columna izquierda - 40% en desktop, 100% en móvil */}
         <div className="w-full lg:w-2/5 order-1 lg:order-1">
-          <div className="p-4 border border-gray-200 rounded-lg">
+          <div className="p-4 border border-gray-200">
             <h2 className="text-lg font-semibold mb-6">Booking Details</h2>
             
             {/* 1. Información del hotel */}
             <div className="mb-6">
               {/* Nombre del hotel */}
               <h3 className="font-semibold text-gray-800 mb-2">Hotel: {bookingData.hotel_name}</h3>
+              {/* total_to_book_in_requested_currency */}
+              <p className="text-gray-600 font-bold text-sm mb-2">
+                {bookingData.selected_rate.requested_currency_code} {bookingData.selected_rate.total_to_book_in_requested_currency}
+              </p>
+              <p className="text-gray-600 text-sm mb-2">Total for 4 nights inc tax</p>
+              <div className='w-full h-0.5 bg-neutral-200 mb-2'></div>
+              <p className="text-gray-600 text-sm mb-2">Average per night inc tax {bookingData.selected_rate.requested_currency_code} {bookingData.selected_rate.rate_in_requested_currency}</p>
+              
+
               {/* Dirección del hotel */}
               {bookingData.selected_room?.hotel_address && (
                 <p className="text-gray-600 text-sm mb-2">
@@ -197,7 +208,7 @@ const Booking = ({ className = '' }) => {
             </div>
 
             {/* 2. Información de la habitación */}
-            <div className="mb-6">
+            <div className="border-t border-gray-200 pt-4 mb-6">
               {/* Nombre de la habitación */}
               <h3 className="font-medium text-gray-800 mb-2">
                 Room: {bookingData.selected_room?.name || 'Room not specified'}
@@ -209,7 +220,7 @@ const Booking = ({ className = '' }) => {
                   <img 
                     src={bookingData.selected_room.images[0].url} 
                     alt={bookingData.selected_room.name}
-                    className="w-full object-cover"
+                    className="w-full object-cover max-h-40"
                   />
                 </div>
               )}
@@ -217,14 +228,14 @@ const Booking = ({ className = '' }) => {
               {/* Fechas de Check-in y Check-out */}
               <div className="mb-3">
                 <div className="flex justify-between items-center py-2 border-b border-gray-100">
-                  <span className="text-sm font-medium text-gray-700">Check-in:</span>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm font-medium text-neutral-600">Check-in:</span>
+                  <span className="text-sm text-neutral-500">
                     {bookingData.start_date ? new Date(bookingData.start_date).toLocaleDateString('en-US') : 'N/A'}
                   </span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-sm font-medium text-gray-700">Check-out:</span>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm font-medium text-neutral-600">Check-out:</span>
+                  <span className="text-sm text-neutral-500">
                     {bookingData.end_date ? new Date(bookingData.end_date).toLocaleDateString('en-US') : 'N/A'}
                   </span>
                 </div>
@@ -232,12 +243,12 @@ const Booking = ({ className = '' }) => {
               
               {/* Resumen de ocupación */}
               {bookingData.selected_room?.occupancies && bookingData.selected_room.occupancies.length > 0 && (
-                <div className="bg-gray-50 rounded-lg p-3">
+                <div className="rounded-lg p-3">
                   <h5 className="font-medium text-gray-800 mb-2 text-sm">Occupancy Summary</h5>
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Rooms:</span>
-                      <span className="text-gray-800 font-medium">1</span>
+                      <span className="text-neutral-500">Rooms:</span>
+                      <span className="text-neutral-800 font-medium">1</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Adults:</span>
@@ -255,19 +266,59 @@ const Booking = ({ className = '' }) => {
                 </div>
               )}
             </div>
+            {/* benefits */}
+            <div className="border-t border-gray-200 pt-4 mb-6">
+              <h3 className="font-semibold text-gray-800 mb-2 text-base">Benefits</h3>
+              <ul>
+              {
+                bookingData.selected_rate.benefits.map((benefit, index) => (
+                  <li key={index} className="text-neutral-500 text-sm">
+                    <span className="text-neutral-800 font-medium mr-0.5">✓</span>
+                    {benefit}
+                  </li>
+                ))
+              }
+              {
+                bookingData.selected_rate.benefits_footnotes.map((footnote, index) => (
+                  <li key={index} className="text-neutral-500 text-sm">
+                    {footnote}
+                  </li>
+                ))
+              }
+              </ul>
+            </div>
 
             {/* Información del huésped */}
-            <div className="border-t border-gray-200 pt-4">
+            <div className="border-t border-gray-200 pt-4 mb-6">
               <h3 className="font-semibold text-gray-800 mb-2 text-base">Guest:</h3>
-              <p className="text-gray-600 text-sm">Name: {bookingData.guest_name || 'N/A'}</p>
-              <p className="text-gray-600 text-sm">Email: {bookingData.guest_email || 'N/A'}</p>
+              <p className="text-neutral-500 text-sm">Name: {bookingData.guest_name || 'N/A'}</p>
+              <p className="text-neutral-500 text-sm">Email: {bookingData.guest_email || 'N/A'}</p>
+            </div>
+
+
+            <div className="border-t border-gray-200 pt-4 mb-6">
+              <h3 className="font-semibold text-gray-800 mb-2">Terms & conditions</h3>
+              <p className="text-neutral-500 text-sm mb-2">
+                {bookingData.selected_rate.cancellation_policy}
+              </p>
+              {
+                bookingData.selected_rate.cancellation_deadline && (
+                  <p className="text-neutral-500 text-sm mb-2">
+                    Cancellation deadline: {new Date(bookingData.selected_rate.cancellation_deadline).toLocaleString('en-US')}
+                  </p>
+                )
+              }
+              <p className="text-neutral-500 text-sm">
+                {bookingData.selected_rate.payment_description}
+              </p>
             </div>
           </div>
         </div>
         
         {/* Columna derecha - 60% en desktop, 100% en móvil */}
         <div className="w-full lg:w-3/5 order-2 lg:order-2">
-          <div className="p-4 border border-gray-200 rounded-lg">
+          
+          <div className="p-4 border border-gray-200">
             <CreditCardForm 
               onCreditCardChange={handleCreditCardChange}
             />

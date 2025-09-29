@@ -80,13 +80,13 @@ const BookingDetail = ({ booking, onBack }) => {
       {/* Estado de la reserva */}
       <div className="mb-6">
         <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-          booking.status === 'pending' 
+          booking.status === 'upcoming' 
             ? 'bg-yellow-100 text-yellow-800' 
             : booking.status === 'confirmed'
             ? 'bg-green-100 text-green-800'
             : 'bg-gray-100 text-gray-800'
         }`}>
-          {booking.status === 'pending' ? 'Pending' : 
+          {booking.status === 'upcoming' ? 'Upcoming' : 
            booking.status === 'confirmed' ? 'Confirmed' : 
            booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
         </span>

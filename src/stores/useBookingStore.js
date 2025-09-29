@@ -22,11 +22,12 @@ export const bookingStore = persistentMap('bookingStore', initialBookingData);
 // Acciones para manipular el booking
 export const bookingActions = {
   // Función para procesar reserva completa
-  processBooking: (hotel, room, searchData, userData) => {
+  processBooking: (hotel, room, rate, searchData, userData) => {
     const bookingData = {
       hotel_name: hotel.hotel_name,
       session_id: hotel.session_id,
       hotel_id: hotel.hotel_id,
+      selected_rate: rate ? JSON.stringify(rate) : null, // Almacenar como string JSON
       selected_room: room ? JSON.stringify(room) : null, // Almacenar como string JSON
       start_date: searchData.checkInDate,
       end_date: searchData.checkOutDate,
@@ -61,8 +62,11 @@ export const useBookingStore = () => {
     return {
       ...data,
       selected_room: data.selected_room && typeof data.selected_room === 'string' 
-        ? JSON.parse(data.selected_room) 
+        ? JSON.parse(data.selected_room)
         : data.selected_room,
+      selected_rate: data.selected_rate && typeof data.selected_rate === 'string' 
+        ? JSON.parse(data.selected_rate)
+        : data.selected_rate,
       credit_card: data.credit_card && typeof data.credit_card === 'string' 
         ? JSON.parse(data.credit_card) 
         : data.credit_card

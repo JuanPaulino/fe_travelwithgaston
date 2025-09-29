@@ -44,7 +44,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   console.log(roomTypes);
 
   // Función para manejar el clic en "Book now"
-  const handleBookNow = (room) => {
+  const handleBookNow = (room, rate) => {
     // Obtener datos del usuario (esto debería venir de un store de auth o similar)
     const userData = {
       name: user.firstName + ' ' + user.lastName,
@@ -52,7 +52,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
     };
     hotelData.hotel_address = parentHotelData.address;
     // Procesar la reserva con todos los datos
-    processBooking(hotelData, room, searchData, userData);
+    processBooking(hotelData, room, rate, searchData, userData);
     window.location.href = '/booking';
   };
 
@@ -78,7 +78,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
     // Para otros roles (premium, admin, etc.)
     return {
       text: 'Book now',
-      onClick: (room) => handleBookNow(room),
+      onClick: (room, rate) => handleBookNow(room, rate),
       className: 'w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors cursor-pointer'
     };
   };
@@ -130,6 +130,11 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
 
   return (
     <div className="mb-8 w-full">
+      {(!isAuthenticated || ( isAuthenticated && user?.role === 'basic' )) && (
+        <div className="mt-8 mb-8">
+          <MembershipCard />
+        </div>
+      )}
       {
       roomTypes.length > 0
         ? <>
@@ -303,7 +308,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                             
                             return (
                               <button 
-                                onClick={() => buttonConfig.onClick(room)}
+                                onClick={() => buttonConfig.onClick(room, rate)}
                                 className={buttonConfig.className}
                               >
                                 {buttonConfig.text}
@@ -323,12 +328,6 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
           </>
         : null
       }
-
-      {(!isAuthenticated || ( isAuthenticated && user?.role === 'basic' )) && (
-        <div className="mt-8">
-          <MembershipCard />
-        </div>
-      )}
     </div>
   );
 };

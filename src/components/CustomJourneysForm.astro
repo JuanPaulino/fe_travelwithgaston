@@ -401,14 +401,15 @@ const formFields = {
           <FormField field={formFields.privacy} />
         </div>
   
-        <!-- Submit Button -->
-        <button 
-          type="button" 
-          id="submit-btn"
-          class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-        >
-          Start Planning My Journey
-        </button>
+    <div class="flex gap-4 mb-6">
+      <button 
+        type="button" 
+        id="submit-btn"
+        class="bg-black text-white px-8 py-3 rounded hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+      >
+        Start Planning My Journey
+      </button>
+    </div>
       </div>
   
       <!-- Status message -->
@@ -631,34 +632,84 @@ const formFields = {
       });
     });
 
-    // Function to collect form data
+    // Function to collect form data as questions and answers array
     function collectFormData() {
-      const formData: Record<string, any> = {};
+      const questionsAndAnswers: Array<{question: string, answer: string}> = [];
       
-      if (!form) return formData;
+      if (!form) return { form_id: 'custom_journeys', questions: questionsAndAnswers };
       
-      // Collect data from all form fields
+      // Define question mappings for each field
+      const questionMappings: Record<string, string> = {
+        'destination': 'Which destination would you like to explore?',
+        'specificCountry': 'Specific Country',
+        'secondaryDestination': 'Do you have a secondary destination in mind?',
+        'secondarySpecificCountry': 'Secondary Specific Country',
+        'tripType': 'What type of trip are you planning?',
+        'holidayExperience': 'What type of holiday experience would you like?',
+        'travelDates': 'Do you have specific travel dates?',
+        'startDate': 'Start Date',
+        'returnDate': 'Return Date',
+        'nights': 'How many nights do you plan to travel?',
+        'currency': 'Currency',
+        'budgetAmount': 'Budget Amount',
+        'budgetDetails': 'Additional budget details',
+        'specialOccasion': 'Are you celebrating a special occasion?',
+        'luxuryServices': 'Do you require any additional luxury services?',
+        'luxuryServicesOther': 'Please specify other luxury services',
+        'tripDetails': 'Would you like me to know more details about your dream trip?',
+        'name': 'Name & Surname',
+        'email': 'Email',
+        'phone': 'Phone (with country code)',
+        'address': 'Address',
+        'city': 'City',
+        'postalCode': 'Postal Code',
+        'countryOfResidence': 'Country of Residence',
+        'travelingWith': 'Who will be traveling with you?',
+        'kidsAge': 'Kids age (if applicable)',
+        'howDidYouHear': 'How did you hear about Travel with Gaston?',
+        'newsletter': 'Subscribe to newsletter',
+        'privacy': 'Privacy Policy acceptance'
+      };
+      
+      // Collect data from all form elements
       const formElements = form.querySelectorAll('input, select, textarea');
+      const processedFields = new Set<string>();
+      
       formElements.forEach((element: any) => {
+        const fieldName = element.name;
+        const question = questionMappings[fieldName];
+        
+        if (!question || processedFields.has(fieldName)) return;
+        
+        let answer = '';
+        
         if (element.type === 'checkbox') {
-          // Handle individual checkboxes (newsletter, privacy)
-          if (element.name === 'newsletter' || element.name === 'privacy') {
-            formData[element.name] = element.checked;
+          // Handle individual checkboxes
+          if (fieldName === 'newsletter' || fieldName === 'privacy') {
+            answer = element.checked ? 'Yes' : 'No';
+            processedFields.add(fieldName);
           }
-          // Handle luxury service checkboxes
-          else if (element.name === 'luxuryServices') {
-            if (!formData.luxuryServices) {
-              formData.luxuryServices = [];
-            }
-            if (element.checked) {
-              formData.luxuryServices.push(element.value);
-            }
+          // Handle luxury service checkboxes - collect all selected services
+          else if (fieldName === 'luxuryServices') {
+            const selectedServices: string[] = [];
+            const luxuryServiceCheckboxes = document.querySelectorAll(`input[name="${fieldName}"]:checked`);
+            luxuryServiceCheckboxes.forEach((checkbox: any) => {
+              selectedServices.push(checkbox.value);
+            });
+            answer = selectedServices.length > 0 ? selectedServices.join(', ') : 'None selected';
+            processedFields.add(fieldName);
           }
-        } else if (element.type === 'button' && (element.classList.contains('trip-type-btn') || element.classList.contains('holiday-experience-btn'))) {
-          // Buttons are handled separately
-          return;
         } else {
-          formData[element.name] = element.value;
+          // Handle text, email, tel, date, select, textarea
+          answer = element.value ? element.value.trim() : '';
+        }
+        
+        // Only add to array if there's an answer or it's a required field
+        if (answer || ['name', 'email', 'destination', 'privacy'].includes(fieldName)) {
+          questionsAndAnswers.push({
+            question: question,
+            answer: answer || 'Not provided'
+          });
         }
       });
       
@@ -670,24 +721,37 @@ const formFields = {
           selectedTripTypes.push(button.value);
         }
       });
-      formData.tripTypes = selectedTripTypes;
+      if (selectedTripTypes.length > 0) {
+        questionsAndAnswers.push({
+          question: 'What type of trip are you planning?',
+          answer: selectedTripTypes.join(', ')
+        });
+      }
       
       // Add selected holiday experiences
       const selectedHolidayExperiences: string[] = [];
       const holidayExperienceButtons = document.querySelectorAll('.holiday-experience-btn');
       holidayExperienceButtons.forEach((button: any) => {
-        if (button.classList.contains('bg-blue-500')) {
+        if (button.classList.contains('bg-primary-dark')) {
           selectedHolidayExperiences.push(button.value);
         }
       });
-      formData.holidayExperiences = selectedHolidayExperiences;
+      if (selectedHolidayExperiences.length > 0) {
+        questionsAndAnswers.push({
+          question: 'What type of holiday experience would you like?',
+          answer: selectedHolidayExperiences.join(', ')
+        });
+      }
       
-      return formData;
+      return {
+        form_id: 'custom_journeys',
+        questions: questionsAndAnswers
+      };
     }
 
-    // Function to send data to local endpoint
+    // Function to send data to API
     async function sendToAPI(formData: Record<string, any>) {
-      const apiUrl = '/api/send-form';
+      const apiUrl = `${import.meta.env.PUBLIC_API_URL}/api/forms/send-form`;
       
       try {
         const response = await fetch(apiUrl, {
@@ -729,7 +793,6 @@ const formFields = {
       if (isFormValid) {
         // Collect form data
         const formData = collectFormData();
-        
         // Show data in console
         console.log('=== FORM DATA ===');
         console.log('Form valid:', isFormValid);
@@ -738,10 +801,10 @@ const formFields = {
         
         // Disable button during submission
         (submitBtn as HTMLButtonElement).disabled = true;
-        (submitBtn as HTMLButtonElement).textContent = 'Sending...';
+        (submitBtn as HTMLButtonElement).textContent = 'Submitting...';
         
         try {
-          // Send to local API
+          // Send to API
           const result = await sendToAPI(formData);
           
           if (result.success) {
@@ -764,7 +827,7 @@ const formFields = {
           } else {
             // API error
             const errorDetails = result.details ? ` (${result.details.join(', ')})` : '';
-            statusMessage.textContent = `Error sending form: ${result.error}${errorDetails}`;
+            statusMessage.textContent = `Error submitting form: ${result.error}${errorDetails}`;
             statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
             statusMessage.classList.remove('hidden');
           }

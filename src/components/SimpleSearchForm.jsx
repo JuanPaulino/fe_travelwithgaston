@@ -82,7 +82,6 @@ function SimpleSearchForm({
 
   // Manejar selección de destino desde el autocompletado
   const handleDestinationSelection = async (suggestion) => {
-    debugger
     setSelectedDestination(suggestion)
     const searchData = {
       selectedDestinationText: suggestion.text,

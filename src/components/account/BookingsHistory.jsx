@@ -17,7 +17,7 @@ const BookingsHistory = () => {
         setBookings(response);
       } catch (err) {
         console.error('Error fetching bookings:', err);
-        setError('Error al cargar las reservas');
+        setError('Error fetching bookings');
       } finally {
         setLoading(false);
       }
@@ -45,7 +45,7 @@ const BookingsHistory = () => {
         <h3 className="text-lg font-medium text-gray-900 mb-2">Bookings</h3>
         <div className="flex justify-center items-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <span className="ml-2 text-gray-600">Cargando reservas...</span>
+          <span className="ml-2 text-gray-600">Loading bookings...</span>
         </div>
       </div>
     );
@@ -141,7 +141,7 @@ const BookingsHistory = () => {
                   {/* Estado de la reserva */}
                   <div className="mt-3 text-center">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      booking.status === 'pending' 
+                      booking.status === 'upcoming' 
                         ? 'bg-yellow-100 text-yellow-800' 
                         : booking.status === 'confirmed'
                         ? 'bg-green-100 text-green-800'
@@ -159,7 +159,7 @@ const BookingsHistory = () => {
           {bookings.data.pagination && (
             <div className="mt-6 text-center text-sm text-gray-600">
               Página {bookings.data.pagination.page} de {bookings.data.pagination.totalPages} 
-              ({bookings.data.pagination.total} reservas en total)
+              ({bookings.data.pagination.total} bookings in total)
             </div>
           )}
         </div>
@@ -168,7 +168,7 @@ const BookingsHistory = () => {
       {/* Mensaje si no hay reservas */}
       {bookings?.data?.bookings && bookings.data.bookings.length === 0 && (
         <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-          <p className="text-gray-600">No tienes reservas registradas.</p>
+          <p className="text-gray-600">No bookings registered.</p>
         </div>
       )}
     </div>

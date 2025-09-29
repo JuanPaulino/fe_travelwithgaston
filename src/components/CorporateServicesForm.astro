@@ -608,7 +608,7 @@ const formFields = {
 
     // Function to send data to API
     async function sendToAPI(formData: Record<string, any>) {
-      const apiUrl = '/api/forms/send-form';
+      const apiUrl = `${import.meta.env.PUBLIC_API_URL}/api/forms/send-form`;
       
       try {
         const response = await fetch(apiUrl, {
@@ -650,7 +650,6 @@ const formFields = {
       if (isFormValid) {
         // Collect form data
         const formData = collectFormData();
-        
         // Show data in console
         console.log('=== FORM DATA ===');
         console.log('Form valid:', isFormValid);

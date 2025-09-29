@@ -5,6 +5,58 @@ export default function ShoppingInquiryForm() {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
 
+  // Function to collect form data as questions and answers array
+  const collectFormData = (formData) => {
+    const questionsAndAnswers = [];
+    
+    // Define question mappings for each field
+    const questionMappings = {
+      'name': 'Name & Surname',
+      'email': 'Email',
+      'phone': 'Phone',
+      'destination': 'Destination / City',
+      'dates': 'Preferred Date(s)',
+      'style_focus': 'Style Focus',
+      'service_type': 'Service Type',
+      'budget_range': 'Budget Range',
+      'description': 'Detailed Description',
+      'newsletter': 'Subscribe to newsletter',
+      'privacy': 'Privacy Policy acceptance'
+    };
+    
+    // Process form data
+    Object.entries(formData).forEach(([fieldName, value]) => {
+      const question = questionMappings[fieldName];
+      if (question && value) {
+        let answer = value;
+        
+        // Handle special cases
+        if (fieldName === 'newsletter' || fieldName === 'privacy') {
+          answer = value === 'on' ? 'Yes' : 'No';
+        }
+        // Handle style_focus checkboxes - collect all selected options
+        else if (fieldName === 'style_focus') {
+          const selectedStyles = [];
+          const styleCheckboxes = document.querySelectorAll(`input[name="${fieldName}"]:checked`);
+          styleCheckboxes.forEach((checkbox) => {
+            selectedStyles.push(checkbox.value);
+          });
+          answer = selectedStyles.length > 0 ? selectedStyles.join(', ') : 'None selected';
+        }
+        
+        questionsAndAnswers.push({
+          question: question,
+          answer: answer
+        });
+      }
+    });
+    
+    return {
+      form_id: 'shopping_inquiry',
+      questions: questionsAndAnswers
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -13,20 +65,23 @@ export default function ShoppingInquiryForm() {
 
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
+    
+    // Convert to questions and answers format
+    const formattedData = collectFormData(data);
 
     try {
-      const response = await fetch('/api/send-form', {
+      const response = await fetch(`${import.meta.env.PUBLIC_API_URL}/api/forms/send-form`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(formattedData)
       });
 
       const result = await response.json();
 
-      if (response.ok) {
-        setMessage('Thank you! We will contact you soon.');
+      if (response.ok && result.success) {
+        setMessage(result.message || 'Thank you! We will contact you soon.');
         setMessageType('success');
         e.target.reset();
       } else {
@@ -34,7 +89,7 @@ export default function ShoppingInquiryForm() {
         setMessageType('error');
       }
     } catch (error) {
-      setMessage('An error occurred. Please try again.');
+      setMessage('Connection error. Please try again.');
       setMessageType('error');
     } finally {
       setIsSubmitting(false);
