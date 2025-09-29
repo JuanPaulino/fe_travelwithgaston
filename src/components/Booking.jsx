@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { authStore } from '../stores/authStore';
-import { useBookingStore } from '../stores/useBookingStore';
+import { useBookingStore, bookingStore } from '../stores/useBookingStore';
 import { bookingAPI, handleAPIError } from '../lib/http';
 import { showSuccess } from '../stores/bannerStore';
 import CreditCardForm from './CreditCardForm';
@@ -11,6 +11,9 @@ const Booking = ({ className = '' }) => {
   const [creditCardValid, setCreditCardValid] = useState(false);
   const [processingBooking, setProcessingBooking] = useState(false);
   const [bookingError, setBookingError] = useState(null);
+  const [allowGuestEdit, setAllowGuestEdit] = useState(false);
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
   const { bookingData, updateCreditCard } = useBookingStore();
 
   useEffect(() => {
@@ -47,12 +50,47 @@ const Booking = ({ className = '' }) => {
     };
   }, [bookingData.session_id]);
 
+  // Inicializar valores de guest cuando cambie bookingData
+  useEffect(() => {
+    if (bookingData.guest_name) {
+      setGuestName(bookingData.guest_name);
+    }
+    if (bookingData.guest_email) {
+      setGuestEmail(bookingData.guest_email);
+    }
+  }, [bookingData.guest_name, bookingData.guest_email]);
+
   // Función para manejar cambios en la tarjeta de crédito
   const handleCreditCardChange = (creditCardData, isValid) => {
     setCreditCardValid(isValid);
     if (isValid) {
       updateCreditCard(creditCardData);
     }
+  };
+
+  // Función para manejar cambios en los campos de guest
+  const handleGuestNameChange = (e) => {
+    const value = e.target.value;
+    setGuestName(value);
+    // Actualizar el store de booking
+    const currentData = bookingStore.get();
+    const updatedData = {
+      ...currentData,
+      guest_name: value
+    };
+    bookingStore.set(updatedData);
+  };
+
+  const handleGuestEmailChange = (e) => {
+    const value = e.target.value;
+    setGuestEmail(value);
+    // Actualizar el store de booking
+    const currentData = bookingStore.get();
+    const updatedData = {
+      ...currentData,
+      guest_email: value
+    };
+    bookingStore.set(updatedData);
   };
 
   // Función para preparar el modelo de datos según el formato requerido por el backend
@@ -319,6 +357,64 @@ const Booking = ({ className = '' }) => {
         <div className="w-full lg:w-3/5 order-2 lg:order-2">
           
           <div className="p-4 border border-gray-200">
+            {/* Switch to enable guest data editing */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-md">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-1">
+                    Edit guest information
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    Allows modifying guest name and email
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={allowGuestEdit}
+                    onChange={(e) => setAllowGuestEdit(e.target.checked)}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+            </div>
+
+            {/* Guest editing fields - only shown when switch is off (default state) */}
+            {allowGuestEdit && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Guest Information</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="guestName" className="block text-sm font-medium text-gray-700 mb-1">
+                      Guest Name
+                    </label>
+                    <input
+                      type="text"
+                      id="guestName"
+                      value={guestName}
+                      onChange={handleGuestNameChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter guest name"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="guestEmail" className="block text-sm font-medium text-gray-700 mb-1">
+                      Guest Email
+                    </label>
+                    <input
+                      type="email"
+                      id="guestEmail"
+                      value={guestEmail}
+                      onChange={handleGuestEmailChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter guest email"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             <CreditCardForm 
               onCreditCardChange={handleCreditCardChange}
             />
