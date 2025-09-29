@@ -72,14 +72,14 @@ const HotelMap = ({ latitude, longitude, hotelName = 'Hotel' }) => {
   if (!latitude || !longitude) {
     return (
       <div className="w-full h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-        <p className="text-gray-500">Ubicación no disponible</p>
+        <p className="text-gray-500">Location not available</p>
       </div>
     );
   }
 
   return (
     <div className="w-full">
-      <h3 className="text-lg font-semibold text-neutral-darkest mb-3">Ubicación</h3>
+      <h2 className="text-h3 font-semibold text-neutral-darkest mb-3">Location</h2>
       <div 
         ref={mapRef} 
         className="w-full h-80 rounded-lg border border-gray-200 shadow-sm"

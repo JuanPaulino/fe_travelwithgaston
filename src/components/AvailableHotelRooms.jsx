@@ -97,7 +97,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   if (loading) {
     return (
       <div className="mb-8 w-full">
-        <h2 className="text-h3 sm:text-h3-desktop font-heading text-neutral-darkest mb-6">
+        <h2 className="text-h2 font-heading text-neutral-darkest mb-6">
           Select your room
         </h2>
         <div className="flex items-center justify-center py-12">
@@ -112,7 +112,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   if (error) {
     return (
       <div className="mb-8 w-full">
-        <h2 className="text-h3 sm:text-h3-desktop font-heading text-neutral-darkest mb-6">
+        <h2 className="text-h2 font-heading text-neutral-darkest mb-6">
           Select your room
         </h2>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
@@ -138,7 +138,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
       {
       roomTypes.length > 0
         ? <>
-            <h2 className="text-h3 sm:text-h3-desktop font-heading text-neutral-darkest mb-6">
+            <h2 className="text-h2 font-heading text-neutral-darkest mb-6">
               Select your room
             </h2>
             {roomTypes.map((room, index) => (

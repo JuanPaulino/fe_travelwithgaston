@@ -218,11 +218,10 @@ const title = `Hotel ${hotelData.name}`;
                </div>
              )}
           </div>
-
         </div>
       </div>
-      <div class="flex flex-col gap-2 mb-4 md:max-w-4xl">
-         <h2 class="text-h2 font-heading text-neutral-darkest">Hotel information</h2>
+      <div class="flex flex-col gap-2 mb-8 md:max-w-4xl">
+         <h2 class="text-h2 font-heading text-neutral-darkest mb-4">Hotel information</h2>
          <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
            {hotelData.hotel_information.map((item: any, index: number) => (
              <div class="flex flex-col gap-4 flex-1" id={`hotel-info-${index}`}>
