@@ -11,6 +11,7 @@ const HotelAvailabilityList = ({
 }) => {
   const [user, setUser] = useState(null);
   const [authStatus, setAuthStatus] = useState(false);
+  const [sortOrder, setSortOrder] = useState('default'); // 'default', 'price-low', 'price-high'
 
   // Validar que rooms sea un número
   const validRooms = typeof rooms === 'number' ? rooms : 1
@@ -45,16 +46,36 @@ const HotelAvailabilityList = ({
 
   // Verificar si el usuario está autenticado y tiene rol "basic" para mostrar MembershipCard
   const shouldShowMembershipCard = authStatus && user?.role === 'basic';
+
+  // Función para ordenar hoteles por precio
+  const sortHotelsByPrice = (hotels, order) => {
+    if (order === 'default') return hotels;
+    
+    return [...hotels].sort((a, b) => {
+      const priceA = a.lowest_rate?.total_to_book_in_requested_currency || Infinity;
+      const priceB = b.lowest_rate?.total_to_book_in_requested_currency || Infinity;
+      
+      // Hoteles sin precio van al final
+      if (priceA === Infinity && priceB === Infinity) return 0;
+      if (priceA === Infinity) return 1;
+      if (priceB === Infinity) return -1;
+      
+      return order === 'price-low' ? priceA - priceB : priceB - priceA;
+    });
+  };
   
-  // Memoizar la separación de hoteles para optimizar rendimiento
+  // Memoizar la separación y ordenación de hoteles para optimizar rendimiento
   const { availableHotels, unavailableHotels } = useMemo(() => {
+    const available = hotels.filter(hotel => hotel.is_available);
+    const unavailable = hotels.filter(hotel => !hotel.is_available);
+    
     const result = {
-      availableHotels: hotels.filter(hotel => hotel.is_available),
-      unavailableHotels: hotels.filter(hotel => !hotel.is_available)
+      availableHotels: sortHotelsByPrice(available, sortOrder),
+      unavailableHotels: sortHotelsByPrice(unavailable, sortOrder)
     }
     
     return result
-  }, [hotels])
+  }, [hotels, sortOrder])
 
 
   // Sin resultados
@@ -67,8 +88,49 @@ const HotelAvailabilityList = ({
     )
   }
 
+  // Función para manejar el cambio de ordenación
+  const handleSortChange = () => {
+    if (sortOrder === 'default') {
+      setSortOrder('price-low');
+    } else if (sortOrder === 'price-low') {
+      setSortOrder('price-high');
+    } else {
+      setSortOrder('default');
+    }
+  };
+
+  // Función para obtener el texto del botón
+  const getSortButtonText = () => {
+    switch (sortOrder) {
+      case 'price-low':
+        return 'Sort by: Price (Low to High)';
+      case 'price-high':
+        return 'Sort by: Price (High to Low)';
+      default:
+        return 'Sort by: Default';
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Botón de ordenación */}
+      {hotels.length > 0 && (
+        <div className="flex justify-between items-center">
+          <div className="text-sm text-gray-600">
+            {hotels.length} {hotels.length === 1 ? 'hotel found' : 'hotels found'}
+          </div>
+          <button
+            onClick={handleSortChange}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-lightest border border-primary rounded-xs text-sm font-medium text-primary hover:bg-primary-dark hover:text-white transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+            </svg>
+            {getSortButtonText()}
+          </button>
+        </div>
+      )}
+      
       {/* Hoteles disponibles primero */}
       {availableHotels.map((hotel, index) => (
         <React.Fragment key={hotel.hotel_id}>
