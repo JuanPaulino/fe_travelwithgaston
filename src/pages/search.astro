@@ -6,8 +6,9 @@ import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
 import SearchFiltersWrapper from '../components/SearchFiltersWrapper.jsx';
 import SearchFormWrapper from '../components/SearchFormWrapper.jsx';
 import SearchResults from '../components/SearchResults.jsx';
+import ProfileUpdateWrapper from '../components/ProfileUpdateWrapper.jsx';
 
-// Obtener parámetros de la URL para pasarlos al componente
+// Get URL parameters to pass to the component
 const url = new URL(Astro.request.url);
 const searchParams = url.searchParams;
 
@@ -33,19 +34,21 @@ const title = 'Search';
 	<Header />
 	<!-- Contenido principal -->
 	<main class="container mx-auto px-4 py-8">
-		<div class="bg-neutral-darkest px-10 py-6 mb-8">
-			<SearchFormWrapper client:load initialData={initialSearchData} />
-		</div>
-		<div class="w-full h-[1px] bg-neutral-lighter mb-8"></div>
-		<div class="flex flex-col md:flex-row gap-6 mb-8">
-			<!-- Componente wrapper que maneja filtros para móvil y desktop -->
-			<SearchFiltersWrapper client:load />
-			
-			<!-- Contenedor principal con resultados de búsqueda -->
-			<div id="search-results" class="flex-1">
-				<SearchResults client:load />
+		<ProfileUpdateWrapper client:load>
+			<div class="bg-neutral-darkest px-10 py-6 mb-8">
+				<SearchFormWrapper client:load initialData={initialSearchData} />
 			</div>
-		</div>
+			<div class="w-full h-[1px] bg-neutral-lighter mb-8"></div>
+			<div class="flex flex-col md:flex-row gap-6 mb-8">
+				<!-- Componente wrapper que maneja filtros para móvil y desktop -->
+				<SearchFiltersWrapper client:load />
+				
+				<!-- Contenedor principal con resultados de búsqueda -->
+				<div id="search-results" class="flex-1">
+					<SearchResults client:load />
+				</div>
+			</div>
+		</ProfileUpdateWrapper>
 	</main>
 
 	<AuthModalWrapper client:load />

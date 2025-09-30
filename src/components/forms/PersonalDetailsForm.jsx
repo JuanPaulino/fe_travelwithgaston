@@ -7,7 +7,7 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
     email: '',
     phone: '',
     countryCode: '+44',
-    address: ''
+    country: ''
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,7 +64,7 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
         email: formData.email.trim().toLowerCase(),
         phone: formData.phone.trim(),
         countryCode: formData.countryCode,
-        address: formData.address.trim()
+        country: formData.country.trim()
       };
 
       // Call the update function
@@ -196,14 +196,14 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
         </div>
 
         <div>
-          <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-            Address
+          <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
+            Country
           </label>
           <input
             type="text"
-            id="address"
-            value={formData.address}
-            onChange={(e) => handleInputChange('address', e.target.value)}
+            id="country"
+            value={formData.country}
+            onChange={(e) => handleInputChange('country', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>

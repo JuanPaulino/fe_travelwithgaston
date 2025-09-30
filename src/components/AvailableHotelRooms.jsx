@@ -4,6 +4,7 @@ import { useSearchStore } from '../stores/useSearchStore.js'
 import { useBookingStore } from '../stores/useBookingStore.js'
 import { useAuth } from '../lib/useAuth.js'
 import MembershipCard from './MembershipCard.jsx'
+import currencies from '../data/currencies.json'
 
 const AvailableHotelRooms = ({ parentHotelData }) => {
   const { searchData, executeSearch } = useSearchStore();
@@ -84,14 +85,28 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   };
 
   // Función para formatear el precio
+  // Función para obtener el símbolo de la moneda
+  const getCurrencySymbol = (currency) => {
+    const currencyObj = currencies.find(c => c.iso_code === currency);
+    return currencyObj ? currencyObj.symbol : '';
+  };
+
+  // Función para formatear el precio
   const formatPrice = (price) => {
     if (!price) return null;
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: hotel.default_currency || 'EUR',
-      minimumFractionDigits: 2
-    }).format(price);
+    return Number(price).toLocaleString('en-US');
   };
+
+  const calculateNights = () => {
+    // Usar checkInDate y checkOutDate del searchData, no checkin/checkout
+    if (!searchData?.checkInDate || !searchData?.checkOutDate) return 1
+    const checkinDate = new Date(searchData.checkInDate)
+    const checkoutDate = new Date(searchData.checkOutDate)
+    const diffTime = Math.abs(checkoutDate - checkinDate)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays || 1
+  }
+  const nights = calculateNights()
 
   // Mostrar estado de carga
   if (loading) {
@@ -187,7 +202,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                   {/* Sección de tarifas */}
                   {room.rates.map((rate, index) => <>
                     <div key={index} className="flex flex-row mb-8 p-6 border-neutral-lighter">
-                      <div className='w-3/5 md:w-4/5'>
+                      <div className='w-3/5 md:w-4/6'>
                           {/* Header de la tarifa */}
                           <div className="mb-4">
                             <h3 className="font-heading text-xl text-neutral-darkest mb-2">{rate.title}</h3>
@@ -291,13 +306,19 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                             {/*<p>• Rate code: {rate.rate_index}</p>*/}
                           </div>
                       </div>
-                      <div className='w-2/5 md:w-1/5 flex flex-col justify-end'>
+                      <div className='w-2/5 md:w-2/6 flex flex-col justify-end text-right'>
                         {/* Precios destacados */}
-                        <div className="p-3">
-                          <p className="text-lg font-semibold text-neutral-darkest">
-                            {formatPrice(rate.total_to_book)}
-                          </p>
-                        </div>
+                        {
+                        rate.total_to_book_in_requested_currency && (
+                          <div className="p-3">
+                            <p className="text-3xl font-semibold text-neutral-darkest mb-2">
+                              <span className="text-lg">{getCurrencySymbol(rate.requested_currency_code)}</span> {formatPrice(rate.total_to_book_in_requested_currency)}
+                            </p>
+                            <p className="text-xs text-neutral-dark mb-1">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
+                            <div className="w-full h-0.5 bg-neutral-300 mb-1"></div>
+                            <p className="text-xs text-neutral-dark">Average per night {getCurrencySymbol(rate.requested_currency_code)} {formatPrice(rate.rate_in_requested_currency)} inc tax</p>
+                          </div>
+                        )}
                         {/* Botón de reserva/suscripción */}
                         <div className="mt-6">
                           {(() => {

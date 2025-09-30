@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import http from '../lib/http.js';
+import useProfileUpdate from '../hooks/useProfileUpdate.js';
 
 const ReturnPageComponent = () => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Hook para actualizar el perfil del usuario
+  const { updateProfile, isUpdating: isProfileUpdating, error: profileError } = useProfileUpdate({
+    autoUpdate: false,
+    autoUpdateOnAuth: false
+  });
 
   useEffect(() => {
     initialize();
@@ -12,6 +19,9 @@ const ReturnPageComponent = () => {
 
   const initialize = async () => {
     try {
+      // Primero actualizar el perfil del usuario para asegurar datos actualizados
+      await updateProfile();
+      
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const sessionId = urlParams.get('session_id');
@@ -76,12 +86,19 @@ const ReturnPageComponent = () => {
     window.location.href = '/search';
   };
 
-  if (loading) {
+  if (loading || isProfileUpdating) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Verifying payment status...</p>
+          <p className="text-gray-600">
+            {isProfileUpdating ? 'Updating user profile...' : 'Verifying payment status...'}
+          </p>
+          {profileError && (
+            <p className="text-red-600 text-sm mt-2">
+              Profile update error: {profileError}
+            </p>
+          )}
         </div>
       </div>
     );

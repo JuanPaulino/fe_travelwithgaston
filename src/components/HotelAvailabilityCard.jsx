@@ -5,7 +5,7 @@ import { useAuth } from '../lib/useAuth.js'
 import currencies from '../data/currencies.json'
 
 function HotelAvailabilityCard({ hotelData, rooms }) {
-  const { setSelectedDestination } = useSearchStore()
+  const { setSelectedDestination, searchData } = useSearchStore()
   const { isAuthenticated } = useAuth()
   const [isVisible, setIsVisible] = useState(false)
   const cardRef = useRef(null)
@@ -49,6 +49,19 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
   // Si el usuario no está autenticado, mostrar todos los hoteles como disponibles
   const isAvailable = isAuthenticated ? hotelData.is_available : true
 
+  // Función para calcular el número de noches
+  const calculateNights = () => {
+    // Usar checkInDate y checkOutDate del searchData, no checkin/checkout
+    if (!searchData?.checkInDate || !searchData?.checkOutDate) return 1
+    const checkinDate = new Date(searchData.checkInDate)
+    const checkoutDate = new Date(searchData.checkOutDate)
+    const diffTime = Math.abs(checkoutDate - checkinDate)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays || 1
+  }
+
+  const nights = calculateNights()
+
   // Función para navegar al hotel
   const handleViewHotel = () => {
     // TODO: necesitamos modificar el valor en el store de selectedDestinationType por hotel selectedDestinationId por el id del hotel
@@ -66,8 +79,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
     console.log('🖼️ Imagen clickeada:', imageIndex, hotel.images[imageIndex])
     // Aquí podrías abrir un modal con la imagen en tamaño completo
   }
-
-
+  
   return (
     <div ref={cardRef} className="overflow-hidden min-w-80 relative">
       {/* Badge de disponibilidad */}
@@ -135,7 +147,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
               )}
           </div>
           {/* price 4 of 12 */}
-          <div className='w-full md:w-3/12'>
+          <div className='w-full md:w-3/12 flex justify-end items-end text-right'>
             {/* Estado del hotel */}
             <div className="flex flex-wrap gap-2 text-xs">
               {hotelData.is_under_refurbishment && (
@@ -148,11 +160,6 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
                   Temporarily closed
                 </span>
               )}
-              {hotelData.opened_at && (
-                <span className="bg-primary text-black px-2 py-1 rounded">
-                  Opened from {new Date(hotelData.opened_at).getFullYear()}
-                </span>
-              )}
             </div>
             {/* Precio y botón */}
             <div className="">
@@ -161,15 +168,15 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
                   <div className="mb-4 py-4">
                     {hotel.lowest_rate ? (
                       <>
-                        <div className="text-3xl font-bold text-gray-900">
-                          
-                          <span className="text-xl">{getCurrencySymbol(hotel.lowest_rate.requested_currency_code)}</span> {hotel.lowest_rate.total_to_book_in_requested_currency}
+                        <div className="text-2xl font-bold text-neutral-darkest">
+                          <span className="text-xl">{getCurrencySymbol(hotel.lowest_rate.requested_currency_code)}</span> {Number(hotel.lowest_rate.total_to_book_in_requested_currency).toLocaleString('en-US')}
                         </div>
-                        <div className="text-sm text-gray-600">
-                          Total for {rooms} {rooms === 1 ? 'room' : 'rooms'} {hotel.lowest_rate.is_tax_included ? 'with taxes included' : 'without taxes'}
+                        <div className="text-xs text-neutral-dark mb-1">
+                          Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax
                         </div>
-                        <div className="text-sm text-gray-600 mt-1">
-                          Average per night {getCurrencySymbol(hotel.lowest_rate.requested_currency_code)}{hotel.lowest_rate.rate_in_requested_currency}
+                        <div className="w-full h-0.5 bg-neutral-300 mb-1"></div>
+                        <div className="text-xs text-neutral-dark">
+                          Average per night inc tax {getCurrencySymbol(hotel.lowest_rate.requested_currency_code)} {Number(hotel.lowest_rate.rate_in_requested_currency).toLocaleString('en-US')}
                         </div>
                         
                       </>

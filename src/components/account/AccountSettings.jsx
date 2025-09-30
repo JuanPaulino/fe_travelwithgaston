@@ -17,7 +17,7 @@ const AccountSettings = () => {
     email: user?.email || '',
     phone: user?.phone || '', // Usar el teléfono del usuario si existe
     countryCode: user?.countryCode || '+34', // Usar el código de país del usuario si existe
-    address: user?.city ? `${user.city}, España` : '' // Usar la ciudad del usuario
+    country: user?.country || ''
   };
 
   // Función para manejar la actualización de datos personales
@@ -29,11 +29,11 @@ const AccountSettings = () => {
       }
 
       // Preparar los datos para enviar al backend
-      const updateData = {
-        phone: data.phone,
-        countryCode: data.countryCode,
-        city: data.address.split(',')[0].trim() // Extraer solo la ciudad del campo address
-      };
+    const updateData = {
+      phone: data.phone,
+      countryCode: data.countryCode,
+      country: data.country
+    };
 
       // Llamar al endpoint de actualización de perfil
       const response = await userAPI.updateProfile(updateData);

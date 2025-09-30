@@ -359,26 +359,26 @@ export const handleAPIError = (error) => {
     
     switch (status) {
       case 400:
-        return { success: false, message: data.message || 'Datos inválidos' };
+        return { success: false, message: data.message || 'Invalid data' };
       case 401:
-        return { success: false, message: 'No autorizado' };
+        return { success: false, message: 'Unauthorized' };
       case 403:
-        return { success: false, message: 'Acceso denegado' };
+        return { success: false, message: 'Access denied' };
       case 404:
-        return { success: false, message: 'Recurso no encontrado' };
+        return { success: false, message: 'Resource not found' };
       case 422:
-        return { success: false, message: data.message || 'Datos de validación incorrectos' };
+        return { success: false, message: data.message || 'Validation errors' };
       case 500:
-        return { success: false, message: 'Error interno del servidor' };
+        return { success: false, message: 'Internal server error' };
       default:
-        return { success: false, message: data.message || 'Error desconocido' };
+        return { success: false, message: data.message || 'Unknown error' };
     }
   } else if (error.request) {
     // Error de red
-    return { success: false, message: 'Error de conexión. Verifica tu conexión a internet.' };
+    return { success: false, message: 'Connection error. Check your internet connection.' };
   } else {
     // Error de configuración
-    return { success: false, message: 'Error de configuración' };
+    return { success: false, message: 'Configuration error' };
   }
 };
 

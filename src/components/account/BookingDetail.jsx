@@ -115,7 +115,7 @@ const BookingDetail = ({ booking, onBack }) => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">CHECK IN</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-sm text-neutral-darker">
                   {new Date(booking.checkIn).toLocaleDateString('en-US', { 
                     weekday: 'long', 
                     day: 'numeric', 
@@ -126,7 +126,7 @@ const BookingDetail = ({ booking, onBack }) => {
               </div>
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">CHECK OUT</p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-sm text-neutral-darker">
                   {new Date(booking.checkOut).toLocaleDateString('en-US', { 
                     weekday: 'long', 
                     day: 'numeric', 
@@ -300,7 +300,7 @@ const BookingDetail = ({ booking, onBack }) => {
                   <h5 className="text-sm font-medium text-gray-900 mb-2">Important notes:</h5>
                   <ul className="space-y-1">
                     {room.benefits_footnotes.map((note, index) => (
-                      <li key={index} className="text-xs text-gray-500">• {note}</li>
+                      <li key={index} className="text-xs text-gray-500">{note}</li>
                     ))}
                   </ul>
                 </div>

@@ -39,6 +39,25 @@ console.log(hotelData);
 
 const hotelImages = hotelData.images || [];
 
+// Función para procesar la descripción del hotel
+const processHotelDescription = (description: string) => {
+  if (!description) return { text: '', shouldShowButton: false, truncatedText: '' };
+  
+  const wordCount = description.trim().split(/\s+/).length;
+  const shouldShowButton = wordCount > 100;
+  
+  if (shouldShowButton) {
+    const words = description.trim().split(/\s+/);
+    const truncatedText = words.slice(0, 100).join(' ');
+    return { text: description, shouldShowButton, truncatedText };
+  }
+  
+  return { text: description, shouldShowButton: false, truncatedText: description };
+};
+
+const descriptionData = processHotelDescription(hotelData.description);
+const uniqueExperiencesData = processHotelDescription(hotelData.unique_experiences as string);
+
 // Función helper para mapear títulos a iconos de Material Symbols
 const getIconForTitle = (title: string) => {
   const iconMap: Record<string, string> = {
@@ -145,8 +164,56 @@ const title = `Hotel ${hotelData.name}`;
         <h2 class="text-h2 font-heading text-neutral-darkest">About this hotel</h2>
         <div class="flex flex-col gap-8">
           <div class="w-full">
-            <p class="text-base text-neutral-DEFAULT m-0 mb-2">{hotelData.description}</p>
-            <p class="text-base text-neutral-DEFAULT m-0">{hotelData.unique_experiences}</p>
+            <div class="w-full">
+              <p class="text-base text-neutral-DEFAULT m-0 mb-2" id="hotel-description">
+                {descriptionData.shouldShowButton ? descriptionData.truncatedText : descriptionData.text}
+                {descriptionData.shouldShowButton && '...'}
+              </p>
+              {descriptionData.shouldShowButton && (
+                <button
+                  onclick="toggleDescription()"
+                  class="text-primary hover:text-primary-dark font-medium text-sm transition-colors duration-200 focus:outline-none focus:underline"
+                  id="read-more-btn"
+                >
+                  Read more
+                </button>
+              )}
+              <div id="full-description" class="hidden">
+                <p class="text-base text-neutral-DEFAULT m-0 mb-2">{descriptionData.text}</p>
+                <button
+                  onclick="toggleDescription()"
+                  class="text-primary hover:text-primary-dark font-medium text-sm transition-colors duration-200 focus:outline-none focus:underline"
+                  id="read-less-btn"
+                >
+                  Read less
+                </button>
+              </div>
+            </div>
+            <div class="w-full">
+              <p class="text-base text-neutral-DEFAULT m-0" id="unique-experiences">
+                {uniqueExperiencesData.shouldShowButton ? uniqueExperiencesData.truncatedText : uniqueExperiencesData.text}
+                {uniqueExperiencesData.shouldShowButton && '...'}
+              </p>
+              {uniqueExperiencesData.shouldShowButton && (
+                <button
+                  onclick="toggleUniqueExperiences()"
+                  class="text-primary hover:text-primary-dark font-medium text-sm transition-colors duration-200 focus:outline-none focus:underline"
+                  id="read-more-ux-btn"
+                >
+                  Read more 
+                </button>
+              )}
+              <div id="full-unique-experiences" class="hidden">
+                <p class="text-base text-neutral-DEFAULT m-0">{uniqueExperiencesData.text}</p>
+                <button
+                  onclick="toggleUniqueExperiences()"
+                  class="text-primary hover:text-primary-dark font-medium text-sm transition-colors duration-200 focus:outline-none focus:underline"
+                  id="read-less-ux-btn"
+                >
+                  Read less
+                </button>
+              </div>
+            </div>
           </div>
           <div class="flex flex-row w-full gap-4">
              {/* Sostenibilidad */}
@@ -161,15 +228,6 @@ const title = `Hotel ${hotelData.name}`;
                  <span class="text-xs text-neutral-light">{hotelData.sustainability_rating}/5</span>
                </div>
              )*/}
-
-             {/* Tipo de hotel */}
-             {hotelData.short_info?.type && (
-               <div class="">
-                 <h4 class="text-sm font-semibold text-neutral-darkest mb-2">Type</h4>
-                 <p class="text-sm text-neutral-DEFAULT">{hotelData.short_info.type}</p>
-               </div>
-             )}
-
              {/* Check-in */}
              {hotelData.short_info?.check_in_time && (
                <div class="">
@@ -217,6 +275,15 @@ const title = `Hotel ${hotelData.name}`;
                  <p class="text-sm text-neutral-DEFAULT">{hotelData.sustainability_initiative}</p>
                </div>
              )}
+
+              {/* Tipo de hotel */}
+              {hotelData.short_info?.type && (
+                <div class="">
+                  <h4 class="text-sm font-semibold text-neutral-darkest mb-2">Type</h4>
+                  <p class="text-sm text-neutral-DEFAULT">{hotelData.short_info.type}</p>
+                </div>
+              )}
+
           </div>
         </div>
       </div>
@@ -283,4 +350,53 @@ const title = `Hotel ${hotelData.name}`;
 
   // Hacer la función globalmente accesible
   (window as any).toggleAccordion = toggleAccordion;
+
+  function toggleDescription() {
+    const description = document.getElementById('hotel-description');
+    const fullDescription = document.getElementById('full-description');
+    const readMoreBtn = document.getElementById('read-more-btn');
+    const readLessBtn = document.getElementById('read-less-btn');
+    
+    if (description && fullDescription && readMoreBtn && readLessBtn) {
+      if (fullDescription.classList.contains('hidden')) {
+        // Mostrar descripción completa
+        description.style.display = 'none';
+        fullDescription.classList.remove('hidden');
+        readMoreBtn.style.display = 'none';
+        readLessBtn.style.display = 'inline';
+      } else {
+        // Mostrar descripción truncada
+        description.style.display = 'block';
+        fullDescription.classList.add('hidden');
+        readMoreBtn.style.display = 'inline';
+        readLessBtn.style.display = 'none';
+      }
+    }
+  }
+
+  // Hacer la función globalmente accesible
+  (window as any).toggleDescription = toggleDescription;
+
+  function toggleUniqueExperiences() {
+    const ux = document.getElementById('unique-experiences');
+    const fullUx = document.getElementById('full-unique-experiences');
+    const readMoreUxBtn = document.getElementById('read-more-ux-btn');
+    const readLessUxBtn = document.getElementById('read-less-ux-btn');
+
+    if (ux && fullUx && readMoreUxBtn && readLessUxBtn) {
+      if (fullUx.classList.contains('hidden')) {
+        ux.style.display = 'none';
+        fullUx.classList.remove('hidden');
+        readMoreUxBtn.style.display = 'none';
+        readLessUxBtn.style.display = 'inline';
+      } else {
+        ux.style.display = 'block';
+        fullUx.classList.add('hidden');
+        readMoreUxBtn.style.display = 'inline';
+        readLessUxBtn.style.display = 'none';
+      }
+    }
+  }
+
+  (window as any).toggleUniqueExperiences = toggleUniqueExperiences;
 </script>

@@ -158,7 +158,7 @@ const BookingsHistory = () => {
           {/* Información de paginación */}
           {bookings.data.pagination && (
             <div className="mt-6 text-center text-sm text-gray-600">
-              Página {bookings.data.pagination.page} de {bookings.data.pagination.totalPages} 
+              Page {bookings.data.pagination.page} of {bookings.data.pagination.totalPages} 
               ({bookings.data.pagination.total} bookings in total)
             </div>
           )}
