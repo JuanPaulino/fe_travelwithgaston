@@ -246,20 +246,11 @@ const BookingDetail = ({ booking, onBack }) => {
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Price summary</h3>
             <div className="space-y-3">
-              <div className="flex justify-between text-base">
-                <span className="text-gray-600">Subtotal:</span>
-                <span className="font-medium text-gray-900">
-                  €{booking.totalPrice.toLocaleString('en-US', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                  })}
-                </span>
-              </div>
-              <div className="border-t border-gray-200 pt-3">
+              <div className="pt-3">
                 <div className="flex justify-between text-lg font-bold">
                   <span className="text-gray-900">Total:</span>
                   <span className="text-gray-900">
-                    €{booking.totalPrice.toLocaleString('en-US', { 
+                    {booking.providerData.currency} {booking.providerData.total_cost.toLocaleString('en-US', { 
                       minimumFractionDigits: 2, 
                       maximumFractionDigits: 2 
                     })}

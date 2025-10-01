@@ -7,7 +7,6 @@ import { Image } from "astro:assets";
 // Obtener datos de navegación
 const { data: navigationData, error } = await getNavigationData();
 const mainNavigation = navigationData?.find(nav => nav.id === 'main')?.items || [];
-console.log(mainNavigation);
 ---
 
 <script>

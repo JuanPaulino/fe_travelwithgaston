@@ -8,12 +8,19 @@ const StoreDebuggerModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [selectedStore, setSelectedStore] = useState('search'); // 'search', 'filters', 'booking', o 'auth'
+  const [isDebugEnabled, setIsDebugEnabled] = useState(false);
   
   // Usar todos los stores
   const { filters } = useFiltersStore();
   const { searchData } = useSearchStore();
   const { bookingData } = useBookingStore();
   const authData = authStore.get();
+
+  // Verificar si el parámetro debugstore está en la URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    setIsDebugEnabled(searchParams.has('debugstore'));
+  }, []);
 
   // Cerrar modal con Escape
   useEffect(() => {
@@ -71,6 +78,11 @@ const StoreDebuggerModal = () => {
         return 'Search Store';
     }
   };
+
+  // No mostrar el debugger si no está habilitado en la URL
+  if (!isDebugEnabled) {
+    return null;
+  }
 
   if (!isOpen) {
     return (

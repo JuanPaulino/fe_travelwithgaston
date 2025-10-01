@@ -25,6 +25,7 @@ function SimpleSearchForm({
   // Estados locales para control de UI
   const [isFormActive, setIsFormActive] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [isUserInteracting, setIsUserInteracting] = useState(false)
 
   // Mostrar campos adicionales solo si hay parámetros de URL
   useEffect(() => {
@@ -134,6 +135,8 @@ function SimpleSearchForm({
   // Manejar cambio de texto en el input de búsqueda
   const handleSearchTextChange = (text) => {
     setSearchText(text)
+    // Marcar que el usuario está interactuando
+    setIsUserInteracting(true)
     
     if (searchData.selectedDestinationId && text !== searchData.selectedDestinationText) {
       setSelectedDestination(null)
@@ -174,8 +177,9 @@ function SimpleSearchForm({
 
   // Función para obtener el valor a mostrar en los campos
   const getFieldValue = (storeValue, emptyValue = '') => {
-    // Siempre mostrar el valor del store para permitir escritura
-    return storeValue || emptyValue;
+    // Solo mostrar el valor si hay urlParams o si el usuario está interactuando
+    const shouldShow = (Object.keys(urlParams).length > 0 && urlParams.destinationId) || isUserInteracting;
+    return shouldShow ? (storeValue || emptyValue) : emptyValue;
   }
 
   // Manejar envío manual del formulario (botón Search)
@@ -262,6 +266,7 @@ function SimpleSearchForm({
                   onClear={() => {
                     setSearchText('')
                     setSelectedDestination(null)
+                    setIsUserInteracting(false)
                   }}
                   disabled={disabled}
                   placeholder={placeholder}
@@ -307,6 +312,7 @@ function SimpleSearchForm({
                   onClear={() => {
                     setSearchText('')
                     setSelectedDestination(null)
+                    setIsUserInteracting(false)
                   }}
                   disabled={disabled}
                   placeholder={placeholder}

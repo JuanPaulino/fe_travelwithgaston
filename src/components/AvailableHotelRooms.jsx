@@ -201,8 +201,8 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                 <div className="w-full md:w-3/5 border-t md:border-l border-neutral-lighter">
                   {/* Sección de tarifas */}
                   {room.rates.map((rate, index) => <>
-                    <div key={index} className="flex flex-row mb-8 p-6 border-neutral-lighter">
-                      <div className='w-3/5 md:w-4/6'>
+                    <div key={index} className="flex flex-col sm:flex-row mb-8 p-6 border-neutral-lighter">
+                      <div className='w-full sm:w-3/5 md:w-4/6'>
                           {/* Header de la tarifa */}
                           <div className="mb-4">
                             <h3 className="font-heading text-xl text-neutral-darkest mb-2">{rate.title}</h3>
@@ -306,10 +306,9 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                             {/*<p>• Rate code: {rate.rate_index}</p>*/}
                           </div>
                       </div>
-                      <div className='w-2/5 md:w-2/6 flex flex-col justify-end text-right'>
+                      <div className='w-full sm:w-2/5 md:w-2/6 flex flex-col justify-end text-center sm:text-right mt-4 sm:mt-0'>
                         {/* Precios destacados */}
-                        {
-                        rate.total_to_book_in_requested_currency && (
+                        {rate.total_to_book_in_requested_currency && (
                           <div className="p-3">
                             <p className="text-3xl font-semibold text-neutral-darkest mb-2">
                               <span className="text-lg">{getCurrencySymbol(rate.requested_currency_code)}</span> {formatPrice(rate.total_to_book_in_requested_currency)}

@@ -283,20 +283,20 @@ const Booking = ({ className = '' }) => {
               {bookingData.selected_room?.occupancies && bookingData.selected_room.occupancies.length > 0 && (
                 <div className="rounded-lg p-3">
                   <h5 className="font-medium text-gray-800 mb-2 text-sm">Occupancy Summary</h5>
-                  <div className="space-y-1 text-sm">
+                  <div className="space-y-1 text-sm text-neutral-500">
                     <div className="flex justify-between">
-                      <span className="text-neutral-500">Rooms:</span>
-                      <span className="text-neutral-800 font-medium">1</span>
+                      <span>Rooms:</span>
+                      <span className="font-medium">1</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Adults:</span>
-                      <span className="text-gray-800 font-medium">
+                      <span>Adults:</span>
+                      <span className="font-medium">
                         {bookingData.adults || 'N/A'}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Children:</span>
-                      <span className="text-gray-800 font-medium">
+                      <span>Children:</span>
+                      <span className="font-medium">
                         {bookingData.children || 0}
                       </span>
                     </div>

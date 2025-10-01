@@ -29,6 +29,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   const [showCollapsibleSection, setShowCollapsibleSection] = useState(false)
   const [minCheckOutDate, setMinCheckOutDate] = useState('')
   const [isFormActive, setIsFormActive] = useState(false)
+  const [isUserInteracting, setIsUserInteracting] = useState(false)
   const dropdownRef = useRef(null)
 
   // Mostrar campos adicionales solo si hay parámetros de URL
@@ -182,6 +183,8 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   // Manejar cambio de texto en el input de búsqueda
   const handleSearchTextChange = (text) => {
     setSearchText(text)
+    // Marcar que el usuario está interactuando
+    setIsUserInteracting(true)
     // Mostrar campos adicionales cuando el usuario empiece a escribir
     if (text && !showAdditionalFields) {
       setShowAdditionalFields(true)
@@ -261,8 +264,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   // Función específica para el campo de destino
   const shouldShowDestinationValue = () => {
     return (Object.keys(urlParams).length > 0 && urlParams.destinationId) || 
-           (searchData.searchText && searchData.searchText.trim().length > 0) ||
-           showAdditionalFields;
+           isUserInteracting;
   }
 
   // Función específica para campos de fechas y huéspedes
@@ -409,22 +411,23 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
           {/* Layout Mobile - Vertical (Mobile First) */}
           <div className="flex flex-col lg:hidden p-4 space-y-4">
             {/* Campo de destino - 100% */}
-            <div className="w-full">
-              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
-              <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
-                <SearchAutocomplete
-                  value={getDestinationValue(searchData.searchText)}
-                  onChange={handleSearchTextChange}
-                  onSelectionChange={handleDestinationSelection}
-                  onClear={() => {
-                    setSearchText('')
-                    setSelectedDestination(null)
-                  }}
-                  disabled={disabled}
-                  className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 placeholder-gray-400 flex-1"
-                />
+              <div className="w-full">
+                <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
+                <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
+                  <SearchAutocomplete
+                    value={getDestinationValue(searchData.searchText)}
+                    onChange={handleSearchTextChange}
+                    onSelectionChange={handleDestinationSelection}
+                    onClear={() => {
+                      setSearchText('')
+                      setSelectedDestination(null)
+                      setIsUserInteracting(false)
+                    }}
+                    disabled={disabled}
+                    className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 placeholder-gray-400 flex-1"
+                  />
+                </div>
               </div>
-            </div>
 
             {/* Sección colapsable de fechas y huéspedes */}
             <div className={`w-full space-y-4 transition-all duration-300 ease-in-out ${
@@ -565,6 +568,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                   onClear={() => {
                     setSearchText('')
                     setSelectedDestination(null)
+                    setIsUserInteracting(false)
                   }}
                   disabled={disabled}
                   className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 placeholder-gray-400"

@@ -6,6 +6,7 @@ const ReturnPageComponent = () => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   
   // Hook para actualizar el perfil del usuario
   const { updateProfile, isUpdating: isProfileUpdating, error: profileError } = useProfileUpdate({
@@ -14,14 +15,36 @@ const ReturnPageComponent = () => {
   });
 
   useEffect(() => {
-    initialize();
+    // Detectar si es móvil
+    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // En móvil, esperar un poco más para asegurar que la hidratación esté completa
+      const timer = setTimeout(() => {
+        initialize();
+      }, 150);
+      
+      return () => clearTimeout(timer);
+    } else {
+      // En desktop, ejecutar inmediatamente
+      initialize();
+    }
   }, []);
 
   const initialize = async () => {
+    // Prevenir múltiples inicializaciones
+    if (isInitialized) return;
+    
     try {
-      // Primero actualizar el perfil del usuario para asegurar datos actualizados
-      await updateProfile();
-      
+      // Verificar que window esté disponible (especialmente importante en móvil)
+      if (typeof window === 'undefined') {
+        console.warn('Window not available, retrying...');
+        setTimeout(initialize, 100);
+        return;
+      }
+
+      setIsInitialized(true);
+
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const sessionId = urlParams.get('session_id');
@@ -41,15 +64,71 @@ const ReturnPageComponent = () => {
         return;
       }
 
-      // Obtener el estado de la sesión
+      // Validar formato del session ID
+      if (!sessionId.startsWith('cs_')) {
+        setError('Invalid session ID format');
+        setLoading(false);
+        return;
+      }
+
+      // PRIMERO: Obtener el estado de la sesión de Stripe
+      // Esto puede actualizar stripeCustomerId y role en la BD
       const response = await http.post(`/api/stripe/session-status?session_id=${sessionId}`);
-      const sessionData = response.data;
+      const responseData = response.data;
+      
+      console.log('Full response from API:', responseData);
+      
+      // Manejar la estructura de respuesta del backend
+      let sessionData;
+      if (responseData.success && responseData.data) {
+        // Nueva estructura: { success: true, data: { status, payment_status, customer_email } }
+        sessionData = responseData.data;
+        console.log('Using new response structure:', sessionData);
+      } else {
+        // Estructura legacy: directamente el objeto de sesión
+        sessionData = responseData;
+        console.log('Using legacy response structure:', sessionData);
+      }
+      
+      // Validar que tenemos los datos necesarios
+      if (!sessionData || !sessionData.status) {
+        console.error('Invalid session data received:', sessionData);
+        setError('Invalid session data received');
+        setLoading(false);
+        return;
+      }
       
       setSession(sessionData);
+      console.log('Session data set:', sessionData);
+      // DESPUÉS: Actualizar el perfil del usuario con los datos actualizados de la BD
+      // Esto incluye el stripeCustomerId y role actualizados por el session status
+      try {
+        await updateProfile();
+        console.log('Profile updated after session status check');
+      } catch (profileError) {
+        console.warn('Profile update failed after session check:', profileError);
+        // No fallar si la actualización del perfil falla, ya tenemos la sesión
+      }
+      
       setLoading(false);
     } catch (err) {
       console.error('Error getting session status:', err);
-      setError('Error verifying payment status');
+      
+      // Manejo específico de errores
+      if (err.response?.status === 401) {
+        setError('Session expired. Please login again.');
+      } else if (err.response?.status === 400) {
+        setError('Invalid session ID. Please try again.');
+      } else if (err.response?.data?.error === 'Invalid session ID') {
+        setError('Invalid session ID. Please try again.');
+      } else if (err.response?.data?.error === 'Payment service temporarily unavailable') {
+        setError('Payment service temporarily unavailable. Please try again later.');
+      } else if (err.code === 'NETWORK_ERROR' || !err.response) {
+        setError('Connection error. Please check your internet connection and try again.');
+      } else {
+        setError('Error verifying payment status. Please try again.');
+      }
+      
       setLoading(false);
     }
   };
@@ -112,12 +191,15 @@ const ReturnPageComponent = () => {
             <p className="font-bold">Error</p>
             <p>{error}</p>
           </div>
-          <button
-            onClick={handleGoHome}
-            className="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4"
-          >
-            Back to Home
-          </button>
+          
+          <div className="space-y-3">
+            <button
+              onClick={handleGoHome}
+              className="bg-primary hover:bg-primary/90 text-white font-bold py-2 px-4 w-full"
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );

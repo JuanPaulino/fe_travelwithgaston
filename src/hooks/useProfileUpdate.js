@@ -18,8 +18,8 @@ const useProfileUpdate = (options = {}) => {
   // Función para actualizar el perfil
   const handleUpdateProfile = useCallback(async () => {
     if (!isAuthenticated) {
-      setError('Usuario no autenticado');
-      return { success: false, error: 'Usuario no autenticado' };
+      setError('User not authenticated');
+      return { success: false, error: 'User not authenticated' };
     }
 
     setIsUpdating(true);
@@ -37,7 +37,7 @@ const useProfileUpdate = (options = {}) => {
         return result;
       }
     } catch (err) {
-      const errorMessage = err.message || 'Error al actualizar perfil';
+      const errorMessage = err.message || 'Error updating profile';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
