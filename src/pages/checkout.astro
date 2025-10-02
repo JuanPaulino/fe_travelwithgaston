@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
 import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
 import CheckoutComponent from '../components/checkoutcomponent.jsx';
+import AuthGuard from '../components/AuthGuard';
 
 // Si hay un error, usar datos por defecto
 const title = 'Checkout';
@@ -15,7 +16,9 @@ const title = 'Checkout';
 	<Header />
 	<!-- Contenido principal -->
 	<main class="container mx-auto px-4 py-8">
-		<CheckoutComponent client:load />
+		<AuthGuard client:load redirectTo="/" requireAuth={true} fallback={null}>
+			<CheckoutComponent client:load />
+		</AuthGuard>
 	</main>
 
 	<AuthModalWrapper client:load />

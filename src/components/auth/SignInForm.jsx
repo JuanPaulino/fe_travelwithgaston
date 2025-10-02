@@ -65,20 +65,16 @@ const SignInForm = ({ onLoginSuccess, onShowForgotPassword }) => {
       });
       
       if (result.success) {
-        console.log('Sesión iniciada exitosamente');
-        // Cerrar el modal cuando el login sea exitoso
+        console.log('Session started successfully');
+        // Close the modal when the login is successful
         if (onLoginSuccess) {
           onLoginSuccess();
         }
-      } else {
-        // Invalid Credentials
-        setErrors({ general: 'Invalid credentials' });
       }
-      
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
+      console.error('Error starting session:', error);
       const errorData = handleAPIError(error);
-      setErrors({ general: 'Error al iniciar sesión' });
+      setErrors({ general: 'Ups, we have a problem. Please try again later.' });
     }
   };
 

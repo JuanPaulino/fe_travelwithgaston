@@ -23,7 +23,7 @@ export const useAuthRedirect = (redirectTo = '/', requireAuth = true) => {
 
       // Si no hay token, redirigir inmediatamente
       if (!authState.token) {
-        console.log('No hay token, redirigiendo a:', redirectTo);
+        console.log('No token, redirecting to:', redirectTo);
         window.location.href = redirectTo;
         return;
       }
@@ -45,21 +45,21 @@ export const useAuthRedirect = (redirectTo = '/', requireAuth = true) => {
           }
         } else {
           // Token inválido, limpiar y redirigir
-          console.log('Token inválido, redirigiendo a:', redirectTo);
+          console.log('Token invalid, redirecting to:', redirectTo);
           authActions.logout();
           window.location.href = redirectTo;
         }
       } catch (error) {
-        console.error('Error verificando token:', error);
+        console.error('Error verifying token:', error);
         
         // Si hay error (probablemente 401), el token es inválido
         if (error.status === 401 || error.response?.status === 401) {
-          console.log('Token expirado (401), redirigiendo a:', redirectTo);
+          console.log('Token expired (401), redirecting to:', redirectTo);
           authActions.logout();
           window.location.href = redirectTo;
         } else {
           // Otro tipo de error, mantener el estado actual pero mostrar error
-          console.error('Error de red al verificar autenticación:', error);
+          console.error('Error de red verifying authentication:', error);
         }
       }
     };

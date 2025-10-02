@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
 import http from '../lib/http.js';
 import useProfileUpdate from '../hooks/useProfileUpdate.js';
+import { useAuth } from '../lib/useAuth.js';
 
 const ReturnPageComponent = () => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  
+  // Hook de autenticación para esperar la hidratación del store
+  const { isAuthenticated, loading: authLoading, user } = useAuth();
   
   // Hook para actualizar el perfil del usuario
   const { updateProfile, isUpdating: isProfileUpdating, error: profileError } = useProfileUpdate({
@@ -14,22 +19,54 @@ const ReturnPageComponent = () => {
     autoUpdateOnAuth: false
   });
 
+  // Esperar a que la autenticación esté lista antes de inicializar
   useEffect(() => {
-    // Detectar si es móvil
-    const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-      // En móvil, esperar un poco más para asegurar que la hidratación esté completa
-      const timer = setTimeout(() => {
-        initialize();
-      }, 150);
-      
-      return () => clearTimeout(timer);
-    } else {
-      // En desktop, ejecutar inmediatamente
-      initialize();
+    // Si aún está cargando la autenticación, esperar
+    if (authLoading) {
+      return;
     }
-  }, []);
+    
+    // Si no está autenticado, mostrar modal de login y abrirlo automáticamente
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      setLoading(false);
+      // Abrir modal de autenticación automáticamente
+      window.dispatchEvent(new CustomEvent('openAuthModal', { 
+        detail: { initialTab: 'signin' } 
+      }));
+      return;
+    }
+    
+    // Si está autenticado, proceder con la inicialización
+    initialize();
+  }, [isAuthenticated, authLoading]);
+
+  // Función para manejar el éxito del login
+  const handleLoginSuccess = () => {
+    setShowAuthModal(false);
+    // Reinicializar después del login exitoso
+    setIsInitialized(false);
+    initialize();
+  };
+
+  // Escuchar eventos de autenticación exitosa
+  useEffect(() => {
+    const handleAuthSuccess = () => {
+      if (showAuthModal) {
+        handleLoginSuccess();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('auth:login', handleAuthSuccess);
+      window.addEventListener('auth:profileUpdated', handleAuthSuccess);
+      
+      return () => {
+        window.removeEventListener('auth:login', handleAuthSuccess);
+        window.removeEventListener('auth:profileUpdated', handleAuthSuccess);
+      };
+    }
+  }, [showAuthModal]);
 
   const initialize = async () => {
     // Prevenir múltiples inicializaciones
@@ -116,7 +153,14 @@ const ReturnPageComponent = () => {
       
       // Manejo específico de errores
       if (err.response?.status === 401) {
-        setError('Session expired. Please login again.');
+        // En lugar de mostrar error, mostrar modal de login y abrirlo automáticamente
+        setShowAuthModal(true);
+        setLoading(false);
+        // Abrir modal de autenticación automáticamente
+        window.dispatchEvent(new CustomEvent('openAuthModal', { 
+          detail: { initialTab: 'signin' } 
+        }));
+        return;
       } else if (err.response?.status === 400) {
         setError('Invalid session ID. Please try again.');
       } else if (err.response?.data?.error === 'Invalid session ID') {
@@ -165,19 +209,59 @@ const ReturnPageComponent = () => {
     window.location.href = '/search';
   };
 
-  if (loading || isProfileUpdating) {
+  // Mostrar loading mientras se verifica la autenticación
+  if (authLoading || loading || isProfileUpdating) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-gray-600">
-            {isProfileUpdating ? 'Updating user profile...' : 'Verifying payment status...'}
+            {authLoading ? 'Verifying authentication...' : 
+             isProfileUpdating ? 'Updating user profile...' : 
+             'Verifying payment status...'}
           </p>
           {profileError && (
             <p className="text-red-600 text-sm mt-2">
-              Profile update error: {profileError}
+              Ups, we have a problem. Please try again later.
             </p>
           )}
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar modal de autenticación si es necesario
+  if (showAuthModal) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="bg-primary-lighter border border-primary-lightest text-primary-dark px-6 py-4 mb-6">
+            <h2 className="text-xl font-bold mb-2">Authentication Required</h2>
+            <p className="text-sm">
+              Your session has expired. Please sign in to continue with your payment verification.
+            </p>
+          </div>
+          
+          <div className="space-y-4">
+            <button
+              onClick={() => {
+                // Disparar evento para abrir modal de autenticación
+                window.dispatchEvent(new CustomEvent('openAuthModal', { 
+                  detail: { initialTab: 'signin' } 
+                }));
+              }}
+              className="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-6 w-full transition-colors"
+            >
+              Sign In
+            </button>
+            
+            <button
+              onClick={handleGoHome}
+              className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 w-full transition-colors"
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );
