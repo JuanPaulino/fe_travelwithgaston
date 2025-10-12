@@ -73,8 +73,11 @@ const SignInForm = ({ onLoginSuccess, onShowForgotPassword }) => {
       }
     } catch (error) {
       console.error('Error starting session:', error);
-      const errorData = handleAPIError(error);
-      setErrors({ general: 'Ups, we have a problem. Please try again later.' });
+      if (error.response.status === 400) {
+        setErrors({ general: 'User or password is incorrect' });
+      } else {
+        setErrors({ general: 'Ups, we have a problem. Please try again later.' });
+      }
     }
   };
 
