@@ -42,13 +42,13 @@ const hotelImages = hotelData.images || [];
 // Función para procesar la descripción del hotel
 const processHotelDescription = (description: string) => {
   if (!description) return { text: '', shouldShowButton: false, truncatedText: '' };
-  
+  let maxWords = 70;
   const wordCount = description.trim().split(/\s+/).length;
-  const shouldShowButton = wordCount > 100;
+  const shouldShowButton = wordCount > maxWords;
   
   if (shouldShowButton) {
     const words = description.trim().split(/\s+/);
-    const truncatedText = words.slice(0, 100).join(' ');
+    const truncatedText = words.slice(0, maxWords).join(' ');
     return { text: description, shouldShowButton, truncatedText };
   }
   
@@ -215,7 +215,7 @@ const title = `Hotel ${hotelData.name}`;
               </div>
             </div>
           </div>
-          <div class="flex flex-row w-full gap-4">
+          <div class="flex flex-row w-full flex-wrap gap-4">
              {/* Sostenibilidad */}
              {/*hotelData.sustainability_rating && (
                <div class="">
@@ -268,13 +268,14 @@ const title = `Hotel ${hotelData.name}`;
                </div>
              )}
 
-             {/* Iniciativa de sostenibilidad */}
+             {/* Iniciativa de sostenibilidad
              {hotelData.sustainability_initiative && (
                <div class=" col-span-2 md:col-span-4">
                  <h4 class="text-sm font-semibold text-neutral-darkest mb-2">Sustainability Initiative</h4>
                  <p class="text-sm text-neutral-DEFAULT">{hotelData.sustainability_initiative}</p>
                </div>
              )}
+             */}
 
               {/* Tipo de hotel */}
               {hotelData.short_info?.type && (
