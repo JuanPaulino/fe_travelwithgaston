@@ -313,6 +313,11 @@ export const userAPI = {
   changePassword: async (passwordData) => {
     const response = await http.put('/api/users/change-password', passwordData);
     return response.data;
+  },
+
+  requestAccountDeletion: async () => {
+    const response = await http.put('/api/users/request-delete');
+    return response.data;
   }
 };
 
