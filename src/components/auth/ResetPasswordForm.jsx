@@ -159,13 +159,6 @@ const ResetPasswordForm = ({ token, onSuccess, onBackToSignIn }) => {
   // Mostrar formulario de reseteo
   return (
     <div className="space-y-6 max-w-xl mx-auto">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Create new password</h2>
-        <p className="text-sm text-gray-600">
-          Please enter your new password below.
-        </p>
-      </div>
-
       <form onSubmit={handleSubmit} className="space-y-6">
         {errors.general && (
           <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">

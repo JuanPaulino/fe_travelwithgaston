@@ -43,7 +43,7 @@ const GuestSelector = ({
 
   return (
     <div className={`space-y-2 ${className}`}>
-      {/* Adultos */}
+      {/* adults */}
       <div className="flex items-center justify-between">
         <span className="text-neutral-darker font-medium font-body">Adults</span>
         <div className="flex items-center gap-3">
