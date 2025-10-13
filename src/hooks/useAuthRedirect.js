@@ -16,11 +16,6 @@ export const useAuthRedirect = (redirectTo = '/', requireAuth = true) => {
       // Si no requiere autenticación, no hacer nada
       if (!requireAuth) return;
 
-      // Si ya está autenticado, no hacer nada
-      if (authState.isAuthenticated && authState.token && authState.user) {
-        return;
-      }
-
       // Si no hay token, redirigir inmediatamente
       if (!authState.token) {
         console.log('No token, redirecting to:', redirectTo);

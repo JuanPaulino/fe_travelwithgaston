@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
-import Booking from '../components/Booking.jsx';
+import BookingComponent from '../components/Booking.jsx';
 import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
+import AuthGuard from '../components/AuthGuard';
 
 const title = 'Hotel Booking';
 ---
@@ -13,10 +14,11 @@ const title = 'Hotel Booking';
 	<!-- Contenido principal -->
 	<main class="min-h-screen py-8">
 		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-			<Booking client:load />
+			<AuthGuard client:load redirectTo="/" requireAuth={true} fallback={null}>
+				<BookingComponent client:load />
+			</AuthGuard>
 		</div>
 	</main>
-
 
 	<StoreDebuggerWrapper client:load />
 </Layout>
