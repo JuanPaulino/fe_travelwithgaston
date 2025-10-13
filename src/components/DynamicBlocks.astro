@@ -70,7 +70,12 @@ const { blocks } = Astro.props;
           );
         }
         
-        return <JoinNow data={block.item.data} background={block.background} />;
+        // Renderizar con un contenedor que controla la visibilidad según autenticación
+        return (
+          <div id={`join-now-block-${index}`} class="join-now-block" data-block-type="join-now">
+            <JoinNow data={block.item.data} background={block.background} />
+          </div>
+        );
       }
 
       // Si es un bloque de tipo process_timeline, renderizar ProcessTimeline
@@ -177,6 +182,39 @@ const { blocks } = Astro.props;
   })}
 </div>
 
+<script>
+  // Función para ocultar/mostrar bloques JoinNow según estado de autenticación
+  function updateJoinNowVisibility() {
+    try {
+      // Verificar si existe authtoken en localStorage
+      const hasToken = localStorage.getItem('authtoken');
+      
+      // Buscar todos los bloques JoinNow
+      const joinNowBlocks = document.querySelectorAll('[data-block-type="join-now"]');
+      
+      joinNowBlocks.forEach(block => {
+        const htmlBlock = block as HTMLElement;
+        if (hasToken) {
+          // Si tiene token, ocultar el bloque
+          htmlBlock.classList.add('hidden');
+        } else {
+          // Si no tiene token, mostrar el bloque
+          htmlBlock.classList.remove('hidden');
+        }
+      });
+    } catch (error) {
+      console.error('Error al verificar estado de autenticación:', error);
+    }
+  }
+  
+  // Ejecutar al cargar la página
+  document.addEventListener('DOMContentLoaded', updateJoinNowVisibility);
+  
+  // Escuchar cambios en el estado de autenticación
+  window.addEventListener('auth:login', updateJoinNowVisibility);
+  window.addEventListener('auth:logout', updateJoinNowVisibility);
+</script>
+
 <style>
   .dynamic-blocks {
     width: 100%;
@@ -194,5 +232,14 @@ const { blocks } = Astro.props;
     background: #fee2e2;
     border: 1px solid #fca5a5;
     margin: 1rem 0;
+  }
+  
+  /* Estilos para el bloque JoinNow */
+  .join-now-block {
+    display: block;
+  }
+  
+  .join-now-block.hidden {
+    display: none;
   }
 </style> 
