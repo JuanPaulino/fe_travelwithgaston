@@ -288,6 +288,7 @@ const title = `Hotel ${hotelData.name}`;
           </div>
         </div>
       </div>
+      {Array.isArray(hotelData.hotel_information) && hotelData.hotel_information.length > 0 && (
       <div class="flex flex-col gap-2 mb-8 md:max-w-4xl">
          <h2 class="text-h2 font-heading text-neutral-darkest mb-4">Hotel information</h2>
          <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -317,7 +318,7 @@ const title = `Hotel ${hotelData.name}`;
            }
          </div>
       </div>
-
+      )}
 			<AvailableHotelRooms client:load parentHotelData={hotelData} />
       <div class="flex flex-col">
         <HotelMap 
