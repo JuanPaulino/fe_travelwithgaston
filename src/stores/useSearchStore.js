@@ -6,6 +6,21 @@ import { filtersStore } from './useFiltersStore.js';
 import { persistentMap } from '@nanostores/persistent'
 import { isAuthenticated } from './authStore.js';
 
+// Función para obtener fechas por defecto de manera consistente
+const getDefaultDates = () => {
+  // Usar una fecha fija para evitar diferencias entre servidor y cliente
+  const baseDate = new Date('2024-01-01T00:00:00Z');
+  const tomorrow = new Date(baseDate);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const dayAfterTomorrow = new Date(baseDate);
+  dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
+  
+  return {
+    checkIn: tomorrow.toISOString().split('T')[0],
+    checkOut: dayAfterTomorrow.toISOString().split('T')[0]
+  };
+};
+
 // Estado inicial de la búsqueda
 const initialSearchData = {
   searchText: '',
@@ -13,16 +28,8 @@ const initialSearchData = {
   selectedDestinationText: '',
   selectedDestinationType: null,
   selectedDestinationLocation: '',
-  checkInDate: (() => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
-  })(),
-  checkOutDate: (() => {
-    const dayAfterTomorrow = new Date();
-    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-    return dayAfterTomorrow.toISOString().split('T')[0];
-  })(),
+  checkInDate: '',
+  checkOutDate: '',
   rooms: 1,
   adults: 2,
   children: 0,
@@ -160,6 +167,19 @@ export const searchActions = {
   // Limpiar todos los datos de búsqueda
   clearSearch: () => {
     searchStore.set(initialSearchData);
+  },
+
+  // Inicializar fechas por defecto si no están configuradas
+  initializeDefaultDates: () => {
+    const currentData = searchStore.get();
+    if (!currentData.checkInDate || !currentData.checkOutDate) {
+      const defaultDates = getDefaultDates();
+      searchStore.set({
+        ...currentData,
+        checkInDate: defaultDates.checkIn,
+        checkOutDate: defaultDates.checkOut
+      });
+    }
   },
 
   // Obtener datos de búsqueda actuales
@@ -323,6 +343,9 @@ export const useSearchStore = () => {
   const [resultsData, setResultsData] = useState(resultsStore.get());
 
   useEffect(() => {    
+    // Inicializar fechas por defecto si es necesario
+    searchActions.initializeDefaultDates();
+    
     const unsubscribeSearch = searchStore.subscribe((newSearchData) => {
       setSearchData(newSearchData)
     });

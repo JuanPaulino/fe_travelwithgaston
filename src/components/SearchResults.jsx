@@ -10,10 +10,18 @@ const SearchResults = ({ className = '' }) => {
   const { resultsData, executeSearch } = useSearchStore()
   const { hotels, loading, error, lastSearch } = resultsData
   const [hasTriggeredDefaultSearch, setHasTriggeredDefaultSearch] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
-  const userIsAuthenticated = isAuthenticated()
+  // Solo verificar autenticación después de que el componente esté montado
+  const userIsAuthenticated = isMounted ? isAuthenticated() : false
 
   useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isMounted) return
+
     const triggerDefaultSearch = async () => {
       if (!userIsAuthenticated && !lastSearch && !hasTriggeredDefaultSearch && !loading) {
         setHasTriggeredDefaultSearch(true)
@@ -27,7 +35,7 @@ const SearchResults = ({ className = '' }) => {
     }
 
     triggerDefaultSearch()
-  }, [userIsAuthenticated, lastSearch, hasTriggeredDefaultSearch, loading, executeSearch])
+  }, [isMounted, userIsAuthenticated, lastSearch, hasTriggeredDefaultSearch, loading, executeSearch])
 
   if (loading) {
     return (
@@ -40,13 +48,26 @@ const SearchResults = ({ className = '' }) => {
     )
   }
 
-  if (!lastSearch && (userIsAuthenticated || hasTriggeredDefaultSearch)) {
+  // Mostrar mensaje de bienvenida solo después del montaje y cuando no hay búsqueda previa
+  if (!lastSearch && isMounted && (userIsAuthenticated || hasTriggeredDefaultSearch)) {
     return (
       <div className={`${className} text-center py-12`}>
         <div className="text-gray-500">
           <p className="text-lg mb-2">Your digital concierge is ready, let's find your perfect room.</p>
           <p className="text-sm">Use the search bar above to find your perfect stay.</p>
         </div>
+      </div>
+    )
+  }
+
+  // Durante la hidratación inicial, mostrar un estado consistente
+  if (!isMounted) {
+    return (
+      <div className={className}>
+        <LoadingSpinner 
+          text="Checking you into luxury, one search at a time..." 
+          size="xl"
+        />
       </div>
     )
   }

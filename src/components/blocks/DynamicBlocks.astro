@@ -1,16 +1,16 @@
 ---
-import HeroSection from './blocks/HeroSection.astro';
-import InspirationGrid from './InspirationGrid.astro';
-import FeaturedHotels from './FeaturedHotels.astro';
-import FormBlock from './FormBlock.jsx';
-import JoinNow from './JoinNow.astro';
-import CardBlock from './CardBlock.astro';
-import ProcessTimeline from './ProcessTimeline.astro';
-import TripInquiryForm from './TripInquiryForm.astro';
-import CustomJourneysForm from './CustomJourneysForm.astro';
-import CorporateServicesForm from './CorporateServicesForm.astro';
-import RichTextBlock from './blocks/RichTextBlock.astro';
-import ContactForm from './ContactForm.astro';
+import HeroSection from './HeroSection.astro';
+import InspirationGrid from '../InspirationGrid.astro';
+import FeaturedHotels from '../FeaturedHotels.astro';
+import FormBlock from '../FormBlock.jsx';
+import JoinNow from '../JoinNow.astro';
+import CardBlock from '../CardBlock.astro';
+import ProcessTimeline from '../ProcessTimeline.astro';
+import TripInquiryForm from '../TripInquiryForm.astro';
+import CustomJourneysForm from '../CustomJourneysForm.astro';
+import CorporateServicesForm from '../CorporateServicesForm.astro';
+import RichTextBlock from './RichTextBlock.astro';
+import ContactForm from '../ContactForm.astro';
 
 export interface Props {
   blocks: any[];
@@ -186,19 +186,15 @@ const { blocks } = Astro.props;
   // Función para ocultar/mostrar bloques JoinNow según estado de autenticación
   function updateJoinNowVisibility() {
     try {
-      // Verificar si existe authtoken en localStorage
-      const hasToken = localStorage.getItem('authtoken');
-      
-      // Buscar todos los bloques JoinNow
+      const authtoken = localStorage.getItem('authtoken');
+      const hasToken = authtoken !== null && authtoken !== undefined && authtoken !== '' && authtoken !== '__NULL__';
+
       const joinNowBlocks = document.querySelectorAll('[data-block-type="join-now"]');
-      
       joinNowBlocks.forEach(block => {
         const htmlBlock = block as HTMLElement;
         if (hasToken) {
-          // Si tiene token, ocultar el bloque
           htmlBlock.classList.add('hidden');
         } else {
-          // Si no tiene token, mostrar el bloque
           htmlBlock.classList.remove('hidden');
         }
       });

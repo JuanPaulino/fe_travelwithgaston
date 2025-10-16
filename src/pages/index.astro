@@ -4,7 +4,7 @@ import Header from '../components/Header.astro';
 import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
 import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
 import { getPageData } from '../lib/directus.js';
-import DynamicBlocks from '../components/DynamicBlocks.astro';
+import DynamicBlocks from '../components/blocks/DynamicBlocks.astro';
 
 // Obtener datos de la página de inicio desde Directus
 const { data: pageData, error } = await getPageData('/');
