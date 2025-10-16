@@ -3,9 +3,9 @@ import { useState, useCallback } from 'react';
 const useBanner = () => {
   const [banners, setBanners] = useState([]);
 
-  const addBanner = useCallback(({ type, message, autoHide = false, duration = 5000 }) => {
+  const addBanner = useCallback(({ type, message, autoHide = false, duration = 5000, position = 'top-right' }) => {
     const id = Date.now() + Math.random();
-    const newBanner = { id, type, message, autoHide, duration };
+    const newBanner = { id, type, message, autoHide, duration, position };
     
     setBanners(prev => [...prev, newBanner]);
 

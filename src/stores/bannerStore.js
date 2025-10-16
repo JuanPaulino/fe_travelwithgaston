@@ -4,9 +4,9 @@ import { atom } from 'nanostores';
 export const $banners = atom([]);
 
 // Funciones para manipular banners
-export const addBanner = ({ type, message, autoHide = false, duration = 5000 }) => {
+export const addBanner = ({ type, message, autoHide = false, duration = 5000, position = 'top-right' }) => {
   const id = Date.now() + Math.random();
-  const newBanner = { id, type, message, autoHide, duration };
+  const newBanner = { id, type, message, autoHide, duration, position };
   
   $banners.set([...$banners.get(), newBanner]);
 

@@ -11,7 +11,6 @@ const BannerManager = () => {
     <BannerContainer 
       banners={banners}
       onRemoveBanner={removeBanner}
-      position="top-right"
     />
   );
 };

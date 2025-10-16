@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { authStore } from '../stores/authStore';
 import { useBookingStore, bookingStore } from '../stores/useBookingStore';
 import { bookingAPI, handleAPIError } from '../lib/http';
-import { showSuccess } from '../stores/bannerStore';
+import { showSuccess, showError } from '../stores/bannerStore';
 import CreditCardForm from './CreditCardForm';
 
 const Booking = ({ className = '' }) => {
@@ -180,10 +180,9 @@ const Booking = ({ className = '' }) => {
 
       // Enviar la reserva al backend
       const response = await bookingAPI.createBooking(bookingPayload);
-
       if (response.success) {
         // Éxito - mostrar banner de éxito y redirigir
-        showSuccess('Booking created successfully!', { autoHide: true });
+        showSuccess('Booking created successfully!', { autoHide: true, position: 'top-center', duration: 5000 });
         
         // Redirigir a la página de cuenta después de un breve delay
         setTimeout(() => {
@@ -194,6 +193,10 @@ const Booking = ({ className = '' }) => {
       }
     } catch (error) {
       console.error('Error al procesar la reserva:', error);
+      if (error.response.data.code === 'booking_conflict') {
+        showError('The selected dates are not available for this hotel', { autoHide: true, position: 'top-center', duration: 5000 });
+        return;
+      }
       const errorInfo = handleAPIError(error);
       setBookingError(errorInfo.message || 'Error processing the booking');
     } finally {
