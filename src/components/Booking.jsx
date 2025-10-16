@@ -1,9 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { authStore } from '../stores/authStore';
 import { useBookingStore, bookingStore } from '../stores/useBookingStore';
 import { bookingAPI, handleAPIError } from '../lib/http';
 import { showSuccess, showError } from '../stores/bannerStore';
 import CreditCardForm from './CreditCardForm';
+
+// Función para obtener idempotency key del backend
+const getBookingIdempotencyKey = async (hotelId, checkIn, checkOut) => {
+  try {
+    const response = await bookingAPI.getIdempotencyKey(hotelId, checkIn, checkOut);
+    if (response.success) {
+      return response.data.idempotencyKey;
+    }
+    throw new Error(response.message || 'Error getting idempotency key');
+  } catch (error) {
+    console.error('Error getting idempotency key:', error);
+    throw error;
+  }
+};
 
 const Booking = ({ className = '' }) => {
   const [isValid, setIsValid] = useState(false);
@@ -15,6 +29,13 @@ const Booking = ({ className = '' }) => {
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const { bookingData, updateCreditCard } = useBookingStore();
+  
+  // Ref para prevenir múltiples requests concurrentes
+  const isProcessingRef = useRef(false);
+  
+  // Ref para el idempotency key - se obtiene del backend
+  const idempotencyKeyRef = useRef(null);
+  const [idempotencyKeyLoading, setIdempotencyKeyLoading] = useState(false);
 
   useEffect(() => {
     const checkAccess = () => {
@@ -59,6 +80,32 @@ const Booking = ({ className = '' }) => {
       setGuestEmail(bookingData.guest_email);
     }
   }, [bookingData.guest_name, bookingData.guest_email]);
+
+  // Generar idempotency key cuando cambien los parámetros críticos
+  useEffect(() => {
+    const generateIdempotencyKey = async () => {
+      debugger;
+      if (bookingData.hotel_id && bookingData.start_date && bookingData.end_date) {
+        try {
+          setIdempotencyKeyLoading(true);
+          const key = await getBookingIdempotencyKey(
+            bookingData.hotel_id,
+            bookingData.start_date,
+            bookingData.end_date
+          );
+          idempotencyKeyRef.current = key;
+          console.log('Idempotency key generated:', key);
+        } catch (error) {
+          console.error('Error generating idempotency key:', error);
+          showError('Error generating booking key. Please try again.');
+        } finally {
+          setIdempotencyKeyLoading(false);
+        }
+      }
+    };
+
+    generateIdempotencyKey();
+  }, [bookingData.hotelId, bookingData.checkIn, bookingData.checkOut]);
 
   // Función para manejar cambios en la tarjeta de crédito
   const handleCreditCardChange = (creditCardData, isValid) => {
@@ -158,7 +205,9 @@ const Booking = ({ className = '' }) => {
         expMonth: bookingData.credit_card.exp_month || null,
         expYear: bookingData.credit_card.exp_year || null
       },
-      rooms: rooms
+      rooms: rooms,
+      // Agregar idempotency key para prevenir duplicados
+      idempotencyKey: idempotencyKeyRef.current
     };
 
     return bookingPayload;
@@ -166,11 +215,32 @@ const Booking = ({ className = '' }) => {
 
   // Función para procesar la reserva
   const handleProcessBooking = async () => {
+    // Verificación 1: Si ya está procesando (estado), retornar inmediatamente
+    if (processingBooking) {
+      console.warn('Ya hay una solicitud de reserva en proceso');
+      return;
+    }
+
+    // Verificación 2: Si el ref indica que está procesando, retornar inmediatamente
+    if (isProcessingRef.current) {
+      console.warn('Ya hay una solicitud de reserva en proceso (ref)');
+      return;
+    }
+
+    // Verificación 3: Verificar que la idempotency key esté disponible
+    if (!idempotencyKeyRef.current) {
+      setBookingError('Booking key is not ready. Please wait a moment and try again.');
+      return;
+    }
+
+    // Verificación 4: Validar tarjeta de crédito
     if (!creditCardValid) {
       setBookingError('Please complete all credit card information');
       return;
     }
 
+    // Marcar como procesando en ambos lugares (estado y ref)
+    isProcessingRef.current = true;
     setProcessingBooking(true);
     setBookingError(null);
 
@@ -189,6 +259,8 @@ const Booking = ({ className = '' }) => {
           window.location.href = '/account';
         }, 1500);
       } else {
+        // Solo resetear si hubo un error (para permitir reintentos)
+        isProcessingRef.current = false;
         setBookingError(response.message || 'Error processing the booking');
       }
     } catch (error) {
@@ -198,8 +270,12 @@ const Booking = ({ className = '' }) => {
         return;
       }
       const errorInfo = handleAPIError(error);
+      // Solo resetear si hubo un error (para permitir reintentos)
+      isProcessingRef.current = false;
+      
       setBookingError(errorInfo.message || 'Error processing the booking');
     } finally {
+      isProcessingRef.current = false;
       setProcessingBooking(false);
     }
   };
@@ -425,9 +501,9 @@ const Booking = ({ className = '' }) => {
             {/* Botón de confirmación de reserva */}
             <div className="mt-6 pt-4 border-t border-gray-200">
               <button
-                disabled={!creditCardValid || processingBooking}
+                disabled={!creditCardValid || processingBooking || idempotencyKeyLoading || !idempotencyKeyRef.current}
                 className={`w-full py-3 px-4 rounded-md font-medium transition-colors ${
-                  creditCardValid && !processingBooking
+                  creditCardValid && !processingBooking && !idempotencyKeyLoading && idempotencyKeyRef.current
                     ? 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
@@ -438,6 +514,13 @@ const Booking = ({ className = '' }) => {
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Processing...
                   </div>
+                ) : idempotencyKeyLoading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500 mr-2"></div>
+                    Preparing booking...
+                  </div>
+                ) : !idempotencyKeyRef.current ? (
+                  'Preparing booking...'
                 ) : (
                   creditCardValid ? 'Confirm Booking' : 'Complete card information'
                 )}

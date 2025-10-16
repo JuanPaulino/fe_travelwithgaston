@@ -330,6 +330,14 @@ export const filtersApi = {
 
 // API de bookings
 export const bookingAPI = {
+  // Obtener idempotency key para un booking
+  getIdempotencyKey: async (hotelId, checkIn, checkOut) => {
+    const response = await http.get('/api/bookings/idempotency-key', {
+      params: { hotelId, checkIn, checkOut }
+    });
+    return response.data;
+  },
+
   // Crear una nueva reserva
   createBooking: async (bookingData) => {
     const response = await http.post('/api/bookings', bookingData);
