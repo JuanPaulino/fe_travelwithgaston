@@ -13,6 +13,21 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   const [hotelData, setHotelData] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
+  const [showRatesModal, setShowRatesModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detectar tamaño de pantalla
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
 
   // Ejecutar búsqueda cuando el componente se monta o cambian los datos de búsqueda
   useEffect(() => {
@@ -108,6 +123,14 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   }
   const nights = calculateNights()
 
+  const openRatesModal = () => {
+    setShowRatesModal(true);
+  };
+
+  const closeRatesModal = () => {
+    setShowRatesModal(false);
+  };
+
   // Mostrar estado de carga
   if (loading) {
     return (
@@ -150,13 +173,211 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
           <MembershipCard />
         </div>
       )}
-      {
-      roomTypes.length > 0
-        ? <>
+      
+      {roomTypes.length > 0 && (
+        <>
             <h2 className="text-h2 font-heading text-neutral-darkest mb-6">
               Select your room
             </h2>
-            {roomTypes.map((room, index) => (
+          
+          {/* Vista móvil compacta */}
+          {isMobile ? (
+            <div className="space-y-4">
+              {/* Carrusel de habitaciones con scroll horizontal */}
+              <div className="w-full">
+                <div 
+                  className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide"
+                  style={{ 
+                    scrollSnapType: 'x mandatory',
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none'
+                  }}
+                >
+                  {roomTypes.map((room, index) => (
+                    <div 
+                      key={index}
+                      className="flex-shrink-0 w-80 rounded-lg border border-neutral-lighter bg-white"
+                      style={{ scrollSnapAlign: 'start' }}
+                    >
+                      {/* Imagen de la habitación */}
+                      <div className="relative h-64">
+                        <ImageCarousel images={room?.images || []} />
+                        {/* Indicador de scroll para múltiples habitaciones */}
+                        {roomTypes.length > 1 && (
+                          <div className="absolute top-4 right-4 bg-black/20 backdrop-blur-sm rounded-full p-2">
+                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Información de la habitación */}
+                      <div className="p-4">
+                        <h3 className="text-lg font-heading text-neutral-darkest mb-2">
+                          {room?.name}
+                          {room?.has_accessibility && " - Accessible"}
+                        </h3>
+                        
+                        {/* Detalles compactos */}
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                          <div className="flex items-center gap-2">
+                            <img src="/images/activity_zone.png" alt="size" className="w-4 h-4" />
+                            <span className="text-sm text-neutral-darkest">{room?.room_size}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <img src="/images/bed.png" alt="bed" className="w-4 h-4" />
+                            <span className="text-sm text-neutral-darkest">{room?.bed_size}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <img src="/images/group.png" alt="occupancy" className="w-4 h-4" />
+                            <span className="text-sm text-neutral-darkest">
+                              {room?.occupancies?.[0]?.adults || 2} adults
+                            </span>
+                          </div>
+                          {room?.view_from_room && (
+                            <div className="flex items-center gap-2">
+                              <img src="/images/view_from_room.png" alt="view" className="w-4 h-4" />
+                              <span className="text-sm text-neutral-darkest">{room?.view_from_room}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Botón para ver rates */}
+                        <button
+                          onClick={openRatesModal}
+                          className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                        >
+                          View Rates
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Modal de rates - Pantalla completa */}
+              {showRatesModal && (
+                <div className="fixed inset-0 bg-white z-50 flex flex-col">
+                  {/* Header fijo */}
+                  <div className="flex items-center justify-between p-4 border-b border-neutral-lighter bg-white">
+                    <h3 className="text-lg font-heading text-neutral-darkest">
+                      {roomTypes[selectedRoomIndex]?.name} - Rates
+                    </h3>
+                    <button
+                      onClick={closeRatesModal}
+                      className="p-2 hover:bg-neutral-lighter rounded-full"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                
+                  {/* Contenido scrolleable */}
+                  <div className="flex-1 overflow-y-auto">
+                    {roomTypes[selectedRoomIndex]?.rates.map((rate, rateIndex) => (
+                      <div key={rateIndex} className="p-4 border-b border-neutral-lighter last:border-b-0">
+                        {/* Header de la tarifa */}
+                        <div className="mb-4">
+                          <h4 className="font-heading text-xl text-neutral-darkest mb-2">{rate.title}</h4>
+                          {rate.description && (
+                            <p className="text-neutral-darkest font-body text-sm mb-3">
+                              {rate.description}
+                            </p>
+                          )}
+                        </div>
+                        
+                        {/* Beneficios */}
+                        {rate.benefits && rate.benefits.length > 0 && (
+                          <div className="mb-4">
+                            <h4 className="font-medium text-neutral-darkest mb-2">Included benefits</h4>
+                            <div className="space-y-2">
+                              {rate.benefits.map((benefit, benefitIndex) => (
+                                <div key={benefitIndex} className="flex items-start gap-3">
+                                  <div className="w-4 h-4 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span className="text-white text-xs">✓</span>
+                                  </div>
+                                  <span className="text-sm text-neutral-darkest">{benefit}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Beneficios adicionales */}
+                        {rate.additional_benefits && rate.additional_benefits.length > 0 && (
+                          <div className="mb-4">
+                            <h4 className="font-medium text-neutral-darkest mb-2">Additional benefits</h4>
+                            <div className="space-y-2">
+                              {rate.additional_benefits.map((benefit, benefitIndex) => (
+                                <div key={benefitIndex} className="flex items-start gap-3">
+                                  <div className="w-4 h-4 bg-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <span className="text-white text-xs">+</span>
+                                  </div>
+                                  <span className="text-sm text-neutral-darkest">{benefit}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        
+                        {/* Precios destacados - Formato desktop */}
+                        <div className="text-center mb-6">
+                          {rate.total_to_book_in_requested_currency && (
+                            <div className="p-3">
+                              <p className="text-3xl font-semibold text-neutral-darkest mb-2">
+                                <span className="text-lg">{getCurrencySymbol(rate.requested_currency_code)}</span> {formatPrice(rate.total_to_book_in_requested_currency)}
+                              </p>
+                              <p className="text-xs text-neutral-dark mb-1">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
+                              <div className="w-full h-0.5 bg-neutral-300 mb-1"></div>
+                              <p className="text-xs text-neutral-dark">Average per night {getCurrencySymbol(rate.requested_currency_code)} {formatPrice(rate.rate_in_requested_currency)} inc tax</p>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Información de pago y cancelación */}
+                        <div className="mb-4">
+                          {rate.cancellation_policy && (
+                            <div className="mb-3">
+                              <p className="text-sm font-semibold text-neutral-darkest mb-1">Cancellation policy</p>
+                              <p className="text-sm text-neutral-darkest">{rate.cancellation_policy}</p>
+                              {rate.cancellation_deadline && (
+                                <p className="text-xs text-neutral-light mt-1">
+                                  Cancellation deadline: {new Date(rate.cancellation_deadline).toLocaleDateString('es-ES')}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          <a href="/terms-and-conditions" className="text-sm text-neutral-light mt-1">Terms and conditions</a>
+                        </div>
+                        
+                        {/* Botón de reserva */}
+                        <button
+                          onClick={() => {
+                            const userData = {
+                              name: user.firstName + ' ' + user.lastName,
+                              email: user.email,
+                            };
+                            hotelData.hotel_address = parentHotelData.address;
+                            processBooking(hotelData, roomTypes[selectedRoomIndex], rate, searchData, userData);
+                            closeRatesModal();
+                            window.location.href = '/booking';
+                          }}
+                          className="w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-4 rounded-lg transition-colors text-base"
+                        >
+                          Book Now
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Vista desktop original */
+            roomTypes.map((room, index) => (
               <div key={index} className={`flex flex-col md:flex-row gap-6 border-x border-t ${index === roomTypes.length - 1 ? 'border-b' : ''} border-neutral-lighter p-4`}>
               {/* Panel izquierdo - Imagen y descripción */}
                 <div className="w-full md:w-2/5">
@@ -200,8 +421,8 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                 {/* Panel derecho - Detalles y tarifas */}
                 <div className="w-full md:w-3/5 border-t md:border-l border-neutral-lighter">
                   {/* Sección de tarifas */}
-                  {room.rates.map((rate, index) => <>
-                    <div key={index} className="flex flex-col sm:flex-row mb-8 p-6 border-neutral-lighter">
+                  {room.rates.map((rate, rateIndex) => <>
+                    <div key={rateIndex} className="flex flex-col sm:flex-row mb-8 p-6 border-neutral-lighter">
                       <div className='w-full sm:w-3/5 md:w-4/6'>
                           {/* Header de la tarifa */}
                           <div className="mb-4">
@@ -338,16 +559,16 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                         </div>
                       </div>
                     </div>
-                    {index !== room.rates.length - 1 && (
+                    {rateIndex !== room.rates.length - 1 && (
                       <div className="w-full h-px bg-neutral-lighter"></div>
                     )}
                     </>)}
                 </div>
               </div>
-            ))}
+            ))
+          )}
           </>
-        : null
-      }
+      )}
     </div>
   );
 };
