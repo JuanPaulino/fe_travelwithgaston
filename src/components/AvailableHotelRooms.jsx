@@ -196,11 +196,11 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                   {roomTypes.map((room, index) => (
                     <div 
                       key={index}
-                      className="flex-shrink-0 w-80 rounded-lg border border-neutral-lighter bg-white"
+                      className="flex-shrink-0 w-80 border border-neutral-lighter"
                       style={{ scrollSnapAlign: 'start' }}
                     >
                       {/* Imagen de la habitación */}
-                      <div className="relative h-64">
+                      <div className="relative">
                         <ImageCarousel images={room?.images || []} />
                         {/* Indicador de scroll para múltiples habitaciones */}
                         {roomTypes.length > 1 && (
@@ -246,7 +246,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                         {/* Botón para ver rates */}
                         <button
                           onClick={openRatesModal}
-                          className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                          className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors"
                         >
                           View Rates
                         </button>

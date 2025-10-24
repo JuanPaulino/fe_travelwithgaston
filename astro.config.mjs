@@ -31,7 +31,7 @@ export default defineConfig({
   env: {
     schema: {
       PUBLIC_API_URL: envField.string({ context: 'client', access: 'public' }),
-      STRIPE_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public' })
+      PUBLIC_STRIPE_PUBLISHABLE_KEY: envField.string({ context: 'client', access: 'public' })
     }
   }
 });
