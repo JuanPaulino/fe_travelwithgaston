@@ -57,7 +57,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   const hotel = hotelData;
   const session_id = hotel?.session_id;
   const roomTypes = hotel?.room_types || [];
-  console.log(roomTypes);
+  const lowestRate = hotel?.lowest_rate || null;
 
   // Función para manejar el clic en "Book now"
   const handleBookNow = (room, rate) => {
@@ -196,7 +196,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                   {roomTypes.map((room, index) => (
                     <div 
                       key={index}
-                      className="flex-shrink-0 w-80 border border-neutral-lighter"
+                      className="flex-shrink-0 w-96 border border-neutral-lighter"
                       style={{ scrollSnapAlign: 'start' }}
                     >
                       {/* Imagen de la habitación */}
@@ -242,7 +242,18 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                             </div>
                           )}
                         </div>
-                        
+                        <div className="text-center mb-6">
+                        {room.lowest_rate && (
+                            <div className="p-3">
+                              <p className="text-xl font-semibold text-neutral-darkest mb-2">
+                                <span className="text-lg">{getCurrencySymbol(room.lowest_rate.requested_currency_code)}</span> {formatPrice(room.lowest_rate.total_to_book_in_requested_currency)}
+                              </p>
+                              <p className="text-xs text-neutral-dark mb-1">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
+                              <div className="w-full h-0.5 bg-neutral-300 mb-1"></div>
+                              <p className="text-xs text-neutral-dark">Average per night {getCurrencySymbol(room.lowest_rate.requested_currency_code)} {formatPrice(room.lowest_rate.rate_in_requested_currency)} inc tax</p>
+                              </div>
+                            )}
+                          </div>
                         {/* Botón para ver rates */}
                         <button
                           onClick={openRatesModal}
