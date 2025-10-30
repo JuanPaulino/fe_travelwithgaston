@@ -110,7 +110,6 @@ function SearchAutocomplete({
     setSelectedIndex(-1)
     inputRef.current?.focus()
   }
-  console.log(showSuggestions)
   // Handle keyboard keys for navigation between columns
   const handleKeyDown = (e) => {
     if (!showSuggestions || suggestions.length === 0) return

@@ -19,7 +19,6 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     setChildrenAges,
     executeSearch 
   } = useSearchStore()
-  console.log('🔍 searchData', searchData)
   // Hook para parámetros de URL
   const { urlParams, updateUrl, buildSearchUrl } = useUrlParams()
 
@@ -42,7 +41,6 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
 
   // Función para autocompletar el formulario con datos externos
   const autocompleteForm = (sourceData) => {
-    console.log('🔗 Autocompletando formulario con datos:', sourceData);
     
     setSearchData({
       searchText: sourceData.destination || '',

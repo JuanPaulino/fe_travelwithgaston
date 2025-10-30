@@ -37,7 +37,6 @@ function SimpleSearchForm({
 
   // Función para autocompletar el formulario con datos externos
   const autocompleteForm = (sourceData) => {
-    console.log('🔗 Autocompletando formulario con datos:', sourceData);
     
     setSearchData({
       searchText: sourceData.destination || '',
