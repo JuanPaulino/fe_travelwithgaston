@@ -29,7 +29,6 @@ const Booking = ({ className = '' }) => {
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
   const { bookingData, updateCreditCard } = useBookingStore();
-  
   // Ref para prevenir múltiples requests concurrentes
   const isProcessingRef = useRef(false);
   
@@ -84,7 +83,6 @@ const Booking = ({ className = '' }) => {
   // Generar idempotency key cuando cambien los parámetros críticos
   useEffect(() => {
     const generateIdempotencyKey = async () => {
-      debugger;
       if (bookingData.hotel_id && bookingData.start_date && bookingData.end_date) {
         try {
           setIdempotencyKeyLoading(true);
@@ -94,7 +92,7 @@ const Booking = ({ className = '' }) => {
             bookingData.end_date
           );
           idempotencyKeyRef.current = key;
-          console.log('Idempotency key generated:', key);
+          // console.log('Idempotency key generated:', key);
         } catch (error) {
           console.error('Error generating idempotency key:', error);
           showError('Error generating booking key. Please try again.');
@@ -328,9 +326,11 @@ const Booking = ({ className = '' }) => {
             <div className="border-t border-gray-200 pt-4 mb-6">
               {/* Nombre de la habitación */}
               <h3 className="font-medium text-gray-800 mb-2">
-                Room: {bookingData.selected_room?.name || 'Room not specified'}
+                Room: {bookingData.selected_room.name}
               </h3>
-              
+              <h4 className="font-medium text-gray-800 mb-2">
+                {bookingData.selected_rate.title}
+              </h4>
               {/* Foto de la habitación */}
               {bookingData.selected_room?.images && bookingData.selected_room.images.length > 0 && (
                 <div className="mb-3">

@@ -61,7 +61,6 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
 
   // Función para manejar el clic en "Book now"
   const handleBookNow = (room, rate) => {
-    // Obtener datos del usuario (esto debería venir de un store de auth o similar)
     const userData = {
       name: user.firstName + ' ' + user.lastName,
       email: user.email,
@@ -123,7 +122,8 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   }
   const nights = calculateNights()
 
-  const openRatesModal = () => {
+  const openRatesModal = (roomIndex) => {
+    setSelectedRoomIndex(roomIndex);
     setShowRatesModal(true);
   };
 
@@ -256,7 +256,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                           </div>
                         {/* Botón para ver rates */}
                         <button
-                          onClick={openRatesModal}
+                          onClick={() => openRatesModal(index)}
                           className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors"
                         >
                           View Rates
@@ -364,22 +364,21 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                           <a href="/terms-and-conditions" className="text-sm text-neutral-light mt-1">Terms and conditions</a>
                         </div>
                         
-                        {/* Botón de reserva */}
-                        <button
-                          onClick={() => {
-                            const userData = {
-                              name: user.firstName + ' ' + user.lastName,
-                              email: user.email,
-                            };
-                            hotelData.hotel_address = parentHotelData.address;
-                            processBooking(hotelData, roomTypes[selectedRoomIndex], rate, searchData, userData);
-                            closeRatesModal();
-                            window.location.href = '/booking';
-                          }}
-                          className="w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-4 rounded-lg transition-colors text-base"
-                        >
-                          Book Now
-                        </button>
+                        {/* Botón de reserva/suscripción (misma lógica que desktop) */}
+                        {(() => {
+                          const buttonConfig = getButtonConfig();
+                          if (!buttonConfig) {
+                            return null; // No mostrar botón si no está autenticado
+                          }
+                          return (
+                            <button
+                              onClick={() => buttonConfig.onClick(roomTypes[selectedRoomIndex], rate)}
+                              className={buttonConfig.className}
+                            >
+                              {buttonConfig.text}
+                            </button>
+                          );
+                        })()}
                       </div>
                     ))}
                   </div>
