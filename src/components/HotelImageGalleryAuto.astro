@@ -115,6 +115,7 @@ const {
   const autoSlideIndicator = document.getElementById('auto-slide-indicator');
 
   // Funciones de navegación
+  // TODO: Revisar dado que recarga todas las imágenes de la página y crea un loop infinito de recarga de imágenes.
   const updateImage = (index) => {
     currentImageIndex = index;
     const image = images[index];
@@ -263,7 +264,7 @@ const {
   } else {
     startAutoSlide();
   }
-
+  console.log('Auto slide interval:', autoSlideInterval);
   // Limpiar timer cuando la página se descarga
   window.addEventListener('beforeunload', stopAutoSlide);
 </script>
