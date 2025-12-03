@@ -213,7 +213,7 @@ const formFields = {
     id: 'privacy',
     name: 'privacy',
     type: 'checkbox',
-    label: 'I have read and accept the Privacy Policy and data protection.',
+    label: 'I have read and accept the <a href="/privacy-policy" target="_blank" class="text-primary hover:underline">Privacy Policy</a> and data protection.',
     required: true,
     width: '100'
   }
@@ -405,27 +405,38 @@ const formFields = {
 
     // Function to show errors
     function showError(fieldName: string, message: string) {
-      const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+      const field = document.getElementById(`field-${fieldName}`) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
       const errorElement = document.getElementById(`${fieldName}-error`);
       
       if (field && errorElement) {
         field.setAttribute('aria-invalid', 'true');
         field.classList.add('border-red-500');
-        field.classList.remove('border-gray-300');
+        field.classList.remove('border-gray-300', 'border-neutral-darkest');
         errorElement.textContent = message;
         errorElement.classList.remove('hidden');
+      } else if (field && !errorElement) {
+        // Si no existe el elemento de error, crearlo dinámicamente
+        field.setAttribute('aria-invalid', 'true');
+        field.classList.add('border-red-500');
+        field.classList.remove('border-gray-300', 'border-neutral-darkest');
+        
+        const newErrorElement = document.createElement('p');
+        newErrorElement.id = `${fieldName}-error`;
+        newErrorElement.className = 'text-xs text-red-600 mt-1';
+        newErrorElement.textContent = message;
+        field.parentElement?.appendChild(newErrorElement);
       }
     }
 
     // Function to clear errors
     function clearError(fieldName: string) {
-      const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+      const field = document.getElementById(`field-${fieldName}`) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
       const errorElement = document.getElementById(`${fieldName}-error`);
       
       if (field && errorElement) {
         field.setAttribute('aria-invalid', 'false');
         field.classList.remove('border-red-500');
-        field.classList.add('border-gray-300');
+        field.classList.add('border-neutral-darkest');
         errorElement.classList.add('hidden');
       }
     }
@@ -438,8 +449,8 @@ const formFields = {
 
     // Function to validate dates
     function validateDates() {
-      const startDateField = document.getElementById('start-date') as HTMLInputElement | null;
-      const endDateField = document.getElementById('end-date') as HTMLInputElement | null;
+      const startDateField = document.getElementById('field-start-date') as HTMLInputElement | null;
+      const endDateField = document.getElementById('field-end-date') as HTMLInputElement | null;
       
       if (!startDateField || !endDateField) return true;
       
@@ -452,6 +463,8 @@ const formFields = {
         
         if (end <= start) {
           showError('end-date', 'End date must be after start date');
+          endDateField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          endDateField.focus();
           return false;
         }
       }
@@ -461,30 +474,43 @@ const formFields = {
     // Function to validate required fields
     function validateRequiredFields() {
       const requiredFields = [
-        'companyName', 'contactPerson', 'email', 'phone'
+        'company-name', 'contact-person', 'email', 'phone'
       ];
       
       let isValid = true;
+      let firstErrorField: HTMLElement | null = null;
       
       requiredFields.forEach(fieldName => {
-        const field = document.getElementById(fieldName) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+        const field = document.getElementById(`field-${fieldName}`) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
         if (!field) return;
         
         if (!field.value.trim()) {
           showError(fieldName, 'This field is required');
           isValid = false;
+          if (!firstErrorField) {
+            firstErrorField = field;
+          }
         } else {
           clearError(fieldName);
         }
       });
       
       // Validate privacy checkbox
-      const privacyCheckbox = document.getElementById('privacy') as HTMLInputElement | null;
+      const privacyCheckbox = document.getElementById('field-privacy') as HTMLInputElement | null;
       if (privacyCheckbox && !privacyCheckbox.checked) {
         showError('privacy', 'You must accept the privacy policy');
         isValid = false;
+        if (!firstErrorField) {
+          firstErrorField = privacyCheckbox;
+        }
       } else if (privacyCheckbox) {
         clearError('privacy');
+      }
+      
+      // Scroll to first error field
+      if (!isValid && firstErrorField) {
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        firstErrorField.focus();
       }
       
       return isValid;
@@ -492,9 +518,11 @@ const formFields = {
 
     // Function to validate email
     function validateEmail() {
-      const emailField = document.getElementById('email') as HTMLInputElement | null;
+      const emailField = document.getElementById('field-email') as HTMLInputElement | null;
       if (emailField && emailField.value && !isValidEmail(emailField.value)) {
         showError('email', 'Please enter a valid email address');
+        emailField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        emailField.focus();
         return false;
       }
       return true;
@@ -697,6 +725,9 @@ const formFields = {
         statusMessage.textContent = 'Please correct the errors before submitting.';
         statusMessage.className = 'mt-4 p-4 rounded-md bg-red-100 text-red-800 border border-red-200';
         statusMessage.classList.remove('hidden');
+        
+        // El scroll al primer campo con error ya se hace en validateRequiredFields()
+        // Aquí solo mostramos el mensaje general
       }
     });
   });

@@ -256,7 +256,7 @@ export default function AirportInquiryForm() {
         <label className="flex items-start">
           <input type="checkbox" name="privacy" required className="mt-1 mr-2" />
           <span className="text-sm text-gray-700">
-            I have read and accept the Privacy Policy and data protection.{' '}
+            I have read and accept the <a href="/privacy-policy" target="_blank" className="text-primary hover:underline">Privacy Policy</a> and data protection.{' '}
             <span className="text-red-500">*</span>
           </span>
         </label>

@@ -130,7 +130,7 @@ const { field, value = '', error, onChange = '() => {}' } = Astro.props;
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? `${field.name}-error` : undefined}
         />
-        <span class="text-sm text-neutral-darkest">{field.label}</span>
+        <span class="text-sm text-neutral-darkest" set:html={field.label}></span>
       </label>
     )}
 
