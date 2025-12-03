@@ -5,6 +5,7 @@ import { useBookingStore } from '../stores/useBookingStore.js'
 import { useAuth } from '../lib/useAuth.js'
 import MembershipCard from './MembershipCard.jsx'
 import currencies from '../data/currencies.json'
+import { calculateNights } from '../lib/dateUtils.js'
 
 const AvailableHotelRooms = ({ parentHotelData }) => {
   const { searchData, executeSearch } = useSearchStore();
@@ -111,16 +112,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
     return Number(price).toLocaleString('en-US');
   };
 
-  const calculateNights = () => {
-    // Usar checkInDate y checkOutDate del searchData, no checkin/checkout
-    if (!searchData?.checkInDate || !searchData?.checkOutDate) return 1
-    const checkinDate = new Date(searchData.checkInDate)
-    const checkoutDate = new Date(searchData.checkOutDate)
-    const diffTime = Math.abs(checkoutDate - checkinDate)
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays || 1
-  }
-  const nights = calculateNights()
+  const nights = calculateNights(searchData?.checkInDate, searchData?.checkOutDate)
 
   const openRatesModal = (roomIndex) => {
     setSelectedRoomIndex(roomIndex);

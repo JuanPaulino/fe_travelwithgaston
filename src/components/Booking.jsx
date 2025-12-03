@@ -4,6 +4,7 @@ import { useBookingStore, bookingStore } from '../stores/useBookingStore';
 import { bookingAPI, handleAPIError } from '../lib/http';
 import { showSuccess, showError } from '../stores/bannerStore';
 import CreditCardForm from './CreditCardForm';
+import { calculateNights } from '../lib/dateUtils';
 
 // Función para obtener idempotency key del backend
 const getBookingIdempotencyKey = async (hotelId, checkIn, checkOut) => {
@@ -35,6 +36,9 @@ const Booking = ({ className = '' }) => {
   // Ref para el idempotency key - se obtiene del backend
   const idempotencyKeyRef = useRef(null);
   const [idempotencyKeyLoading, setIdempotencyKeyLoading] = useState(false);
+
+  // Calcular número de noches
+  const nights = calculateNights(bookingData?.start_date, bookingData?.end_date);
 
   useEffect(() => {
     const checkAccess = () => {
@@ -309,7 +313,7 @@ const Booking = ({ className = '' }) => {
               <p className="text-gray-600 font-bold text-sm mb-2">
                 {bookingData.selected_rate.requested_currency_code} {bookingData.selected_rate.total_to_book_in_requested_currency}
               </p>
-              <p className="text-gray-600 text-sm mb-2">Total for 4 nights inc tax</p>
+              <p className="text-gray-600 text-sm mb-2">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
               <div className='w-full h-0.5 bg-neutral-200 mb-2'></div>
               <p className="text-gray-600 text-sm mb-2">Average per night inc tax {bookingData.selected_rate.requested_currency_code} {bookingData.selected_rate.rate_in_requested_currency}</p>
               

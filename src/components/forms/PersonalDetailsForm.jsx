@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import countryCodes from '../../data/countryCodes.json';
 
 const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -18,14 +19,6 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
       setFormData(prev => ({ ...prev, ...initialData }));
     }
   }, [initialData]);
-
-  const countryCodes = [
-    { code: '+44', country: 'United Kingdom' },
-    { code: '+34', country: 'Spain' },
-    { code: '+1', country: 'United States' },
-    { code: '+33', country: 'France' },
-    { code: '+49', country: 'Germany' }
-  ];
 
   const validateForm = () => {
     const newErrors = {};
@@ -184,7 +177,7 @@ const PersonalDetailsForm = ({ initialData = {}, onUpdate }) => {
               required
             >
               {countryCodes.map((country) => (
-                <option key={country.code} value={country.code}>
+                <option key={country.iso} value={country.code}>
                   {country.code} {country.country}
                 </option>
               ))}

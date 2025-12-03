@@ -130,19 +130,19 @@ const CreditCardForm = ({ onCreditCardChange, className = '' }) => {
     const newErrors = {};
 
     if (!formData.number || !validateCardNumber(formData.number)) {
-      newErrors.number = 'Número de tarjeta inválido';
+      newErrors.number = 'Invalid card number';
     }
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Nombre del titular es requerido';
+      newErrors.name = 'Cardholder name is required';
     }
 
     if (!formData.cvc || !validateCVC(formData.cvc, formData.brand_name)) {
-      newErrors.cvc = 'CVC inválido';
+      newErrors.cvc = 'Invalid CVC';
     }
 
     if (!formData.exp_month || !formData.exp_year || !validateExpiration(formData.exp_month, formData.exp_year)) {
-      newErrors.expiration = 'Fecha de expiración inválida';
+      newErrors.expiration = 'Invalid expiration date';
     }
 
     setErrors(newErrors);
