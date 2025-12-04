@@ -40,8 +40,25 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
     }
   }, [urlParams])
 
+  // Función para obtener fechas por defecto
+  const getDefaultDates = () => {
+    // Check-in: hoy
+    const checkInDate = new Date()
+    
+    // Check-out: mañana (hoy + 1 día)
+    const checkOutDate = new Date()
+    checkOutDate.setDate(checkOutDate.getDate() + 1)
+    
+    return {
+      checkIn: checkInDate.toISOString().split('T')[0],
+      checkOut: checkOutDate.toISOString().split('T')[0]
+    }
+  }
+
   // Función para autocompletar el formulario con datos externos
   const autocompleteForm = (sourceData) => {
+    // Obtener fechas por defecto usando la lógica de 13:00 PM
+    const defaultDates = getDefaultDates();
     
     setSearchData({
       searchText: sourceData.destination || '',
@@ -49,16 +66,8 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
       selectedDestinationText: sourceData.destination || '',
       selectedDestinationType: sourceData.destinationType || 'hotel',
       selectedDestinationLocation: sourceData.destinationLocation || '',
-      checkInDate: sourceData.checkIn || (() => {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        return tomorrow.toISOString().split('T')[0];
-      })(),
-      checkOutDate: sourceData.checkOut || (() => {
-        const dayAfterTomorrow = new Date();
-        dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-        return dayAfterTomorrow.toISOString().split('T')[0];
-      })(),
+      checkInDate: sourceData.checkIn || defaultDates.checkIn,
+      checkOutDate: sourceData.checkOut || defaultDates.checkOut,
       rooms: parseInt(sourceData.rooms) || 1,
       adults: parseInt(sourceData.adults) || 2,
       children: parseInt(sourceData.children) || 0,
@@ -268,9 +277,9 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
 
   // Función específica para campos de fechas y huéspedes
   const shouldShowDateAndGuestValues = () => {
-    return (Object.keys(urlParams).length > 0 && urlParams.destinationId) || 
-           (searchData.selectedDestinationId && typeof searchData.selectedDestinationId === 'string' && searchData.selectedDestinationId.trim().length > 0) ||
-           showAdditionalFields;
+    // Solo mostrar valores del store cuando vienen de URL params
+    // Nunca autocompletar desde el store (localStorage)
+    return (Object.keys(urlParams).length > 0 && urlParams.destinationId);
   }
 
   // Manejar cuando el formulario se vuelve activo
@@ -309,8 +318,23 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   }
 
   // Función específica para obtener valor de campos de fechas y huéspedes
-  const getDateAndGuestValue = (storeValue, emptyValue = '') => {
-    return shouldShowDateAndGuestValues() ? storeValue : emptyValue;
+  const getDateAndGuestValue = (storeValue, emptyValue = '', fieldType = '') => {
+    // Si hay URL params, usar los valores del store (que fueron poblados desde la URL)
+    if (shouldShowDateAndGuestValues()) {
+      return storeValue;
+    }
+    
+    // Si no hay URL params, usar valores por defecto en lugar del store
+    // Para fechas, usar la lógica de 13:00 PM
+    if (fieldType === 'checkIn') {
+      return getDefaultDates().checkIn;
+    }
+    if (fieldType === 'checkOut') {
+      return getDefaultDates().checkOut;
+    }
+    
+    // Para otros campos (guests), usar valores por defecto
+    return emptyValue;
   }
 
   // Función para hacer scroll a los resultados en móvil
@@ -436,8 +460,8 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
             }`}>
               {/* Fechas - Date Range Picker */}
               <DateRangePicker
-                startDate={getDateAndGuestValue(searchData.checkInDate)}
-                endDate={getDateAndGuestValue(searchData.checkOutDate)}
+                startDate={getDateAndGuestValue(searchData.checkInDate, '', 'checkIn')}
+                endDate={getDateAndGuestValue(searchData.checkOutDate, '', 'checkOut')}
                 onStartDateChange={setCheckInDate}
                 onEndDateChange={setCheckOutDate}
                 disabled={disabled}
@@ -539,8 +563,8 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
 
             {/* Selector de fechas - Date Range Picker */}
             <DateRangePicker
-              startDate={getDateAndGuestValue(searchData.checkInDate)}
-              endDate={getDateAndGuestValue(searchData.checkOutDate)}
+              startDate={getDateAndGuestValue(searchData.checkInDate, '', 'checkIn')}
+              endDate={getDateAndGuestValue(searchData.checkOutDate, '', 'checkOut')}
               onStartDateChange={setCheckInDate}
               onEndDateChange={setCheckOutDate}
               disabled={disabled}
