@@ -1,0 +1,359 @@
+/* 
+ * Estilos de rsuite aislados solo para el DateRangePicker
+ * Solo afectan elementos con clases rs-* para evitar conflictos con otros estilos
+ */
+
+/* ===== RESET BÁSICO SOLO PARA RSUITE ===== */
+.rs-picker *,
+.rs-picker-menu *,
+.rs-calendar * {
+  box-sizing: border-box;
+}
+
+/* ===== PICKER BASE ===== */
+.rs-picker {
+  position: relative;
+  display: inline-block;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.rs-picker-block {
+  display: block;
+  width: 100%;
+}
+
+.rs-picker-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  width: 100%;
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rs-picker-toggle:not(.rs-picker-toggle-disabled):hover {
+  border-color: #d1d5db;
+}
+
+.rs-picker-toggle-active,
+.rs-picker-toggle-open {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.rs-picker-toggle-disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background-color: #f9fafb;
+}
+
+.rs-picker-toggle-textbox {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.rs-picker-toggle-value,
+.rs-picker-toggle-placeholder {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #111827;
+}
+
+.rs-picker-toggle-placeholder {
+  color: #9ca3af;
+}
+
+.rs-picker-toggle-caret {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.rs-picker-toggle-clean {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  cursor: pointer;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.rs-picker-toggle-clean:hover {
+  color: #6b7280;
+}
+
+.rs-picker-has-value .rs-picker-toggle-clean {
+  display: inline-flex;
+}
+
+.rs-picker:not(.rs-picker-has-value) .rs-picker-toggle-clean {
+  display: none;
+}
+
+/* ===== DROPDOWN/MENU ===== */
+.rs-picker-menu {
+  position: absolute !important;
+  z-index: 1050 !important;
+  margin-top: 4px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.rs-picker-daterange-menu {
+  display: flex;
+  padding: 16px;
+  min-width: 320px;
+}
+
+.rs-picker-daterange-panel {
+  flex: 1;
+}
+
+.rs-picker-daterange-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 12px;
+}
+
+.rs-picker-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px 0 0 0;
+  border-top: 1px solid #f3f4f6;
+  margin-top: 12px;
+}
+
+.rs-picker-toolbar-right {
+  display: flex;
+  gap: 8px;
+}
+
+.rs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rs-btn:hover {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.rs-btn-primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+}
+
+.rs-btn-primary:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.rs-btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== CALENDAR ===== */
+.rs-calendar {
+  display: inline-block;
+  user-select: none;
+  font-family: inherit;
+}
+
+.rs-calendar-view {
+  padding: 8px;
+}
+
+.rs-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.rs-calendar-header-title {
+  flex: 1;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  color: #111827;
+  cursor: pointer;
+}
+
+.rs-calendar-header-title:hover {
+  color: #3b82f6;
+}
+
+.rs-calendar-header-backward,
+.rs-calendar-header-forward {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  border-radius: 6px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+.rs-calendar-header-backward:hover,
+.rs-calendar-header-forward:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* ===== TABLA DEL CALENDARIO ===== */
+.rs-calendar-table {
+  width: 100%;
+  table-layout: fixed;
+  border-spacing: 0;
+  border-collapse: separate;
+}
+
+.rs-calendar-table-row {
+  display: table-row;
+}
+
+.rs-calendar-table-header-row {
+  display: table-row;
+}
+
+.rs-calendar-table-cell,
+.rs-calendar-table-header-cell {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  padding: 4px;
+}
+
+.rs-calendar-table-header-cell {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  padding: 8px 4px;
+}
+
+.rs-calendar-table-cell-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #374151;
+  font-weight: 400;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.rs-calendar-table-cell-content:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+/* Estados de las celdas */
+.rs-calendar-table-cell-selected .rs-calendar-table-cell-content {
+  background-color: #3b82f6 !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.rs-calendar-table-cell-in-range .rs-calendar-table-cell-content {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.rs-calendar-table-cell-disabled .rs-calendar-table-cell-content {
+  color: #d1d5db;
+  cursor: not-allowed;
+  background-color: transparent;
+}
+
+.rs-calendar-table-cell-disabled .rs-calendar-table-cell-content:hover {
+  background-color: transparent;
+}
+
+.rs-calendar-table-cell-is-today .rs-calendar-table-cell-content {
+  border: 2px solid #3b82f6;
+  font-weight: 500;
+}
+
+.rs-calendar-table-cell-un-same-month .rs-calendar-table-cell-content {
+  color: #d1d5db;
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes rs-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rs-anim-fade {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.rs-anim-in {
+  animation: rs-fade-in 0.3s ease-out;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .rs-calendar-table-cell-content {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+  
+  .rs-picker-daterange-menu {
+    min-width: 280px;
+    padding: 12px;
+  }
+}
+
+/* ===== PORTAL / OVERLAY ===== */
+body > .rs-picker-menu {
+  z-index: 9999 !important;
+}

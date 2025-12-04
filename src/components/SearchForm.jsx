@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import SearchAutocomplete from './SearchAutocomplete.jsx'
 import GuestSelector from './common/GuestSelector.jsx'
+import DateRangePicker from './common/DateRangePicker.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 import { useUrlParams } from '../hooks/useUrlParams.js'
 import { useDebounce } from '../hooks/useDebounce.js'
@@ -433,52 +434,14 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                 ? 'max-h-[1000px] opacity-100' 
                 : 'max-h-0 opacity-0'
             }`}>
-              {/* Fechas - Check In y Check Out en la misma fila para móvil */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Check In */}
-                <div className="w-full">
-                  <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide flex items-center gap-2">
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>CHECK IN</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
-                    <input
-                      type="date"
-                      value={getDateAndGuestValue(searchData.checkInDate)}
-                      onChange={(e) => setCheckInDate(e.target.value)}
-                      disabled={disabled}
-                      className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
-                      min={(() => {
-                        const tomorrow = new Date();
-                        tomorrow.setDate(tomorrow.getDate() + 1);
-                        return tomorrow.toISOString().split('T')[0];
-                      })()}
-                    />
-                  </div>
-                </div>
-
-                {/* Check Out */}
-                <div className="w-full">
-                  <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide flex items-center gap-2">
-                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span>CHECK OUT</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white">
-                    <input
-                      type="date"
-                      value={getDateAndGuestValue(searchData.checkOutDate)}
-                      onChange={(e) => setCheckOutDate(e.target.value)}
-                      disabled={disabled}
-                      className="border-0 p-0 focus:ring-0 text-sm font-medium text-gray-900 bg-transparent cursor-pointer flex-1"
-                      min={minCheckOutDate}
-                    />
-                  </div>
-                </div>
-              </div>
+              {/* Fechas - Date Range Picker */}
+              <DateRangePicker
+                startDate={getDateAndGuestValue(searchData.checkInDate)}
+                endDate={getDateAndGuestValue(searchData.checkOutDate)}
+                onStartDateChange={setCheckInDate}
+                onEndDateChange={setCheckOutDate}
+                disabled={disabled}
+              />
 
               {/* Selector de huéspedes - 100% */}
               <div className="w-full relative" ref={dropdownRef} data-dropdown="guests">
@@ -574,45 +537,14 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
               </div>
             </div>
 
-            {/* Selector de fechas - Check In */}
-            <div className="p-6 flex-0">
-              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK IN</div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <input
-                  type="date"
-                  value={getDateAndGuestValue(searchData.checkInDate)}
-                  onChange={(e) => setCheckInDate(e.target.value)}
-                  disabled={disabled}
-                  className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 bg-transparent cursor-pointer"
-                  min={(() => {
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    return tomorrow.toISOString().split('T')[0];
-                  })()}
-                />
-              </div>
-            </div>
-
-            {/* Selector de fechas - Check Out */}
-            <div className="p-6 flex-0">
-              <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK OUT</div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <input
-                  type="date"
-                  value={getDateAndGuestValue(searchData.checkOutDate)}
-                  onChange={(e) => setCheckOutDate(e.target.value)}
-                  disabled={disabled}
-                  className="border-0 p-0 focus:ring-0 text-base font-medium text-gray-900 bg-transparent cursor-pointer"
-                  min={minCheckOutDate}
-                />
-              </div>
-            </div>
+            {/* Selector de fechas - Date Range Picker */}
+            <DateRangePicker
+              startDate={getDateAndGuestValue(searchData.checkInDate)}
+              endDate={getDateAndGuestValue(searchData.checkOutDate)}
+              onStartDateChange={setCheckInDate}
+              onEndDateChange={setCheckOutDate}
+              disabled={disabled}
+            />
 
             {/* Selector de huéspedes */}
             <div className="relative p-6" ref={dropdownRef} data-dropdown="guests">
