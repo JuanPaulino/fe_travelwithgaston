@@ -256,6 +256,9 @@
 .rdp-range_end {
   background: var(--color-primary-dark, #A48238) !important;
 }
+.rdp-day_button {
+  color: black !important;
+}
 .rdp-range_end .rdp-day_button, .rdp-range_start .rdp-day_button {
   background-color: var(--color-primary-dark, #A48238) !important;
   color: white !important;
