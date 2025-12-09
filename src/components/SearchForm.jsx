@@ -324,16 +324,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
       return storeValue;
     }
     
-    // Si no hay URL params, usar valores por defecto en lugar del store
-    // Para fechas, usar la lógica de 13:00 PM
-    if (fieldType === 'checkIn') {
-      return getDefaultDates().checkIn;
-    }
-    if (fieldType === 'checkOut') {
-      return getDefaultDates().checkOut;
-    }
-    
-    // Para otros campos (guests), usar valores por defecto
+    // Si no hay URL params, NO autocompletar nada - dejar campos vacíos
     return emptyValue;
   }
 

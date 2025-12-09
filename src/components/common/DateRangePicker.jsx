@@ -17,9 +17,25 @@ function DateRangePicker({
   const [focusedInput, setFocusedInput] = useState('startDate') // 'startDate' o 'endDate'
   const containerRef = useRef(null)
 
-  // Parsear las fechas si son strings
-  const parsedStartDate = startDate ? (typeof startDate === 'string' ? new Date(startDate) : startDate) : null
-  const parsedEndDate = endDate ? (typeof endDate === 'string' ? new Date(endDate) : endDate) : null
+  // Estado local para las fechas (fuente de verdad)
+  const [localStartDate, setLocalStartDate] = useState(null)
+  const [localEndDate, setLocalEndDate] = useState(null)
+
+  // Sincronizar con props del padre cuando vienen predefinidas
+  useEffect(() => {
+    if (startDate) {
+      const parsedDate = typeof startDate === 'string' ? new Date(startDate) : startDate
+      setLocalStartDate(parsedDate)
+    }
+    if (endDate) {
+      const parsedDate = typeof endDate === 'string' ? new Date(endDate) : endDate
+      setLocalEndDate(parsedDate)
+    }
+  }, [startDate, endDate])
+
+  // Parsear las fechas si son strings - USANDO ESTADO LOCAL
+  const parsedStartDate = localStartDate ? (typeof localStartDate === 'string' ? new Date(localStartDate) : localStartDate) : null
+  const parsedEndDate = localEndDate ? (typeof localEndDate === 'string' ? new Date(localEndDate) : localEndDate) : null
 
   // Cerrar al hacer clic fuera
   useEffect(() => {
@@ -49,32 +65,36 @@ function DateRangePicker({
     return format(parsedDate, 'yyyy-MM-dd')
   }
 
-  // Manejar selección de fecha
-  const handleDayClick = (date) => {
-    if (!date) return
+  // Manejar selección de fecha - usando onSelect de DayPicker range mode
+  const handleRangeSelect = (range) => {
+    if (!range) {
+      // Si no hay rango, limpiar las fechas - ESTADO LOCAL Y EMITIR AL PADRE
+      setLocalStartDate(null)
+      setLocalEndDate(null)
+      onStartDateChange('')
+      onEndDateChange('')
+      return
+    }
 
-    const clickedDate = startOfDay(date)
+    const { from, to } = range
 
-    if (focusedInput === 'startDate') {
-      // Si estamos seleccionando check-in
-      onStartDateChange(formatDateForInput(clickedDate))
+    if (from) {
+      // Actualizar estado local
+      const formattedFrom = startOfDay(from)
+      setLocalStartDate(formattedFrom)
+      // Emitir al padre
+      onStartDateChange(formatDateForInput(formattedFrom))
+    }
+
+    if (to) {
+      // Actualizar estado local
+      const formattedTo = startOfDay(to)
+      setLocalEndDate(formattedTo)
+      // Emitir al padre
+      onEndDateChange(formatDateForInput(formattedTo))
       
-      // Si ya hay un check-out y es anterior al nuevo check-in, lo actualizamos
-      if (parsedEndDate && isBefore(parsedEndDate, clickedDate)) {
-        onEndDateChange(formatDateForInput(addDays(clickedDate, 1)))
-      }
-      
-      // Cambiar el foco a check-out
-      setFocusedInput('endDate')
-    } else {
-      // Si estamos seleccionando check-out
-      if (parsedStartDate && isBefore(clickedDate, parsedStartDate)) {
-        // Si la fecha seleccionada es anterior al check-in, establecerla como check-in
-        onStartDateChange(formatDateForInput(clickedDate))
-        setFocusedInput('endDate')
-      } else {
-        onEndDateChange(formatDateForInput(clickedDate))
-        // Cerrar el calendario después de seleccionar check-out
+      // Solo cerrar el calendario si from y to son diferentes
+      if (from && to.getTime() !== from.getTime()) {
         setTimeout(() => setIsOpen(false), 200)
       }
     }
@@ -96,83 +116,67 @@ function DateRangePicker({
     from: parsedStartDate,
     to: parsedEndDate
   } : parsedStartDate ? {
-    from: parsedStartDate,
-    to: parsedStartDate
+    from: parsedStartDate
   } : undefined
 
   return (
     <div className={`relative ${className}`} ref={containerRef}>
-      {/* Desktop Layout */}
-      <div className="hidden lg:flex items-stretch divide-x divide-gray-200">
-        {/* Check In */}
-        <div 
-          className={`p-6 cursor-pointer transition-colors hover:bg-gray-50 ${focusedInput === 'startDate' && isOpen ? 'bg-gray-50' : ''}`}
-          onClick={() => handleInputClick('startDate')}
-        >
-          <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK IN</div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+      {/* Desktop Layout - Campo Unificado */}
+      <div 
+        className={`hidden lg:block p-6 cursor-pointer transition-colors hover:bg-gray-50 ${isOpen ? 'bg-gray-50' : ''}`}
+        onClick={() => handleInputClick('startDate')}
+      >
+        <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK IN - CHECK OUT</div>
+        <div className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          {parsedStartDate && parsedEndDate ? (
             <span className="text-base font-medium text-gray-900">
-              {parsedStartDate ? formatDate(parsedStartDate) : 'Select date'}
+              {formatDate(parsedStartDate)} - {formatDate(parsedEndDate)}
             </span>
-          </div>
-        </div>
-
-        {/* Check Out */}
-        <div 
-          className={`p-6 cursor-pointer transition-colors hover:bg-gray-50 ${focusedInput === 'endDate' && isOpen ? 'bg-gray-50' : ''}`}
-          onClick={() => handleInputClick('endDate')}
-        >
-          <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">CHECK OUT</div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+          ) : parsedStartDate ? (
             <span className="text-base font-medium text-gray-900">
-              {parsedEndDate ? formatDate(parsedEndDate) : 'Select date'}
+              {formatDate(parsedStartDate)} <span className="text-gray-400">- Select checkout</span>
             </span>
-          </div>
+          ) : (
+            <span className="text-base font-medium text-gray-400">
+              Select dates
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Mobile Layout */}
-      <div className="grid grid-cols-2 gap-4 lg:hidden">
-        {/* Check In Mobile */}
-        <div className="w-full">
-          <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide flex items-center gap-2">
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>CHECK IN</span>
-          </div>
-          <div 
-            className={`flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white cursor-pointer transition-colors hover:bg-gray-50 ${focusedInput === 'startDate' && isOpen ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => handleInputClick('startDate')}
-          >
-            <span className="text-sm font-medium text-gray-900 flex-1">
-              {parsedStartDate ? formatDate(parsedStartDate) : 'Select date'}
-            </span>
-          </div>
+      {/* Mobile Layout - Campo Unificado */}
+      <div className="w-full lg:hidden">
+        <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide flex items-center gap-2">
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span>CHECK IN - CHECK OUT</span>
         </div>
-
-        {/* Check Out Mobile */}
-        <div className="w-full">
-          <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide flex items-center gap-2">
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <span>CHECK OUT</span>
+        <div 
+          className={`flex items-center justify-between gap-3 p-3 border border-gray-200 rounded-lg bg-white cursor-pointer transition-colors hover:bg-gray-50 ${isOpen ? 'ring-2 ring-primary' : ''}`}
+          onClick={() => handleInputClick('startDate')}
+        >
+          <div className="flex-1 flex items-center gap-2">
+            {parsedStartDate && parsedEndDate ? (
+              <span className="text-sm font-medium text-gray-900">
+                {formatDate(parsedStartDate)} - {formatDate(parsedEndDate)}
+              </span>
+            ) : parsedStartDate ? (
+              <span className="text-sm font-medium text-gray-900">
+                {formatDate(parsedStartDate)} - Select checkout
+              </span>
+            ) : (
+              <span className="text-sm font-medium text-gray-400">
+                Select dates
+              </span>
+            )}
           </div>
-          <div 
-            className={`flex items-center gap-2 p-3 border border-gray-200 rounded-lg bg-white cursor-pointer transition-colors hover:bg-gray-50 ${focusedInput === 'endDate' && isOpen ? 'ring-2 ring-primary' : ''}`}
-            onClick={() => handleInputClick('endDate')}
-          >
-            <span className="text-sm font-medium text-gray-900 flex-1">
-              {parsedEndDate ? formatDate(parsedEndDate) : 'Select date'}
-            </span>
-          </div>
+          <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
       </div>
 
@@ -203,7 +207,7 @@ function DateRangePicker({
             <DayPicker
               mode="range"
               selected={selectedRange}
-              onDayClick={handleDayClick}
+              onSelect={handleRangeSelect}
               disabled={disabledDays}
               numberOfMonths={typeof window !== 'undefined' && window.innerWidth >= 1024 ? 2 : 1}
               defaultMonth={parsedStartDate || minDate}
@@ -217,6 +221,10 @@ function DateRangePicker({
             <button
               type="button"
               onClick={() => {
+                // ESTADO LOCAL
+                setLocalStartDate(null)
+                setLocalEndDate(null)
+                // EMITIR AL PADRE
                 onStartDateChange('')
                 onEndDateChange('')
                 setFocusedInput('startDate')
