@@ -2,11 +2,13 @@ import React, { useRef, useEffect, useState } from 'react'
 import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 import { useAuth } from '../lib/useAuth.js'
+import { useUrlParams } from '../hooks/useUrlParams.js'
 import currencies from '../data/currencies.json'
 
 function HotelAvailabilityCard({ hotelData, rooms }) {
   const { setSelectedDestination, searchData } = useSearchStore()
   const { isAuthenticated } = useAuth()
+  const { buildSearchUrl } = useUrlParams()
   const [isVisible, setIsVisible] = useState(false)
   const cardRef = useRef(null)
 
@@ -64,14 +66,15 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
 
   // Función para navegar al hotel
   const handleViewHotel = () => {
-    // TODO: necesitamos modificar el valor en el store de selectedDestinationType por hotel selectedDestinationId por el id del hotel
+    // Actualizar el destino seleccionado en el store
     setSelectedDestination({
       type: 'hotel',
       id: hotel.id,
       text: hotel.name,
       location: hotel.location,
     })
-    window.location.href = `/hotels/${hotel.id}`
+    // Construir URL con parámetros de búsqueda y redirigir
+    window.location.href = `/hotels/${hotel.id}${buildSearchUrl(searchData)}`
   }
 
   // Función para manejar clic en imagen
@@ -185,7 +188,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
                   
                   <button 
                     onClick={handleViewHotel}
-                    className="bg-primary text-white px-6 py-2 font-medium transition-colors pointer"
+                    className="bg-primary text-white px-6 py-2 font-medium transition-colors cursor-pointer"
                   >
                     View hotel
                   </button>
@@ -200,7 +203,7 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
                   </div>
                   <button 
                     onClick={handleViewHotel}
-                    className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg font-medium transition-colors pointer"
+                    className="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg font-medium transition-colors cursor-pointer"
                   >
                     View details
                   </button>

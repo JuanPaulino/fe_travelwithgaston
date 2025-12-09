@@ -173,7 +173,7 @@ function HotelCard({ hotelData }) {
           <div className="mt-4 align-self-end">
             <button 
               onClick={handleViewHotel}
-              className="bg-primary text-white px-6 py-2 font-medium transition-colors pointer w-full"
+              className="bg-primary text-white px-6 py-2 font-medium transition-colors cursor-pointer w-full"
             >
               View hotel
             </button>
