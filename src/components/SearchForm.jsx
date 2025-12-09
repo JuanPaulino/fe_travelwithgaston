@@ -534,7 +534,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
           {/* Layout Desktop - Horizontal */}
           <div className="hidden lg:flex items-stretch divide-x divide-gray-200">
             {/* Campo de destino */}
-            <div className="flex-1 p-6">
+            <div className="flex-2/4 p-6">
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
               <div className="flex items-center gap-2">
                 <SearchAutocomplete
@@ -551,18 +551,19 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                 />
               </div>
             </div>
-
-            {/* Selector de fechas - Date Range Picker */}
-            <DateRangePicker
-              startDate={getDateAndGuestValue(searchData.checkInDate, '', 'checkIn')}
-              endDate={getDateAndGuestValue(searchData.checkOutDate, '', 'checkOut')}
-              onStartDateChange={setCheckInDate}
-              onEndDateChange={setCheckOutDate}
-              disabled={disabled}
-            />
+            <div className="flex-1/4">
+              {/* Selector de fechas - Date Range Picker */}
+              <DateRangePicker
+                startDate={getDateAndGuestValue(searchData.checkInDate, '', 'checkIn')}
+                endDate={getDateAndGuestValue(searchData.checkOutDate, '', 'checkOut')}
+                onStartDateChange={setCheckInDate}
+                onEndDateChange={setCheckOutDate}
+                disabled={disabled}
+              />
+            </div>
 
             {/* Selector de huéspedes */}
-            <div className="relative p-6" ref={dropdownRef} data-dropdown="guests">
+            <div className="relative p-6 flex-1/4 cursor-pointer transition-colors hover:bg-gray-50" ref={dropdownRef} data-dropdown="guests">
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
               <button
                 type="button"
