@@ -461,11 +461,9 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
               {/* Selector de huéspedes - 100% */}
               <div className="w-full relative" ref={dropdownRef} data-dropdown="guests">
                 <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
-                <button
-                  type="button"
-                  onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
-                  disabled={disabled}
-                  className="w-full flex items-center justify-between gap-2 text-base font-medium text-gray-900 p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+                <div
+                  onClick={() => !disabled && setShowGuestsDropdown(!showGuestsDropdown)}
+                  className="w-full flex items-center justify-between gap-2 text-base font-medium text-gray-900 p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors cursor-pointer"
                 >
                   <span>
                     {shouldShowDateAndGuestValues() 
@@ -476,7 +474,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
-                </button>
+                </div>
 
                 {/* Dropdown de huéspedes para móvil */}
                 {showGuestsDropdown && (
@@ -563,21 +561,21 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
             </div>
 
             {/* Selector de huéspedes */}
-            <div className="relative p-6 flex-1/4 cursor-pointer transition-colors hover:bg-gray-50" ref={dropdownRef} data-dropdown="guests">
+            <div 
+              className="relative p-6 flex-1/4 cursor-pointer transition-colors hover:bg-gray-50" 
+              ref={dropdownRef} 
+              data-dropdown="guests"
+              onClick={() => !disabled && setShowGuestsDropdown(!showGuestsDropdown)}
+            >
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
-              <button
-                type="button"
-                onClick={() => setShowGuestsDropdown(!showGuestsDropdown)}
-                disabled={disabled}
-                className=" flex items-center gap-2 text-base font-medium text-gray-900 hover:text-gray-700 transition-colors"
-              >
+              <div className="flex items-center gap-2 text-base font-medium text-gray-900">
                 <span>
                   {shouldShowDateAndGuestValues() 
                     ? `${searchData.adults} Adults, ${searchData.children} child, ${searchData.rooms} rooms`
                     : 'Select guests'
                   }
                 </span>
-              </button>
+              </div>
 
               {/* Dropdown de huéspedes */}
               {showGuestsDropdown && (
