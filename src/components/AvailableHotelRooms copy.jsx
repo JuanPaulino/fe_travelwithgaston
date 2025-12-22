@@ -17,7 +17,6 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   const [selectedRoomIndex, setSelectedRoomIndex] = useState(0);
   const [showRatesModal, setShowRatesModal] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   // Detectar tamaño de pantalla
   useEffect(() => {
@@ -124,15 +123,6 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
     setShowRatesModal(false);
   };
 
-  // Funciones para navegación del slider en desktop
-  const nextSlide = () => {
-    setCurrentSlideIndex((prev) => (prev + 1) % roomTypes.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlideIndex((prev) => (prev - 1 + roomTypes.length) % roomTypes.length);
-  };
-
   // Mostrar estado de carga
   if (loading) {
     return (
@@ -203,7 +193,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                     >
                       {/* Imagen de la habitación */}
                       <div className="relative">
-                        <ImageCarousel images={room?.images || []} className="aspect-auto h-64"/>
+                        <ImageCarousel images={room?.images || []} />
                         {/* Indicador de scroll para múltiples habitaciones */}
                         {roomTypes.length > 1 && (
                           <div className="absolute top-4 right-4 bg-black/20 backdrop-blur-sm rounded-full p-2">
@@ -388,249 +378,196 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
               )}
             </div>
           ) : (
-            /* Vista desktop con grid de 3 columnas */
-            <div className="space-y-4">
-              {/* Grid de habitaciones */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {roomTypes.map((room, index) => (
-                  <div 
-                    key={index}
-                    className="border border-neutral-lighter rounded-lg overflow-hidden hover:shadow-lg transition-shadow flex flex-col"
-                  >
-                    {/* Imagen de la habitación con altura fija */}
-                    <div className="relative overflow-hidden">
-                      <ImageCarousel images={room?.images || []} autoPlay={false} className="aspect-auto h-64"/>
-                    </div>
-                    
-                    {/* Información de la habitación */}
-                    <div className="p-4 flex flex-col flex-grow">
-                      <h3 className="text-lg font-heading text-neutral-darkest mb-3 line-clamp-2">
-                        {room?.name}
-                        {room?.has_accessibility && " - Accessible"}
-                      </h3>
-                      
-                      {/* Detalles en grid 2x2 */}
-                      <div className="grid grid-cols-2 gap-2 mb-4">
-                        <div className="flex items-center gap-2">
-                          <img src="/images/activity_zone.png" alt="size" className="w-6 h-6 flex-shrink-0" />
-                          <span className="text-xs text-neutral-darkest truncate">{room?.room_size}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <img src="/images/bed.png" alt="bed" className="w-6 h-6 flex-shrink-0" />
-                          <span className="text-xs text-neutral-darkest truncate">{room?.bed_size}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <img src="/images/group.png" alt="occupancy" className="w-6 h-6 flex-shrink-0" />
-                          <span className="text-xs text-neutral-darkest">
-                            {room?.occupancies?.[0]?.adults || 2} adults
-                          </span>
-                        </div>
-                        {room?.view_from_room && (
-                          <div className="flex items-center gap-2">
-                            <img src="/images/view_from_room.png" alt="view" className="w-6 h-6 flex-shrink-0" />
-                            <span className="text-xs text-neutral-darkest truncate">{room?.view_from_room}</span>
-                          </div>
-                        )}
+            /* Vista desktop original */
+            roomTypes.map((room, index) => (
+              <div key={index} className={`flex flex-col md:flex-row gap-6 border-x border-t ${index === roomTypes.length - 1 ? 'border-b' : ''} border-neutral-lighter p-4`}>
+              {/* Panel izquierdo - Imagen y descripción */}
+                <div className="w-full md:w-2/5">
+                  {/* Título de la habitación */}
+                  <h3 className="text-h5 sm:text-h5-desktop font-heading text-neutral-darkest mb-4">
+                    {room.name}
+                    {room.has_accessibility && " - Accessible"}
+                  </h3>
+                  {/* Imagen principal con carrusel */}
+                  <ImageCarousel images={room.images} />
+                  {/* Descripción de la habitación */}
+                  <div className="">
+                    <p className="text-neutral-darkest font-body leading-relaxed mb-4">
+                      {room.description || `Experience luxury and comfort in our ${room.name}. This beautifully appointed room features ${room.room_size ? room.room_size : 'spacious accommodations'} with ${room.bed_size ? room.bed_size : 'premium bedding'} and modern amenities.`}
+                    </p>
+
+                    <div className="grid grid-cols-2 grid-rows-2 gap-4">
+                      <div className="flex flex-row gap-2 items-center">
+                        <img src="/images/activity_zone.png" alt="activity_zone" className="w-6 h-6" />
+                        <span className="text-sm">{room.room_size}</span>
                       </div>
-
-                      {/* Precio desde */}
-                      <div className="text-center mb-4 bg-neutral-lightest p-3 rounded-lg mt-auto">
-                        {room.lowest_rate && (
-                          <div>
-                            <p className="text-xs text-neutral-dark mb-1">From</p>
-                            <p className="text-2xl font-semibold text-neutral-darkest mb-1">
-                              <span className="text-base">{getCurrencySymbol(room.lowest_rate.requested_currency_code)}</span> {formatPrice(room.lowest_rate.total_to_book_in_requested_currency)}
-                            </p>
-                            <p className="text-xs text-neutral-dark mb-1">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
-                            <div className="w-full h-0.5 bg-neutral-300 my-1"></div>
-                            <p className="text-xs text-neutral-dark">Avg per night {getCurrencySymbol(room.lowest_rate.requested_currency_code)} {formatPrice(room.lowest_rate.rate_in_requested_currency)}</p>
-                          </div>
-                        )}
+                      <div className="flex flex-row gap-2 items-center">
+                        <img src="/images/bed.png" alt="bed" className="w-6 h-6" />
+                        <span className="text-sm">{room.bed_size}</span>
                       </div>
-                      
-                      {/* Botón para ver rates */}
-                      <button
-                        onClick={() => openRatesModal(index)}
-                        className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2.5 px-4 transition-colors rounded-lg text-sm"
-                      >
-                        View Rates
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Modal de rates para Desktop */}
-              {showRatesModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                  <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] flex flex-col">
-                    {/* Header fijo */}
-                    <div className="flex items-center justify-between p-6 border-b border-neutral-lighter bg-white rounded-t-lg">
-                      <h3 className="text-2xl font-heading text-neutral-darkest">
-                        {roomTypes[selectedRoomIndex]?.name} - Available Rates
-                      </h3>
-                      <button
-                        onClick={closeRatesModal}
-                        className="p-2 hover:bg-neutral-lighter rounded-full transition-colors"
-                      >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  
-                    {/* Contenido scrolleable */}
-                    <div className="flex-1 overflow-y-auto p-6">
-                      <div className="space-y-6">
-                        {roomTypes[selectedRoomIndex]?.rates.map((rate, rateIndex) => (
-                          <div key={rateIndex} className="border border-neutral-lighter rounded-lg p-6">
-                            <div className="flex flex-col lg:flex-row gap-6">
-                              {/* Columna izquierda - Información */}
-                              <div className="flex-1">
-                                {/* Header de la tarifa */}
-                                <div className="mb-4">
-                                  <h4 className="font-heading text-2xl text-neutral-darkest mb-2">{rate.title}</h4>
-                                  {rate.description && (
-                                    <p className="text-neutral-darkest font-body text-sm mb-3">
-                                      {rate.description}
-                                    </p>
-                                  )}
-                                </div>
-
-                                {/* Información de cancelación y pago */}
-                                <div className="mb-4">
-                                  {rate.cancellation_policy && (
-                                    <div className="mb-3">
-                                      <p className="text-sm font-semibold text-neutral-darkest mb-1">Cancellation policy</p>
-                                      <p className="text-sm text-neutral-darkest">{rate.cancellation_policy}</p>
-                                      {rate.cancellation_deadline && (
-                                        <p className="text-xs text-neutral-light mt-1">
-                                          Cancellation deadline: {new Date(rate.cancellation_deadline).toLocaleDateString('es-ES')}
-                                        </p>
-                                      )}
-                                    </div>
-                                  )}
-                                  {rate.payment_description && (
-                                    <div className="mb-3">
-                                      <p className="text-sm font-semibold text-neutral-darkest mb-1">Payment description</p>
-                                      <p className="text-sm text-neutral-darkest">{rate.payment_description}</p>
-                                    </div>
-                                  )}
-                                </div>
-                                
-                                {/* Beneficios */}
-                                {rate.benefits && rate.benefits.length > 0 && (
-                                  <div className="mb-4">
-                                    <h4 className="font-medium text-neutral-darkest mb-2">Included benefits</h4>
-                                    <div className="space-y-2">
-                                      {rate.benefits.map((benefit, benefitIndex) => (
-                                        <div key={benefitIndex} className="flex items-start gap-3">
-                                          <div className="w-4 h-4 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                            <span className="text-white text-xs">✓</span>
-                                          </div>
-                                          <span className="text-sm text-neutral-darkest">{benefit}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                    {rate.benefits_footnotes && rate.benefits_footnotes.length > 0 && (
-                                      <div className="mt-2">
-                                        {rate.benefits_footnotes.map((footnote, footnoteIndex) => (
-                                          <p key={footnoteIndex} className="text-xs text-neutral-light italic">
-                                            {footnote}
-                                          </p>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-
-                                {/* Beneficios adicionales */}
-                                {rate.additional_benefits && rate.additional_benefits.length > 0 && (
-                                  <div className="mb-4">
-                                    <h4 className="font-medium text-neutral-darkest mb-2">Additional benefits</h4>
-                                    <div className="space-y-2">
-                                      {rate.additional_benefits.map((benefit, benefitIndex) => (
-                                        <div key={benefitIndex} className="flex items-start gap-3">
-                                          <div className="w-4 h-4 bg-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                            <span className="text-white text-xs">+</span>
-                                          </div>
-                                          <span className="text-sm text-neutral-darkest">{benefit}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* Requisitos de estancia */}
-                                {rate.stay_requirements && rate.stay_requirements.length > 0 && (
-                                  <div className="mb-4">
-                                    <h4 className="font-medium text-neutral-darkest mb-2">Stay requirements</h4>
-                                    <div className="space-y-2">
-                                      {rate.stay_requirements.map((requirement, reqIndex) => (
-                                        <div key={reqIndex} className="flex items-start gap-3">
-                                          <div className="w-4 h-4 bg-neutral-light rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                            <span className="text-neutral-darkest text-xs">ℹ</span>
-                                          </div>
-                                          <span className="text-sm text-neutral-darkest">{requirement}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* Información adicional */}
-                                <div className="text-xs text-neutral-light space-y-1">
-                                  {rate.is_tax_included && (
-                                    <p>• Taxes included</p>
-                                  )}
-                                  {rate.can_cancel && (
-                                    <p>• Cancellation available</p>
-                                  )}
-                                  {rate.requires_cvc && (
-                                    <p>• CVC code required</p>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Columna derecha - Precio y botón */}
-                              <div className="lg:w-80 flex flex-col justify-between">
-                                {/* Precio */}
-                                {rate.total_to_book_in_requested_currency && (
-                                  <div className="bg-neutral-lightest p-6 rounded-lg text-center mb-4">
-                                    <p className="text-4xl font-semibold text-neutral-darkest mb-3">
-                                      <span className="text-2xl">{getCurrencySymbol(rate.requested_currency_code)}</span> {formatPrice(rate.total_to_book_in_requested_currency)}
-                                    </p>
-                                    <p className="text-sm text-neutral-dark mb-2">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
-                                    <div className="w-full h-0.5 bg-neutral-300 my-2"></div>
-                                    <p className="text-sm text-neutral-dark">Average per night {getCurrencySymbol(rate.requested_currency_code)} {formatPrice(rate.rate_in_requested_currency)} inc tax</p>
-                                  </div>
-                                )}
-
-                                {/* Botón de reserva/suscripción */}
-                                {(() => {
-                                  const buttonConfig = getButtonConfig();
-                                  if (!buttonConfig) {
-                                    return null;
-                                  }
-                                  return (
-                                    <button
-                                      onClick={() => buttonConfig.onClick(roomTypes[selectedRoomIndex], rate)}
-                                      className={`${buttonConfig.className} rounded-lg`}
-                                    >
-                                      {buttonConfig.text}
-                                    </button>
-                                  );
-                                })()}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
+                      <div className="flex flex-row gap-2 items-center">
+                        {room.occupancies && room.occupancies.length > 0 && (<>
+                          <img src="/images/group.png" alt="group" className="w-6 h-6" />
+                          <span className="text-sm">{room.occupancies[0]?.adults || 2} adults</span>
+                        </>)}
+                      </div>
+                      <div className="flex flex-row gap-2 items-center">
+                        {room.view_from_room && (<>
+                          <img src="/images/view_from_room.png" alt="view_from_room" className="w-6 h-6" />
+                          <span className="text-sm">{room.view_from_room}</span>
+                        </>)}
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+                {/* Panel derecho - Detalles y tarifas */}
+                <div className="w-full md:w-3/5 border-t md:border-l border-neutral-lighter">
+                  {/* Sección de tarifas */}
+                  {room.rates.map((rate, rateIndex) => <>
+                    <div key={rateIndex} className="flex flex-col sm:flex-row mb-8 p-6 border-neutral-lighter">
+                      <div className='w-full sm:w-3/5 md:w-4/6'>
+                          {/* Header de la tarifa */}
+                          <div className="mb-4">
+                            <h3 className="font-heading text-xl text-neutral-darkest mb-2">{rate.title}</h3>
+                            {rate.description && (
+                              <p className="text-neutral-darkest font-body text-sm mb-3">
+                                {rate.description}
+                              </p>
+                            )}
+                          </div>
+                          {/* Información de pago y cancelación */}
+                          <div className="mb-4">
+                            {rate.cancellation_policy && (
+                              <div className="mb-3">
+                                <p className="text-sm font-semibold text-neutral-darkest mb-1">Cancellation policy</p>
+                                <p className="text-sm text-neutral-darkest">{rate.cancellation_policy}</p>
+                                {rate.cancellation_deadline && (
+                                  <p className="text-xs text-neutral-light mt-1">
+                                    Cancellation deadline: {new Date(rate.cancellation_deadline).toLocaleDateString('es-ES')}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                            {rate.payment_description && (
+                              <div className="mb-3">
+                                <p className="text-sm font-semibold text-neutral-darkest mb-1">Payment description</p>
+                                <p className="text-sm text-neutral-darkest">{rate.payment_description}</p>
+                              </div>
+                            )}
+                          </div>
+                          {/* Beneficios */}
+                          {rate.benefits && rate.benefits.length > 0 && (
+                            <div className="mb-4">
+                              <h4 className="font-medium text-neutral-darkest mb-2">Included benefits</h4>
+                              <div className="space-y-2">
+                                {rate.benefits.map((benefit, benefitIndex) => (
+                                  <div key={benefitIndex} className="flex items-start gap-3">
+                                    <div className="w-4 h-4 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                      <span className="text-white text-xs">✓</span>
+                                    </div>
+                                    <span className="text-sm text-neutral-darkest">{benefit}</span>
+                                  </div>
+                                ))}
+                              </div>
+                              {rate.benefits_footnotes && rate.benefits_footnotes.length > 0 && (
+                                <div className="mt-2">
+                                  {rate.benefits_footnotes.map((footnote, footnoteIndex) => (
+                                    <p key={footnoteIndex} className="text-xs text-neutral-light italic">
+                                      {footnote}
+                                    </p>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Beneficios adicionales */}
+                          {rate.additional_benefits && rate.additional_benefits.length > 0 && (
+                            <div className="mb-4">
+                              <h4 className="font-medium text-neutral-darkest mb-2">Additional benefits</h4>
+                              <div className="space-y-2">
+                                {rate.additional_benefits.map((benefit, benefitIndex) => (
+                                  <div key={benefitIndex} className="flex items-start gap-3">
+                                    <div className="w-4 h-4 bg-secondary rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                      <span className="text-white text-xs">+</span>
+                                    </div>
+                                    <span className="text-sm text-neutral-darkest">{benefit}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Requisitos de estancia */}
+                          {rate.stay_requirements && rate.stay_requirements.length > 0 && (
+                            <div className="mb-4">
+                              <h4 className="font-medium text-neutral-darkest mb-2">Stay requirements</h4>
+                              <div className="space-y-2">
+                                {rate.stay_requirements.map((requirement, reqIndex) => (
+                                  <div key={reqIndex} className="flex items-start gap-3">
+                                    <div className="w-4 h-4 bg-neutral-light rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                      <span className="text-neutral-darkest text-xs">ℹ</span>
+                                    </div>
+                                    <span className="text-sm text-neutral-darkest">{requirement}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Información adicional */}
+                          <div className="text-xs text-neutral-light space-y-1">
+                            {rate.is_tax_included && (
+                              <p>• Taxes included</p>
+                            )}
+                            {rate.can_cancel && (
+                              <p>• Cancellation available</p>
+                            )}
+                            {rate.requires_cvc && (
+                              <p>• CVC code required</p>
+                            )}
+                            {/*<p>• Rate code: {rate.rate_index}</p>*/}
+                          </div>
+                      </div>
+                      <div className='w-full sm:w-2/5 md:w-2/6 flex flex-col justify-end text-center sm:text-right mt-4 sm:mt-0'>
+                        {/* Precios destacados */}
+                        {rate.total_to_book_in_requested_currency && (
+                          <div className="p-3">
+                            <p className="text-3xl font-semibold text-neutral-darkest mb-2">
+                              <span className="text-lg">{getCurrencySymbol(rate.requested_currency_code)}</span> {formatPrice(rate.total_to_book_in_requested_currency)}
+                            </p>
+                            <p className="text-xs text-neutral-dark mb-1">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
+                            <div className="w-full h-0.5 bg-neutral-300 mb-1"></div>
+                            <p className="text-xs text-neutral-dark">Average per night {getCurrencySymbol(rate.requested_currency_code)} {formatPrice(rate.rate_in_requested_currency)} inc tax</p>
+                          </div>
+                        )}
+                        {/* Botón de reserva/suscripción */}
+                        <div className="mt-6">
+                          {(() => {
+                            const buttonConfig = getButtonConfig();
+                            if (!buttonConfig) {
+                              return null; // No mostrar botón si no está autenticado
+                            }
+                            
+                            return (
+                              <button 
+                                onClick={() => buttonConfig.onClick(room, rate)}
+                                className={buttonConfig.className}
+                              >
+                                {buttonConfig.text}
+                              </button>
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                    {rateIndex !== room.rates.length - 1 && (
+                      <div className="w-full h-px bg-neutral-lighter"></div>
+                    )}
+                    </>)}
+                </div>
+              </div>
+            ))
           )}
           </>
       )}

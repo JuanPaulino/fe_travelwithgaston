@@ -8,12 +8,14 @@ export interface Props {
   }>;
   className?: string;
   autoSlideInterval?: number; // Intervalo en milisegundos (por defecto 7000ms = 7 segundos)
+  autoSlide?: boolean; // Si es true, activa el auto-slide (por defecto true)
 }
 
 const { 
   images = [], 
   className = '', 
-  autoSlideInterval = 1000 
+  autoSlideInterval = 1000,
+  autoSlide = true
 } = Astro.props;
 ---
 
@@ -32,7 +34,7 @@ const {
     </div>
 
     <!-- Indicador de auto-slide -->
-    {images.length > 1 && (
+    {images.length > 1 && autoSlide && (
       <div class="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-xs">
         <span id="auto-slide-indicator">Auto</span>
       </div>
@@ -98,7 +100,7 @@ const {
   </div>
 </div>
 
-<script define:vars={{ images, autoSlideInterval }}>
+<script define:vars={{ images, autoSlideInterval, autoSlide }}>
   let currentImageIndex = 0;
   let autoSlideTimer = null;
   let isFullscreen = false;
@@ -162,7 +164,7 @@ const {
 
   // Función para iniciar el auto-slide
   const startAutoSlide = () => {
-    if (images.length <= 1) return;
+    if (images.length <= 1 || !autoSlide) return;
     
     stopAutoSlide(); // Limpiar timer existente
     
@@ -197,7 +199,9 @@ const {
       fullscreenGallery.classList.remove('flex');
       document.body.style.overflow = '';
       isFullscreen = false;
-      startAutoSlide(); // Reanudar auto-slide al cerrar vista completa
+      if (autoSlide) {
+        startAutoSlide(); // Reanudar auto-slide al cerrar vista completa
+      }
     }
   };
 
@@ -205,13 +209,15 @@ const {
   if (mainImage) {
     mainImage.addEventListener('click', openFullscreen);
     
-    // Pausar auto-slide al hacer hover
-    mainImage.addEventListener('mouseenter', stopAutoSlide);
-    mainImage.addEventListener('mouseleave', () => {
-      if (!isFullscreen) {
-        startAutoSlide();
-      }
-    });
+    // Pausar auto-slide al hacer hover (solo si autoSlide está activo)
+    if (autoSlide) {
+      mainImage.addEventListener('mouseenter', stopAutoSlide);
+      mainImage.addEventListener('mouseleave', () => {
+        if (!isFullscreen) {
+          startAutoSlide();
+        }
+      });
+    }
   }
 
   if (closeGallery) {
@@ -253,18 +259,21 @@ const {
     }
   });
 
-  // Iniciar auto-slide cuando la página esté lista
-  document.addEventListener('DOMContentLoaded', () => {
-    startAutoSlide();
-  });
+  // Iniciar auto-slide cuando la página esté lista (solo si autoSlide está activo)
+  if (autoSlide) {
+    document.addEventListener('DOMContentLoaded', () => {
+      startAutoSlide();
+    });
 
-  // Iniciar auto-slide inmediatamente si el DOM ya está listo
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startAutoSlide);
-  } else {
-    startAutoSlide();
+    // Iniciar auto-slide inmediatamente si el DOM ya está listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startAutoSlide);
+    } else {
+      startAutoSlide();
+    }
+    console.log('Auto slide interval:', autoSlideInterval);
   }
-  console.log('Auto slide interval:', autoSlideInterval);
+  
   // Limpiar timer cuando la página se descarga
   window.addEventListener('beforeunload', stopAutoSlide);
 </script>
