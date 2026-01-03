@@ -73,8 +73,15 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
       text: hotel.name,
       location: hotel.location,
     })
+    const newSearchData = {
+      ...searchData,
+      selectedDestinationType: 'hotel',
+      selectedDestinationId: hotel.id,
+      selectedDestinationText: hotel.name,
+      selectedDestinationLocation: hotel.location,
+    }
     // Construir URL con parámetros de búsqueda y redirigir
-    window.location.href = `/hotels/${hotel.id}${buildSearchUrl(searchData)}`
+    window.location.href = `/hotels/${hotel.id}${buildSearchUrl(newSearchData)}`
   }
 
   // Función para manejar clic en imagen
