@@ -200,11 +200,9 @@ export const searchActions = {
   executeSearch: async () => {
     const searchData = searchStore.get();
     
-    
     if (!searchActions.isSearchValid()) {
       return null;
     }
-
 
     // Actualizar estado de carga
     resultsStore.set({
@@ -262,11 +260,6 @@ export const searchActions = {
         currency: searchData.selectedCurrency || config.search.defaultCurrency,
         language: config.search.defaultLanguage
       };
-
-      // Si hay niños, agregar sus edades
-      if (searchData.children > 0) {
-        searchParams.rooms[0].children_ages = searchData.childrenAges;
-      }
 
       // Agregar filtros activos con sufijo _ids
       Object.entries(activeFilters).forEach(([filterKey, filterValues]) => {
@@ -330,6 +323,92 @@ export const searchActions = {
         ...resultsStore.get(),
         loading: false,
         error: error.message || 'Error searching for hotels. Try again.'
+      });
+
+      return null;
+    }
+  },
+
+  executeSearchHotelAvailability: async () => {
+    const searchData = searchStore.get();
+
+    // Construir el objeto selectedDestination
+    const selectedDestination = {
+      id: searchData.selectedDestinationId,
+      text: searchData.selectedDestinationText,
+      type: searchData.selectedDestinationType,
+      location: searchData.selectedDestinationLocation
+    };
+
+    // Validar que el tipo de destino sea 'hotel'
+    if (selectedDestination.type !== 'hotel') {
+      // Si no es hotel, actualizar estado y retornar null
+      resultsStore.set({
+        ...resultsStore.get(),
+        loading: false,
+        error: 'This function is only available for hotel searches'
+      });
+      return null;
+    }
+
+    // Actualizar estado de carga
+    resultsStore.set({
+      ...resultsStore.get(),
+      loading: true,
+      error: null
+    });
+
+    try {
+      const destinationId = selectedDestination.id;
+
+      if (!destinationId) {
+        throw new Error('Could not get the hotel ID of the selected destination');
+      }
+
+      // Obtener filtros activos del store de filtros
+      const activeFilters = filtersStore.get();
+      
+      // Transformar datos al formato que espera el endpoint
+      const childrenAges = Array.isArray(searchData.childrenAges) 
+        ? searchData.childrenAges.map(age => ({ age: parseInt(age) }))
+        : searchData.childrenAges.split(',').map(age => ({ age: parseInt(age) }));
+      const searchParams = {
+        hotel_id: destinationId,
+        start_date: searchData.checkInDate,
+        end_date: searchData.checkOutDate,
+        rooms: [
+          {
+            adults: Number(searchData.adults),
+            ...(Number(searchData.children) > 0 && {
+              children: childrenAges
+            })
+          }
+        ],
+        currency: searchData.selectedCurrency || config.search.defaultCurrency,
+        language: config.search.defaultLanguage
+      };
+
+      // Agregar filtros activos con sufijo _ids
+      Object.entries(activeFilters).forEach(([filterKey, filterValues]) => {
+        if (filterValues && filterValues.length > 0) {
+          const paramKey = `${filterKey}_ids`;
+          searchParams[paramKey] = filterValues;
+        }
+      });
+
+      const response = await hotelsApi.getAvailability(searchParams);
+
+      resultsStore.set({
+        ...resultsStore.get(),
+        loading: false
+      });
+
+      return {results: response, search_type: 'hotel'};
+    } catch (error) {
+      resultsStore.set({
+        ...resultsStore.get(),
+        loading: false,
+        error: error.message || 'Error getting hotel availability. Try again.'
       });
 
       return null;

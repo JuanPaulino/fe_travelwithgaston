@@ -8,7 +8,7 @@ import currencies from '../data/currencies.json'
 import { calculateNights } from '../lib/dateUtils.js'
 
 const AvailableHotelRooms = ({ parentHotelData }) => {
-  const { searchData, executeSearch } = useSearchStore();
+  const { searchData, executeSearchHotelAvailability } = useSearchStore();
   const { processBooking } = useBookingStore();
   const { user, isAuthenticated } = useAuth();
   const [hotelData, setHotelData] = useState();
@@ -40,7 +40,8 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
         setError(null);
         
         try {
-          const response = await executeSearch();
+          debugger;
+          const response = await executeSearchHotelAvailability();
           if (response && response.search_type === 'hotel') {
             setHotelData(response.results[0]);
           }
@@ -54,7 +55,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
     if (isAuthenticated) {
       fetchHotelAvailability();
     }
-  }, [searchData?.selectedDestinationId, executeSearch]);
+  }, [searchData?.selectedDestinationId, executeSearchHotelAvailability]);
 
   const hotel = hotelData;
   const session_id = hotel?.session_id;
@@ -167,7 +168,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
       </div>
     );
   }
-
+  console.log(roomTypes);
   return (
     <div className="mb-8 w-full">
       {(!isAuthenticated || ( isAuthenticated && user?.role === 'basic' )) && (

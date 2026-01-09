@@ -30,7 +30,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   const [minCheckOutDate, setMinCheckOutDate] = useState('')
   const [isFormActive, setIsFormActive] = useState(false)
   const [isUserInteracting, setIsUserInteracting] = useState(false)
-  const dropdownRef = useRef(null)
+  const guestsDropdownRef = useRef(null)
 
   // Mostrar campos adicionales solo si hay parámetros de URL
   useEffect(() => {
@@ -119,36 +119,22 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Solo cerrar si el dropdown está abierto
       if (!showGuestsDropdown) return
       
-      // Verificar si el click fue dentro del dropdown usando múltiples métodos
-      const clickedElement = event.target
-      
-      // Método 1: contains() directo
-      if (dropdownRef.current && dropdownRef.current.contains(clickedElement)) {
+      // Verificar si el click fue dentro del dropdown
+      if (guestsDropdownRef.current && guestsDropdownRef.current.contains(event.target)) {
         return // Click dentro del dropdown, no cerrar
       }
       
-      // Método 2: closest() para elementos dinámicos
-      if (clickedElement.closest && clickedElement.closest('[data-dropdown="guests"]')) {
+      // Verificar también usando closest para elementos dinámicos
+      if (event.target.closest && event.target.closest('[data-dropdown="guests"]')) {
         return // Click dentro del dropdown, no cerrar
-      }
-      
-      // Método 3: Verificación manual del árbol DOM
-      let parent = clickedElement.parentElement
-      while (parent && parent !== document.body) {
-        if (parent === dropdownRef.current) {
-          return // Click dentro del dropdown, no cerrar
-        }
-        parent = parent.parentElement
       }
       
       // Si llegamos aquí, el click fue fuera del dropdown
       setShowGuestsDropdown(false)
     }
     
-    // Solo agregar el listener si el dropdown está abierto
     if (showGuestsDropdown) {
       document.addEventListener('mousedown', handleClickOutside)
       return () => document.removeEventListener('mousedown', handleClickOutside)
@@ -459,7 +445,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
               />
 
               {/* Selector de huéspedes - 100% */}
-              <div className="w-full relative" ref={dropdownRef} data-dropdown="guests">
+              <div className="w-full relative" data-dropdown="guests">
                 <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
                 <div
                   onClick={() => !disabled && setShowGuestsDropdown(!showGuestsDropdown)}
@@ -478,7 +464,12 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
 
                 {/* Dropdown de huéspedes para móvil */}
                 {showGuestsDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-[99999] p-4" data-dropdown="guests">
+                  <div 
+                    ref={guestsDropdownRef}
+                    className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border z-[99999] p-4" 
+                    data-dropdown="guests"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <h3 className="font-medium text-gray-900 mb-4">Configure guests</h3>
                     
                     <GuestSelector
@@ -562,13 +553,14 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
 
             {/* Selector de huéspedes */}
             <div 
-              className="relative p-6 flex-1/4 cursor-pointer transition-colors hover:bg-gray-50" 
-              ref={dropdownRef} 
+              className="relative p-6 flex-1/4 transition-colors hover:bg-gray-50" 
               data-dropdown="guests"
-              onClick={() => !disabled && setShowGuestsDropdown(!showGuestsDropdown)}
             >
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">GUESTS</div>
-              <div className="flex items-center gap-2 text-base font-medium text-gray-900">
+              <div 
+                className="flex items-center gap-2 text-base font-medium text-gray-900 cursor-pointer"
+                onClick={() => !disabled && setShowGuestsDropdown(!showGuestsDropdown)}
+              >
                 <span>
                   {shouldShowDateAndGuestValues() 
                     ? `${searchData.adults} Adults, ${searchData.children} child, ${searchData.rooms} rooms`
@@ -579,7 +571,12 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
 
               {/* Dropdown de huéspedes */}
               {showGuestsDropdown && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 md:w-auto md:min-w-[600px] bg-white rounded-lg shadow-xl border z-[99999] p-4 pointer-events-auto" data-dropdown="guests">
+                <div 
+                  ref={guestsDropdownRef}
+                  className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-80 md:w-auto md:min-w-[600px] bg-white rounded-lg shadow-xl border z-[99999] p-4 pointer-events-auto" 
+                  data-dropdown="guests"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <h3 className="font-medium text-gray-900 mb-4">Configure guests</h3>
                   
                   <GuestSelector
