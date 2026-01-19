@@ -36,4 +36,4 @@ const AuthModalWrapper = () => {
   );
 };
 
-export default AuthModalWrapper; 
+export default AuthModalWrapper;

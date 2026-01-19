@@ -207,6 +207,7 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
   // Manejar cambio en número de niños
   const handleChildrenChange = (newChildren) => {
     setChildren(newChildren)
+    console.log('newChildren', newChildren)
   }
 
   // Manejar cambio en edades de niños
@@ -263,9 +264,19 @@ function SearchForm({ initialData = {}, disabled = false, className = "", isMain
 
   // Función específica para campos de fechas y huéspedes
   const shouldShowDateAndGuestValues = () => {
-    // Solo mostrar valores del store cuando vienen de URL params
-    // Nunca autocompletar desde el store (localStorage)
-    return (Object.keys(urlParams).length > 0 && urlParams.destinationId);
+    // Si hay parámetros de URL con destinationId, mostrar valores
+    if (Object.keys(urlParams).length > 0 && urlParams.destinationId) {
+      return true;
+    }
+    
+    // Si estamos en el Home y se ha mostrado la sección colapsable (el usuario interactuó)
+    // mostrar los valores actuales del store
+    if (isOnHomePage() && showCollapsibleSection) {
+      return true;
+    }
+    
+    // En cualquier otro caso, no mostrar valores (dejar campos vacíos)
+    return false;
   }
 
   // Manejar cuando el formulario se vuelve activo

@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import AuthModalWrapper from '../components/auth/AuthModalWrapper.jsx';
+import TokenVerifier from '../components/auth/TokenVerifier.jsx';
 import StoreDebuggerWrapper from '../components/StoreDebuggerWrapper.jsx';
 import { getPageData } from '../lib/directus.js';
 import DynamicBlocks from '../components/blocks/DynamicBlocks.astro';
@@ -33,6 +34,7 @@ const title = pageData?.title || 'TravelWithGaston - Home';
 			<DynamicBlocks blocks={blocks} />
 		)}
 	</main>
+	<TokenVerifier client:load />
 	<AuthModalWrapper client:load />
 	<StoreDebuggerWrapper client:load />
 </Layout>

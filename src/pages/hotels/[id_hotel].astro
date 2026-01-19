@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Header from '../../components/Header.astro';
 import AuthModalWrapper from '../../components/auth/AuthModalWrapper.jsx';
+import TokenVerifier from '../../components/auth/TokenVerifier.jsx';
 import StoreDebuggerWrapper from '../../components/StoreDebuggerWrapper.jsx';
 import SearchFormWrapper from '../../components/SearchFormWrapper.jsx';
 import AvailableHotelRooms from '../../components/AvailableHotelRooms.jsx';
@@ -330,6 +331,7 @@ const title = `Hotel ${hotelData.name}`;
       </div>
 		</div>
 	</main>
+	<TokenVerifier client:load />
 	<AuthModalWrapper client:load />
 	<StoreDebuggerWrapper client:load />
 </Layout>

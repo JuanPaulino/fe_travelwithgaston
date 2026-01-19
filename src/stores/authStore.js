@@ -353,12 +353,6 @@ export const authActions = {
 
 // Inicializar estado al cargar
 if (typeof window !== 'undefined') {
-  // Escuchar eventos de logout desde el interceptor HTTP
-  window.addEventListener('auth:logout', () => {
-    console.log('Evento auth:logout recibido, cerrando sesión...')
-    authActions.logout()
-  })
-
   // Escuchar eventos de token actualizado desde el interceptor HTTP
   window.addEventListener('auth:tokenUpdated', (event) => {
     console.log('Evento auth:tokenUpdated recibido')
