@@ -6,10 +6,8 @@ import { filtersStore } from './useFiltersStore.js';
 import { persistentMap } from '@nanostores/persistent'
 import { isAuthenticated } from './authStore.js';
 
-// Función para obtener fechas por defecto de manera consistente
 const getDefaultDates = () => {
-  // Usar una fecha fija para evitar diferencias entre servidor y cliente
-  const baseDate = new Date('2024-01-01T00:00:00Z');
+  const baseDate = new Date();
   const tomorrow = new Date(baseDate);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const dayAfterTomorrow = new Date(baseDate);
