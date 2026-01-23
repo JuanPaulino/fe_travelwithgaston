@@ -9,7 +9,7 @@ const BookingsHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [activeTab, setActiveTab] = useState('upcoming'); // upcoming, past, cancelled
+  const [activeTab, setActiveTab] = useState('upcoming'); // upcoming, completed, cancelled
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -41,9 +41,9 @@ const BookingsHistory = () => {
       checkOutDate.setHours(0, 0, 0, 0);
       
       if (activeTab === 'upcoming') {
-        return booking.status === 'upcoming' || booking.status === 'confirmed';
-      } else if (activeTab === 'past') {
-        return checkOutDate < today && booking.status !== 'cancelled';
+        return booking.status === 'upcoming';
+      } else if (activeTab === 'completed') {
+        return booking.status === 'completed';
       } else if (activeTab === 'cancelled') {
         return booking.status === 'cancelled';
       }
@@ -64,7 +64,7 @@ const BookingsHistory = () => {
   // Configuración de tabs
   const tabs = [
     { key: 'upcoming', label: 'Upcoming' },
-    { key: 'past', label: 'Past' },
+    { key: 'completed', label: 'Completed' },
     { key: 'cancelled', label: 'Cancelled' }
   ];
 
@@ -128,7 +128,7 @@ const BookingsHistory = () => {
         <div className="mt-8 p-6 bg-primary-lighter rounded-lg">
           <p className="text-primary-darker">
             {activeTab === 'upcoming' && 'No upcoming bookings.'}
-            {activeTab === 'past' && 'No past bookings.'}
+            {activeTab === 'completed' && 'No completed bookings.'}
             {activeTab === 'cancelled' && 'No cancelled bookings.'}
           </p>
         </div>
