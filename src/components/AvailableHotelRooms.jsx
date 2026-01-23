@@ -31,16 +31,13 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
     return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
-  // Ejecutar búsqueda cuando el componente se monta o cambian los datos de búsqueda
   useEffect(() => {
     const fetchHotelAvailability = async () => {
-      // Solo ejecutar si tenemos un destino seleccionado
       if (searchData?.selectedDestinationId) {
         setLoading(true);
         setError(null);
         
         try {
-          debugger;
           const response = await executeSearchHotelAvailability();
           if (response && response.search_type === 'hotel') {
             setHotelData(response.results[0]);

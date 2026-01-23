@@ -1,6 +1,4 @@
 // Configuración de la aplicación
-console.log(import.meta.env.PUBLIC_API_URL);
-console.log(import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY);
 export const config = {
   // URLs de la API
   api: {
