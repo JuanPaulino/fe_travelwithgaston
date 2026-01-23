@@ -6,19 +6,6 @@ import { filtersStore } from './useFiltersStore.js';
 import { persistentMap } from '@nanostores/persistent'
 import { isAuthenticated } from './authStore.js';
 
-const getDefaultDates = () => {
-  const baseDate = new Date();
-  const tomorrow = new Date(baseDate);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const dayAfterTomorrow = new Date(baseDate);
-  dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-  
-  return {
-    checkIn: tomorrow.toISOString().split('T')[0],
-    checkOut: dayAfterTomorrow.toISOString().split('T')[0]
-  };
-};
-
 // Estado inicial de la búsqueda
 const initialSearchData = {
   searchText: '',
@@ -52,107 +39,6 @@ export const resultsStore = atom(initialResultsData);
 
 // Acciones para manipular la búsqueda
 export const searchActions = {
-  // Actualizar texto de búsqueda
-  setSearchText: (searchText) => {
-    searchStore.set({
-      ...searchStore.get(),
-      searchText
-    });
-  },
-
-  // Actualizar destino seleccionado
-  setSelectedDestination: (destination) => {
-    searchStore.set({
-      ...searchStore.get(),
-      selectedDestinationId: destination?.id || null,
-      selectedDestinationText: destination?.text || '',
-      selectedDestinationType: destination?.type || null,
-      selectedDestinationLocation: destination?.location || ''
-    });
-  },
-
-  // Actualizar fecha de check-in
-  setCheckInDate: (date) => {
-    searchStore.set({
-      ...searchStore.get(),
-      checkInDate: date
-    });
-  },
-
-  // Actualizar fecha de check-out
-  setCheckOutDate: (date) => {
-    searchStore.set({
-      ...searchStore.get(),
-      checkOutDate: date
-    });
-  },
-
-  // Actualizar número de habitaciones
-  setRooms: (rooms) => {
-    searchStore.set({
-      ...searchStore.get(),
-      rooms
-    });
-  },
-
-  // Actualizar número de adultos
-  setAdults: (adults) => {
-    searchStore.set({
-      ...searchStore.get(),
-      adults,
-      totalGuests: adults + searchStore.get().children
-    });
-  },
-
-  // Actualizar número de niños
-  setChildren: (children) => {
-    const currentData = searchStore.get();
-    let newRooms = currentData.rooms;
-    let newChildrenAges = currentData.childrenAges;
-    
-    // Si se agregan niños y hay más de 1 habitación, forzar a 1 habitación
-    if (children > 0 && newRooms > 1) {
-      newRooms = 1;
-    }
-    
-    // Ajustar el array de edades según el número de niños
-    if (children > currentData.children) {
-      // Agregar niños: mantener edades existentes y agregar 0 para nuevos niños
-      const existingAges = currentData.childrenAges || [];
-      const newAges = Array(children).fill(0).map((_, index) => {
-        return existingAges[index] !== undefined ? existingAges[index] : 0;
-      });
-      newChildrenAges = newAges;
-    } else if (children < currentData.children) {
-      // Remover niños: mantener solo las edades necesarias
-      newChildrenAges = currentData.childrenAges.slice(0, children);
-    }
-    
-    searchStore.set({
-      ...currentData,
-      children,
-      rooms: newRooms,
-      childrenAges: newChildrenAges,
-      totalGuests: currentData.adults + children
-    });
-  },
-
-  // Actualizar edades de los niños
-  setChildrenAges: (ages) => {
-    searchStore.set({
-      ...searchStore.get(),
-      childrenAges: ages
-    });
-  },
-
-  // Actualizar moneda seleccionada
-  setSelectedCurrency: (currency) => {
-    searchStore.set({
-      ...searchStore.get(),
-      selectedCurrency: currency
-    });
-  },
-
   // Actualizar todos los datos de búsqueda
   setSearchData: (searchData) => {
     searchStore.set({
@@ -165,19 +51,6 @@ export const searchActions = {
   // Limpiar todos los datos de búsqueda
   clearSearch: () => {
     searchStore.set(initialSearchData);
-  },
-
-  // Inicializar fechas por defecto si no están configuradas
-  initializeDefaultDates: () => {
-    const currentData = searchStore.get();
-    if (!currentData.checkInDate || !currentData.checkOutDate) {
-      const defaultDates = getDefaultDates();
-      searchStore.set({
-        ...currentData,
-        checkInDate: defaultDates.checkIn,
-        checkOutDate: defaultDates.checkOut
-      });
-    }
   },
 
   // Obtener datos de búsqueda actuales
@@ -419,10 +292,7 @@ export const useSearchStore = () => {
   const [searchData, setSearchData] = useState(searchStore.get());
   const [resultsData, setResultsData] = useState(resultsStore.get());
 
-  useEffect(() => {    
-    // Inicializar fechas por defecto si es necesario
-    searchActions.initializeDefaultDates();
-    
+  useEffect(() => {
     const unsubscribeSearch = searchStore.subscribe((newSearchData) => {
       setSearchData(newSearchData)
     });

@@ -11,41 +11,28 @@ function SimpleSearchForm({
   isMain = false,
   placeholder = "Where are you going?"
 }) {
+  // Solo usar store para guardar búsquedas confirmadas y ejecutarlas
   const { 
-    searchData, 
-    setSearchText, 
-    setSearchData,
-    setSelectedDestination, 
-    executeSearch 
+    setSearchData,  // Solo para guardar al hacer submit
+    executeSearch   // Solo para ejecutar búsqueda confirmada
   } = useSearchStore()
 
   // Hook para parámetros de URL
   const { urlParams, updateUrl, buildSearchUrl } = useUrlParams()
 
+  // Estado local para el formulario (draft)
+  const [formData, setFormData] = useState({
+    searchText: '',
+    selectedDestinationId: null,
+    selectedDestinationText: '',
+    selectedDestinationType: null,
+    selectedDestinationLocation: '',
+  })
+
   // Estados locales para control de UI
   const [isFormActive, setIsFormActive] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
   const [isUserInteracting, setIsUserInteracting] = useState(false)
-
-  // Mostrar campos adicionales solo si hay parámetros de URL
-  useEffect(() => {
-    if (Object.keys(urlParams).length > 0 && urlParams.destinationId) {
-      // Auto-complete form with URL parameters
-      autocompleteForm(urlParams);
-    }
-  }, [urlParams])
-
-  // Función para autocompletar el formulario con datos externos
-  const autocompleteForm = (sourceData) => {
-    
-    setSearchData({
-      searchText: sourceData.destination || '',
-      selectedDestinationId: sourceData.destinationId || '',
-      selectedDestinationText: sourceData.destination || '',
-      selectedDestinationType: sourceData.destinationType || 'hotel',
-      selectedDestinationLocation: sourceData.destinationLocation || ''
-    });
-  };
 
   // Función para verificar si estamos en la página de búsqueda
   const isOnSearchPage = () => {
@@ -60,6 +47,8 @@ function SimpleSearchForm({
   // Hook de debounce para auto search
   const { debouncedCallback: debouncedAutoSearch } = useDebounce(
     async () => {
+      // Guardar en store antes de ejecutar búsqueda
+      setSearchData(formData);
       await executeSearch();
     },
     500,
@@ -68,36 +57,67 @@ function SimpleSearchForm({
     }
   );
 
-  // Solo autocompletar formulario con parámetros de URL (no con initialData)
+  // Autocompletar solo desde URL params
   useEffect(() => {
-    // Solo proceder si hay parámetros de URL válidos
+    // Solo autocompletar si hay URL params válidos
     if (Object.keys(urlParams).length > 0 && urlParams.destinationId) {
-      autocompleteForm(urlParams);
+      setFormData({
+        searchText: urlParams.destination || '',
+        selectedDestinationId: urlParams.destinationId || null,
+        selectedDestinationText: urlParams.destination || '',
+        selectedDestinationType: urlParams.destinationType || 'hotel',
+        selectedDestinationLocation: urlParams.destinationLocation || '',
+      })
       
       if (canExecuteAutoSearch(urlParams)) {
         debouncedAutoSearch();
       }
     }
-  }, [urlParams]);
+  }, [urlParams])
+
+  // Función para verificar si estamos en la página home
+  const isOnHomePage = () => {
+    if (isMain) return true;
+    return false;
+  }
+
+  // Función para verificar si estamos en la página de hotel
+  const isOnHotelPage = () => {
+    return typeof window !== 'undefined' && window.location.pathname.startsWith('/hotels/');
+  };
 
   // Manejar selección de destino desde el autocompletado
   const handleDestinationSelection = async (suggestion) => {
-    setSelectedDestination(suggestion)
+    // Actualizar estado local
+    setFormData(prev => ({
+      ...prev,
+      selectedDestinationId: suggestion.id,
+      selectedDestinationText: suggestion.text,
+      selectedDestinationType: suggestion.type,
+      selectedDestinationLocation: suggestion.location,
+      searchText: suggestion.text
+    }))
+    
     const searchData = {
+      searchText: suggestion.text,
       selectedDestinationText: suggestion.text,
       selectedDestinationId: suggestion.id,
       selectedDestinationType: suggestion.type,
       selectedDestinationLocation: suggestion.location
     }
+    
     // Auto-execute search when destination is selected
     if (suggestion && suggestion.id) {
       setIsSearching(true)
       
       try {
+        // GUARDAR EN STORE antes de ejecutar búsqueda
+        setSearchData(searchData)
+        
         // Update URL parameters
         updateUrl(searchData);
         
-        // 4. Redirecciones
+        // Redirecciones
         // Si la búsqueda es a hotel y estamos en la página search.astro o home
         if (suggestion.type === 'hotel' && (isOnSearchPage() || isOnHomePage())) {
           window.location.href = `/hotels/${suggestion.id}${buildSearchUrl(searchData)}`;
@@ -111,7 +131,6 @@ function SimpleSearchForm({
         }
         // Si la búsqueda es a location o inspiration y estamos en la página de hotel
         if ((suggestion.type === 'location' || suggestion.type === 'inspiration') && (isOnHotelPage() || isOnHomePage())) {
-
           const searchUrl = `/search${buildSearchUrl(searchData)}`;
           window.location.href = searchUrl;
           return;
@@ -120,7 +139,7 @@ function SimpleSearchForm({
         // Execute search
         const response = await executeSearch();
         
-        if (response.results) {
+        if (response && response.results) {
           console.log('Búsqueda ejecutada exitosamente:', response.results)
         }
       } catch (error) {
@@ -133,25 +152,19 @@ function SimpleSearchForm({
 
   // Manejar cambio de texto en el input de búsqueda
   const handleSearchTextChange = (text) => {
-    setSearchText(text)
-    // Marcar que el usuario está interactuando
+    setFormData(prev => ({ ...prev, searchText: text }))
     setIsUserInteracting(true)
     
-    if (searchData.selectedDestinationId && text !== searchData.selectedDestinationText) {
-      setSelectedDestination(null)
+    if (formData.selectedDestinationId && text !== formData.selectedDestinationText) {
+      setFormData(prev => ({
+        ...prev,
+        selectedDestinationId: null,
+        selectedDestinationText: '',
+        selectedDestinationType: null,
+        selectedDestinationLocation: ''
+      }))
     }
   }
-
-  // Función para verificar si estamos en la página home
-  const isOnHomePage = () => {
-    if (isMain) return true;
-    return false;
-  }
-
-  // Función para verificar si estamos en la página de hotel
-  const isOnHotelPage = () => {
-    return typeof window !== 'undefined' && window.location.pathname.startsWith('/hotels/');
-  };
 
   // Manejar cuando el formulario se vuelve activo
   const handleFormFocus = () => {
@@ -174,53 +187,46 @@ function SimpleSearchForm({
     }
   }
 
-  // Función para obtener el valor a mostrar en los campos
-  const getFieldValue = (storeValue, emptyValue = '') => {
-    // Solo mostrar el valor si hay urlParams o si el usuario está interactuando
-    const shouldShow = (Object.keys(urlParams).length > 0 && urlParams.destinationId) || isUserInteracting;
-    return shouldShow ? (storeValue || emptyValue) : emptyValue;
-  }
-
   // Manejar envío manual del formulario (botón Search)
   const handleSubmit = async (e) => {
     e.preventDefault()
     // Solo ejecutar si hay un destino seleccionado
-    if (!searchData.selectedDestinationId) {
+    if (!formData.selectedDestinationId) {
       return
     }
     
     setIsSearching(true)
-    // 4. Redirecciones
-    // Si la búsqueda es a hotel y estamos en la página search.astro o home
-    if (searchData.selectedDestinationType === 'hotel' && (isOnSearchPage() || isOnHomePage())) {
-      window.location.href = `/hotels/${searchData.selectedDestinationId}${buildSearchUrl(searchData)}`;
-      return;
-    }
-    // si la busqueda es a hotel y estamos en la página de hotel actualizar con los parametros de la url
-    if (searchData.selectedDestinationType === 'hotel' && isOnHotelPage()) {
-      const searchUrl = `/hotels/${searchData.selectedDestinationId}${buildSearchUrl(searchData)}`;
-      window.location.href = searchUrl;
-      return;
-    }
-    // Si la búsqueda es a location o inspiration y estamos en la página de hotel
-    if ((searchData.selectedDestinationType === 'location' || searchData.selectedDestinationType === 'inspiration') && (isOnHotelPage() || isOnHomePage())) {
-      const searchUrl = `/search${buildSearchUrl(searchData)}`;
-      window.location.href = searchUrl;
-      return;
-    }
-
+    
     try {
-      // Update URL parameters with only destination data
-      updateUrl({
-        destination: searchData.selectedDestinationText,
-        destinationId: searchData.selectedDestinationId,
-        destinationType: searchData.selectedDestinationType
-      });
+      // GUARDAR EN STORE
+      setSearchData(formData)
+      
+      // Update URL parameters
+      updateUrl(formData);
+      
+      // Redirecciones
+      // Si la búsqueda es a hotel y estamos en la página search.astro o home
+      if (formData.selectedDestinationType === 'hotel' && (isOnSearchPage() || isOnHomePage())) {
+        window.location.href = `/hotels/${formData.selectedDestinationId}${buildSearchUrl(formData)}`;
+        return;
+      }
+      // si la busqueda es a hotel y estamos en la página de hotel actualizar con los parametros de la url
+      if (formData.selectedDestinationType === 'hotel' && isOnHotelPage()) {
+        const searchUrl = `/hotels/${formData.selectedDestinationId}${buildSearchUrl(formData)}`;
+        window.location.href = searchUrl;
+        return;
+      }
+      // Si la búsqueda es a location o inspiration y estamos en la página de hotel
+      if ((formData.selectedDestinationType === 'location' || formData.selectedDestinationType === 'inspiration') && (isOnHotelPage() || isOnHomePage())) {
+        const searchUrl = `/search${buildSearchUrl(formData)}`;
+        window.location.href = searchUrl;
+        return;
+      }
       
       // Execute search
       const response = await executeSearch();
       
-      if (response.results) {
+      if (response && response.results) {
         console.log('Búsqueda ejecutada exitosamente:', response.results)
       }
     } catch (error) {
@@ -234,7 +240,7 @@ function SimpleSearchForm({
     if (!isOnHomePage()) {
       return 'opacity-100';
     }
-    const text = getFieldValue(searchData.searchText);
+    const text = formData.searchText;
     if (text && text.trim().length > 0) {
       return 'opacity-100';
     }
@@ -259,12 +265,18 @@ function SimpleSearchForm({
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
               <div className="flex items-center gap-2 p-3 border border-gray-200 bg-white">
                 <SearchAutocomplete
-                  value={getFieldValue(searchData.searchText)}
+                  value={formData.searchText}
                   onChange={handleSearchTextChange}
                   onSelectionChange={handleDestinationSelection}
                   onClear={() => {
-                    setSearchText('')
-                    setSelectedDestination(null)
+                    setFormData(prev => ({
+                      ...prev,
+                      searchText: '',
+                      selectedDestinationId: null,
+                      selectedDestinationText: '',
+                      selectedDestinationType: null,
+                      selectedDestinationLocation: ''
+                    }))
                     setIsUserInteracting(false)
                   }}
                   disabled={disabled}
@@ -278,7 +290,7 @@ function SimpleSearchForm({
             <div className="w-full">
               <button
                 type="submit"
-                disabled={disabled || !searchData.selectedDestinationId || isSearching}
+                disabled={disabled || !formData.selectedDestinationId || isSearching}
                 className="w-full cursor-pointer bg-primary hover:bg-primary-dark text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 py-3 px-4"
               >
                 {isSearching ? (
@@ -305,12 +317,18 @@ function SimpleSearchForm({
               <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">WHERE ARE YOU GOING?</div>
               <div className="flex items-center gap-2">
                 <SearchAutocomplete
-                  value={getFieldValue(searchData.searchText)}
+                  value={formData.searchText}
                   onChange={handleSearchTextChange}
                   onSelectionChange={handleDestinationSelection}
                   onClear={() => {
-                    setSearchText('')
-                    setSelectedDestination(null)
+                    setFormData(prev => ({
+                      ...prev,
+                      searchText: '',
+                      selectedDestinationId: null,
+                      selectedDestinationText: '',
+                      selectedDestinationType: null,
+                      selectedDestinationLocation: ''
+                    }))
                     setIsUserInteracting(false)
                   }}
                   disabled={disabled}
@@ -324,7 +342,7 @@ function SimpleSearchForm({
             <div className="flex">
               <button
                 type="submit"
-                disabled={disabled || !searchData.selectedDestinationId || isSearching}
+                disabled={disabled || !formData.selectedDestinationId || isSearching}
                 className="cursor-pointer bg-primary hover:bg-primary-dark text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 w-full h-full px-6 py-4"
               >
                 {isSearching ? (

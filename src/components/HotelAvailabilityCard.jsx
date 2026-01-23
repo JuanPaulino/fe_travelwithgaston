@@ -6,7 +6,7 @@ import { useUrlParams } from '../hooks/useUrlParams.js'
 import currencies from '../data/currencies.json'
 
 function HotelAvailabilityCard({ hotelData, rooms }) {
-  const { setSelectedDestination, searchData } = useSearchStore()
+  const { setSearchData, searchData } = useSearchStore()
   const { isAuthenticated } = useAuth()
   const { buildSearchUrl } = useUrlParams()
   const [isVisible, setIsVisible] = useState(false)
@@ -66,13 +66,6 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
 
   // Función para navegar al hotel
   const handleViewHotel = () => {
-    // Actualizar el destino seleccionado en el store
-    setSelectedDestination({
-      type: 'hotel',
-      id: hotel.id,
-      text: hotel.name,
-      location: hotel.location,
-    })
     const newSearchData = {
       ...searchData,
       selectedDestinationType: 'hotel',
@@ -80,6 +73,8 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
       selectedDestinationText: hotel.name,
       selectedDestinationLocation: hotel.location,
     }
+    // Actualizar el store con los nuevos datos
+    setSearchData(newSearchData)
     // Construir URL con parámetros de búsqueda y redirigir
     window.location.href = `/hotels/${hotel.id}${buildSearchUrl(newSearchData)}`
   }

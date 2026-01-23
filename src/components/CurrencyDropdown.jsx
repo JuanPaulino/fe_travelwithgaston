@@ -3,7 +3,7 @@ import { useSearchStore } from '../stores/useSearchStore';
 import currencies from '../data/currencies.json';
 
 const CurrencyDropdown = ({ className = '', isMobile = false }) => {
-  const { searchData, setSelectedCurrency } = useSearchStore();
+  const { searchData, setSearchData } = useSearchStore();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -25,7 +25,10 @@ const CurrencyDropdown = ({ className = '', isMobile = false }) => {
   const selectedCurrency = currencies.find(currency => currency.iso_code === searchData.selectedCurrency);
 
   const handleCurrencySelect = (currency) => {
-    setSelectedCurrency(currency.iso_code);
+    setSearchData({
+      ...searchData,
+      selectedCurrency: currency.iso_code
+    });
     setIsOpen(false);
   };
 

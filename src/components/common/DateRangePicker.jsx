@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { DayPicker } from 'react-day-picker'
-import { format, addDays, isAfter, isBefore, startOfDay } from 'date-fns'
+import { format, addDays, startOfDay } from 'date-fns'
 import 'react-day-picker/style.css'
 import '../../styles/datepicker.css'
 
@@ -17,25 +17,9 @@ function DateRangePicker({
   const [focusedInput, setFocusedInput] = useState('startDate') // 'startDate' o 'endDate'
   const containerRef = useRef(null)
 
-  // Estado local para las fechas (fuente de verdad)
-  const [localStartDate, setLocalStartDate] = useState(null)
-  const [localEndDate, setLocalEndDate] = useState(null)
-
-  // Sincronizar con props del padre cuando vienen predefinidas
-  useEffect(() => {
-    if (startDate) {
-      const parsedDate = typeof startDate === 'string' ? new Date(startDate) : startDate
-      setLocalStartDate(parsedDate)
-    }
-    if (endDate) {
-      const parsedDate = typeof endDate === 'string' ? new Date(endDate) : endDate
-      setLocalEndDate(parsedDate)
-    }
-  }, [startDate, endDate])
-
-  // Parsear las fechas si son strings - USANDO ESTADO LOCAL
-  const parsedStartDate = localStartDate ? (typeof localStartDate === 'string' ? new Date(localStartDate) : localStartDate) : null
-  const parsedEndDate = localEndDate ? (typeof localEndDate === 'string' ? new Date(localEndDate) : localEndDate) : null
+  // Parsear las fechas si son strings - directamente de props
+  const parsedStartDate = startDate ? (typeof startDate === 'string' ? new Date(startDate) : startDate) : null
+  const parsedEndDate = endDate ? (typeof endDate === 'string' ? new Date(endDate) : endDate) : null
 
   // Cerrar al hacer clic fuera
   useEffect(() => {
@@ -68,9 +52,6 @@ function DateRangePicker({
   // Manejar selección de fecha - usando onSelect de DayPicker range mode
   const handleRangeSelect = (range) => {
     if (!range) {
-      // Si no hay rango, limpiar las fechas - ESTADO LOCAL Y EMITIR AL PADRE
-      setLocalStartDate(null)
-      setLocalEndDate(null)
       onStartDateChange('')
       onEndDateChange('')
       return
@@ -79,18 +60,12 @@ function DateRangePicker({
     const { from, to } = range
 
     if (from) {
-      // Actualizar estado local
       const formattedFrom = startOfDay(from)
-      setLocalStartDate(formattedFrom)
-      // Emitir al padre
       onStartDateChange(formatDateForInput(formattedFrom))
     }
 
     if (to) {
-      // Actualizar estado local
       const formattedTo = startOfDay(to)
-      setLocalEndDate(formattedTo)
-      // Emitir al padre
       onEndDateChange(formatDateForInput(formattedTo))
       
       // Solo cerrar el calendario si from y to son diferentes
@@ -215,10 +190,6 @@ function DateRangePicker({
             <button
               type="button"
               onClick={() => {
-                // ESTADO LOCAL
-                setLocalStartDate(null)
-                setLocalEndDate(null)
-                // EMITIR AL PADRE
                 onStartDateChange('')
                 onEndDateChange('')
                 setFocusedInput('startDate')
@@ -242,4 +213,3 @@ function DateRangePicker({
 }
 
 export default DateRangePicker
-

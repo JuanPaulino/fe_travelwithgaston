@@ -3,7 +3,7 @@ import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 
 function HotelCard({ hotelData }) {
-  const { setSelectedDestination } = useSearchStore()
+  const { setSearchData, searchData } = useSearchStore()
   const [isVisible, setIsVisible] = useState(false)
   const cardRef = useRef(null)
 
@@ -42,11 +42,13 @@ function HotelCard({ hotelData }) {
 
   // Function to navigate to hotel
   const handleViewHotel = () => {
-    setSelectedDestination({
-      type: 'hotel',
-      id: hotel.id,
-      text: hotel.name,
-      location: hotel.location,
+    // Actualizar el store con los nuevos datos
+    setSearchData({
+      ...searchData,
+      selectedDestinationType: 'hotel',
+      selectedDestinationId: hotel.id,
+      selectedDestinationText: hotel.name,
+      selectedDestinationLocation: hotel.location,
     })
     window.location.href = `/hotels/${hotel.id}`
   }
