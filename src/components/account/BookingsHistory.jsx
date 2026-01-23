@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { bookingAPI } from '../../lib/http.js';
 import BookingDetail from './BookingDetail.jsx';
+import BookingCard from './BookingCard.jsx';
+import Tabs from '../common/Tabs.jsx';
 
 const BookingsHistory = () => {
   const [bookings, setBookings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [activeTab, setActiveTab] = useState('upcoming'); // upcoming, past, cancelled
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -26,6 +29,30 @@ const BookingsHistory = () => {
     fetchBookings();
   }, []);
 
+  // Filtrar bookings según el tab activo
+  const getFilteredBookings = () => {
+    if (!bookings?.data?.bookings) return [];
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return bookings.data.bookings.filter(booking => {
+      const checkOutDate = new Date(booking.checkOut);
+      checkOutDate.setHours(0, 0, 0, 0);
+      
+      if (activeTab === 'upcoming') {
+        return booking.status === 'upcoming' || booking.status === 'confirmed';
+      } else if (activeTab === 'past') {
+        return checkOutDate < today && booking.status !== 'cancelled';
+      } else if (activeTab === 'cancelled') {
+        return booking.status === 'cancelled';
+      }
+      return false;
+    });
+  };
+
+  const filteredBookings = getFilteredBookings();
+
   const handleViewBooking = (booking) => {
     setSelectedBooking(booking);
   };
@@ -33,6 +60,13 @@ const BookingsHistory = () => {
   const handleBackToList = () => {
     setSelectedBooking(null);
   };
+
+  // Configuración de tabs
+  const tabs = [
+    { key: 'upcoming', label: 'Upcoming' },
+    { key: 'past', label: 'Past' },
+    { key: 'cancelled', label: 'Cancelled' }
+  ];
 
   // Si hay una reserva seleccionada, mostrar el detalle
   if (selectedBooking) {
@@ -61,98 +95,22 @@ const BookingsHistory = () => {
       </div>
     );
   }
-  return (
-    <div className="py-12">
-      <h3 className="text-lg font-medium text-gray-900 mb-6">Bookings</h3>
-
-      {/* Mostrar cards de reservas si existen */}
-      {bookings?.data?.bookings && bookings.data.bookings.length > 0 && (
+  // Renderizar el contenido de las reservas
+  const renderBookingsContent = () => (
+    <>
+      {/* Mostrar cards de reservas filtradas */}
+      {filteredBookings.length > 0 && (
         <div className="mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {bookings.data.bookings.map((booking) => (
+            {filteredBookings.map((booking) => (
               booking.providerData && (
-              <div key={booking.id} className="w-full md:w-96 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-                {/* Imagen del hotel */}
-                <div className="h-64 relative">
-                  <div className="absolute inset-0 object-cover flex items-center justify-center">
-                    <img src={booking.providerData.image.url} alt={booking.hotelName} />
-                  </div>
-                </div>
-                
-                {/* Contenido de la card */}
-                <div className="p-6">
-                  {/* Nombre del hotel */}
-                  <h5 className="text-lg font-bold text-gray-900 mb-4">{booking.hotelName}</h5>
-                  
-                  {/* Fechas */}
-                  <div className="flex justify-between mb-4">
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wide">CHECK IN</p>
-                      <p className="text-base font-semibold text-neutral-darker">
-                        {new Date(booking.checkIn).toLocaleDateString('en-US', { 
-                          weekday: 'short', 
-                          day: 'numeric', 
-                          month: 'short', 
-                          year: 'numeric' 
-                        })}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500 uppercase tracking-wide">CHECK OUT</p>
-                      <p className="text-base font-semibold text-neutral-darker">
-                        {new Date(booking.checkOut).toLocaleDateString('en-US', { 
-                          weekday: 'short', 
-                          day: 'numeric', 
-                          month: 'short', 
-                          year: 'numeric' 
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  {/* Información de la reserva */}
-                  <div className="mb-4">
-                    <p className="text-base font-semibold text-neutral-darker">{booking.guestName}</p>
-                    <p className="text-base font-thin text-neutral-darker">{booking.guestEmail}</p>
-                  </div>
-                  
-                  {/* Precio total */}
-                  <div className="flex justify-end items-center mb-4">
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500 uppercase tracking-wide">Total</p>
-                      <p className="text-lg font-bold text-gray-900">
-                        ${booking.totalPrice.toLocaleString('en-US', { 
-                          minimumFractionDigits: 2, 
-                          maximumFractionDigits: 2 
-                        })}
-                      </p>
-                      <p className="text-xs text-gray-500">Total inc tax</p>
-                    </div>
-                  </div>
-                  
-                  {/* Botón View */}
-                  <button 
-                    onClick={() => handleViewBooking(booking)}
-                    className="w-full bg-black border border-black text-white px-6 py-2 rounded-md hover:bg-gray-50 hover:text-black transition-colors duration-200"
-                  >
-                    View details
-                  </button>
-                  
-                  {/* Estado de la reserva */}
-                  <div className="mt-3 text-center">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      booking.status === 'upcoming' 
-                        ? 'bg-yellow-100 text-yellow-800' 
-                        : booking.status === 'confirmed'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )))}
+                <BookingCard 
+                  key={booking.id}
+                  booking={booking}
+                  onViewDetails={handleViewBooking}
+                />
+              )
+            ))}
           </div>
           
           {/* Información de paginación */}
@@ -165,12 +123,31 @@ const BookingsHistory = () => {
         </div>
       )}
 
-      {/* Mensaje si no hay reservas */}
-      {bookings?.data?.bookings && bookings.data.bookings.length === 0 && (
-        <div className="mt-8 p-6 bg-gray-50 rounded-lg">
-          <p className="text-gray-600">No bookings registered.</p>
+      {/* Mensaje si no hay reservas en el tab actual */}
+      {filteredBookings.length === 0 && bookings?.data?.bookings && (
+        <div className="mt-8 p-6 bg-primary-lighter rounded-lg">
+          <p className="text-primary-darker">
+            {activeTab === 'upcoming' && 'No upcoming bookings.'}
+            {activeTab === 'past' && 'No past bookings.'}
+            {activeTab === 'cancelled' && 'No cancelled bookings.'}
+          </p>
         </div>
       )}
+    </>
+  );
+
+  return (
+    <div className="py-12">
+      <h3 className="text-lg font-medium text-gray-900 mb-6">Bookings</h3>
+
+      {/* Usar el componente Tabs reutilizable */}
+      <Tabs 
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      >
+        {renderBookingsContent()}
+      </Tabs>
     </div>
   );
 };

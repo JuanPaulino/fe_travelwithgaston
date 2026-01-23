@@ -303,7 +303,7 @@ const BookingDetail = ({ booking, onBack }) => {
 
       {/* Botones de acción */}
       <div className="mt-8 flex flex-col sm:flex-row gap-4">
-        {providerData.is_cancellable && (
+        {providerData.is_cancellable && booking.status === 'upcoming' && (
           <button 
             onClick={handleCancelClick}
             disabled={isCancelling}
