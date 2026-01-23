@@ -57,6 +57,28 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
     }
   }, [searchData?.selectedDestinationId, executeSearchHotelAvailability]);
 
+  useEffect(() => {
+    if (hotelData && searchData?.selectedCurrency && isAuthenticated) {
+      const refetchWithNewCurrency = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+          const response = await executeSearchHotelAvailability();
+          if (response && response.search_type === 'hotel') {
+            setHotelData(response.results[0]);
+          }
+        } catch (err) {
+          setError(err.message || 'Error getting hotel availability');
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      refetchWithNewCurrency();
+    }
+  }, [searchData?.selectedCurrency, isAuthenticated]);
+
   const hotel = hotelData;
   const session_id = hotel?.session_id;
   const roomTypes = hotel?.room_types || [];

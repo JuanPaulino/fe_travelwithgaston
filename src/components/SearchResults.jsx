@@ -7,7 +7,7 @@ import LoadingSpinner from './common/LoadingSpinner.jsx'
 import { isAuthenticated } from '../stores/authStore.js'
 
 const SearchResults = ({ className = '' }) => {
-  const { resultsData, executeSearch } = useSearchStore()
+  const { searchData, resultsData, executeSearch } = useSearchStore()
   const { hotels, loading, error, lastSearch } = resultsData
   const [hasTriggeredDefaultSearch, setHasTriggeredDefaultSearch] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
@@ -36,6 +36,22 @@ const SearchResults = ({ className = '' }) => {
 
     triggerDefaultSearch()
   }, [isMounted, userIsAuthenticated, lastSearch, hasTriggeredDefaultSearch, loading, executeSearch])
+
+  useEffect(() => {
+    if (!isMounted) return
+    
+    if (lastSearch && searchData.selectedCurrency) {
+      const reExecuteSearch = async () => {
+        try {
+          await executeSearch()
+        } catch (error) {
+          console.error('Error re-executing search after currency change', error)
+        }
+      }
+      
+      reExecuteSearch()
+    }
+  }, [searchData.selectedCurrency, isMounted])
 
   if (loading) {
     return (
