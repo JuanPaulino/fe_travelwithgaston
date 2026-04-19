@@ -40,7 +40,7 @@ const SearchResults = ({ className = '' }) => {
   useEffect(() => {
     if (!isMounted) return
     
-    if (lastSearch && searchData.selectedCurrency) {
+    if (lastSearch) {
       const reExecuteSearch = async () => {
         try {
           await executeSearch()

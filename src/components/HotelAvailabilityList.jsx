@@ -3,6 +3,8 @@ import { getUser, isAuthenticated as checkIsAuthenticated } from '../stores/auth
 import HotelAvailabilityCard from './HotelAvailabilityCard.jsx'
 import EmptyState from './common/EmptyState.jsx'
 import MembershipCard from './MembershipCard.jsx'
+import { useSearchStore } from '../stores/useSearchStore.js'
+import { parseDisplayTotal } from '../lib/hotelRatePricing.js'
 
 const HotelAvailabilityList = ({
   hotels = [],
@@ -12,6 +14,7 @@ const HotelAvailabilityList = ({
   const [user, setUser] = useState(null);
   const [authStatus, setAuthStatus] = useState(false);
   const [sortOrder, setSortOrder] = useState('default'); // 'default', 'price-low', 'price-high'
+  const { searchData } = useSearchStore()
 
   // Validar que rooms sea un número
   const validRooms = typeof rooms === 'number' ? rooms : 1
@@ -47,13 +50,13 @@ const HotelAvailabilityList = ({
   // Verificar si el usuario está autenticado y tiene rol "basic" para mostrar MembershipCard
   const shouldShowMembershipCard = authStatus && user?.role === 'basic';
 
-  // Función para ordenar hoteles por precio
-  const sortHotelsByPrice = (hotels, order) => {
+  // Función para ordenar hoteles por precio (importe mostrado según moneda del store)
+  const sortHotelsByPrice = (hotels, order, selectedCurrency) => {
     if (order === 'default') return hotels;
     
     return [...hotels].sort((a, b) => {
-      const priceA = a.lowest_rate?.total_to_book_in_requested_currency || Infinity;
-      const priceB = b.lowest_rate?.total_to_book_in_requested_currency || Infinity;
+      const priceA = parseDisplayTotal(a.lowest_rate, selectedCurrency);
+      const priceB = parseDisplayTotal(b.lowest_rate, selectedCurrency);
       
       // Hoteles sin precio van al final
       if (priceA === Infinity && priceB === Infinity) return 0;
@@ -69,13 +72,14 @@ const HotelAvailabilityList = ({
     const available = hotels.filter(hotel => hotel.is_available);
     const unavailable = hotels.filter(hotel => !hotel.is_available);
     
+    const selectedCurrency = searchData?.selectedCurrency
     const result = {
-      availableHotels: sortHotelsByPrice(available, sortOrder),
-      unavailableHotels: sortHotelsByPrice(unavailable, sortOrder)
+      availableHotels: sortHotelsByPrice(available, sortOrder, selectedCurrency),
+      unavailableHotels: sortHotelsByPrice(unavailable, sortOrder, selectedCurrency)
     }
     
     return result
-  }, [hotels, sortOrder])
+  }, [hotels, sortOrder, searchData?.selectedCurrency])
 
 
   // Sin resultados

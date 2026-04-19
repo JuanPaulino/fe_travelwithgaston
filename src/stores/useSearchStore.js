@@ -5,6 +5,7 @@ import { config } from '../config/config.js';
 import { filtersStore } from './useFiltersStore.js';
 import { persistentMap } from '@nanostores/persistent'
 import { isAuthenticated } from './authStore.js';
+import { resolveAvailabilityCurrency } from '../lib/hotelRatePricing.js';
 
 // Estado inicial de la búsqueda
 const initialSearchData = {
@@ -128,7 +129,7 @@ export const searchActions = {
             })
           }
         ],
-        currency: searchData.selectedCurrency || config.search.defaultCurrency,
+        currency: resolveAvailabilityCurrency(searchData.selectedCurrency),
         language: config.search.defaultLanguage
       };
 
@@ -255,7 +256,7 @@ export const searchActions = {
             })
           }
         ],
-        currency: searchData.selectedCurrency || config.search.defaultCurrency,
+        currency: resolveAvailabilityCurrency(searchData.selectedCurrency),
         language: config.search.defaultLanguage
       };
 

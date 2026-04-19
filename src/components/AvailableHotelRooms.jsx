@@ -4,7 +4,11 @@ import { useSearchStore } from '../stores/useSearchStore.js'
 import { useBookingStore } from '../stores/useBookingStore.js'
 import { useAuth } from '../lib/useAuth.js'
 import MembershipCard from './MembershipCard.jsx'
-import currencies from '../data/currencies.json'
+import {
+  getPricingForDisplay,
+  hasDisplayablePricing,
+  getCurrencySymbolOrIso
+} from '../lib/hotelRatePricing.js'
 import { calculateNights } from '../lib/dateUtils.js'
 
 const AvailableHotelRooms = ({ parentHotelData }) => {
@@ -55,7 +59,7 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   }, [searchData?.selectedDestinationId, executeSearchHotelAvailability]);
 
   useEffect(() => {
-    if (hotelData && searchData?.selectedCurrency && isAuthenticated) {
+    if (hotelData && isAuthenticated) {
       const refetchWithNewCurrency = async () => {
         setLoading(true);
         setError(null);
@@ -79,7 +83,6 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
   const hotel = hotelData;
   const session_id = hotel?.session_id;
   const roomTypes = hotel?.room_types || [];
-  const lowestRate = hotel?.lowest_rate || null;
 
   // Función para manejar el clic en "Book now"
   const handleBookNow = (room, rate) => {
@@ -118,13 +121,6 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
       onClick: (room, rate) => handleBookNow(room, rate),
       className: 'w-full bg-black hover:bg-primary-dark text-white font-medium py-3 px-6 transition-colors cursor-pointer'
     };
-  };
-
-  // Función para formatear el precio
-  // Función para obtener el símbolo de la moneda
-  const getCurrencySymbol = (currency) => {
-    const currencyObj = currencies.find(c => c.iso_code === currency);
-    return currencyObj ? currencyObj.symbol : '';
   };
 
   // Función para formatear el precio
@@ -187,7 +183,6 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
       </div>
     );
   }
-  console.log(roomTypes);
   return (
     <div className="mb-8 w-full">
       {(!isAuthenticated || ( isAuthenticated && user?.role === 'basic' )) && (
@@ -265,16 +260,19 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                           )}
                         </div>
                         <div className="text-center mb-6">
-                        {room.lowest_rate && (
+                        {room.lowest_rate && (() => {
+                          const p = getPricingForDisplay(room.lowest_rate, searchData?.selectedCurrency)
+                          return (
                             <div className="p-3">
                               <p className="text-xl font-semibold text-neutral-darkest mb-2">
-                                <span className="text-lg">{getCurrencySymbol(room.lowest_rate.requested_currency_code)}</span> {formatPrice(room.lowest_rate.total_to_book_in_requested_currency)}
+                                <span className="text-lg">{getCurrencySymbolOrIso(p.currencyCode)}</span> {formatPrice(p.total)}
                               </p>
                               <p className="text-xs text-neutral-dark mb-1">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
                               <div className="w-full h-0.5 bg-neutral-300 mb-1"></div>
-                              <p className="text-xs text-neutral-dark">Average per night {getCurrencySymbol(room.lowest_rate.requested_currency_code)} {formatPrice(room.lowest_rate.rate_in_requested_currency)} inc tax</p>
+                              <p className="text-xs text-neutral-dark">Average per night {getCurrencySymbolOrIso(p.currencyCode)} {formatPrice(p.nightly)} inc tax</p>
                               </div>
-                            )}
+                          )
+                        })()}
                           </div>
                         {/* Botón para ver rates */}
                         <button
@@ -358,16 +356,19 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                         
                         {/* Precios destacados - Formato desktop */}
                         <div className="text-center mb-6">
-                          {rate.total_to_book_in_requested_currency && (
+                          {hasDisplayablePricing(rate, searchData?.selectedCurrency) && (() => {
+                            const p = getPricingForDisplay(rate, searchData?.selectedCurrency)
+                            return (
                             <div className="p-3">
                               <p className="text-3xl font-semibold text-neutral-darkest mb-2">
-                                <span className="text-lg">{getCurrencySymbol(rate.requested_currency_code)}</span> {formatPrice(rate.total_to_book_in_requested_currency)}
+                                <span className="text-lg">{getCurrencySymbolOrIso(p.currencyCode)}</span> {formatPrice(p.total)}
                               </p>
                               <p className="text-xs text-neutral-dark mb-1">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
                               <div className="w-full h-0.5 bg-neutral-300 mb-1"></div>
-                              <p className="text-xs text-neutral-dark">Average per night {getCurrencySymbol(rate.requested_currency_code)} {formatPrice(rate.rate_in_requested_currency)} inc tax</p>
+                              <p className="text-xs text-neutral-dark">Average per night {getCurrencySymbolOrIso(p.currencyCode)} {formatPrice(p.nightly)} inc tax</p>
                             </div>
-                          )}
+                            )
+                          })()}
                         </div>
                         
                         {/* Información de pago y cancelación */}
@@ -455,17 +456,20 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
 
                       {/* Precio desde */}
                       <div className="text-center mb-4 bg-neutral-lightest p-3 rounded-lg mt-auto">
-                        {room.lowest_rate && (
+                        {room.lowest_rate && (() => {
+                          const p = getPricingForDisplay(room.lowest_rate, searchData?.selectedCurrency)
+                          return (
                           <div>
                             <p className="text-xs text-neutral-dark mb-1">From</p>
                             <p className="text-2xl font-semibold text-neutral-darkest mb-1">
-                              <span className="text-base">{getCurrencySymbol(room.lowest_rate.requested_currency_code)}</span> {formatPrice(room.lowest_rate.total_to_book_in_requested_currency)}
+                              <span className="text-base">{getCurrencySymbolOrIso(p.currencyCode)}</span> {formatPrice(p.total)}
                             </p>
                             <p className="text-xs text-neutral-dark mb-1">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
                             <div className="w-full h-0.5 bg-neutral-300 my-1"></div>
-                            <p className="text-xs text-neutral-dark">Avg per night {getCurrencySymbol(room.lowest_rate.requested_currency_code)} {formatPrice(room.lowest_rate.rate_in_requested_currency)}</p>
+                            <p className="text-xs text-neutral-dark">Avg per night {getCurrencySymbolOrIso(p.currencyCode)} {formatPrice(p.nightly)}</p>
                           </div>
-                        )}
+                          )
+                        })()}
                       </div>
                       
                       {/* Botón para ver rates */}
@@ -615,16 +619,19 @@ const AvailableHotelRooms = ({ parentHotelData }) => {
                               {/* Columna derecha - Precio y botón */}
                               <div className="lg:w-80 flex flex-col justify-between">
                                 {/* Precio */}
-                                {rate.total_to_book_in_requested_currency && (
+                                {hasDisplayablePricing(rate, searchData?.selectedCurrency) && (() => {
+                                  const p = getPricingForDisplay(rate, searchData?.selectedCurrency)
+                                  return (
                                   <div className="bg-neutral-lightest p-6 rounded-lg text-center mb-4">
                                     <p className="text-4xl font-semibold text-neutral-darkest mb-3">
-                                      <span className="text-2xl">{getCurrencySymbol(rate.requested_currency_code)}</span> {formatPrice(rate.total_to_book_in_requested_currency)}
+                                      <span className="text-2xl">{getCurrencySymbolOrIso(p.currencyCode)}</span> {formatPrice(p.total)}
                                     </p>
                                     <p className="text-sm text-neutral-dark mb-2">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
                                     <div className="w-full h-0.5 bg-neutral-300 my-2"></div>
-                                    <p className="text-sm text-neutral-dark">Average per night {getCurrencySymbol(rate.requested_currency_code)} {formatPrice(rate.rate_in_requested_currency)} inc tax</p>
+                                    <p className="text-sm text-neutral-dark">Average per night {getCurrencySymbolOrIso(p.currencyCode)} {formatPrice(p.nightly)} inc tax</p>
                                   </div>
-                                )}
+                                  )
+                                })()}
 
                                 {/* Botón de reserva/suscripción */}
                                 {(() => {

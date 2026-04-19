@@ -20,7 +20,9 @@ export const config = {
     maxRooms: 10,
     maxAdults: 10,
     maxChildren: 10,
-    defaultLanguage: import.meta.env.VITE_DEFAULT_LANGUAGE || 'en'
+    defaultLanguage: import.meta.env.VITE_DEFAULT_LANGUAGE || 'en',
+    /** ISO enviado al API cuando «Hotel currency» deja selectedCurrency vacío */
+    defaultCurrency: 'USD'
   },
   stripe: {
     publishableKey: import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY

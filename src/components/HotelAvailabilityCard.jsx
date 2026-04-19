@@ -3,7 +3,7 @@ import ImageCarousel from './common/ImageCarousel.jsx'
 import { useSearchStore } from '../stores/useSearchStore.js'
 import { useAuth } from '../lib/useAuth.js'
 import { useUrlParams } from '../hooks/useUrlParams.js'
-import currencies from '../data/currencies.json'
+import { getPricingForDisplay, getCurrencySymbolOrIso } from '../lib/hotelRatePricing.js'
 
 function HotelAvailabilityCard({ hotelData, rooms }) {
   const { setSearchData, searchData } = useSearchStore()
@@ -11,12 +11,6 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
   const { buildSearchUrl } = useUrlParams()
   const [isVisible, setIsVisible] = useState(false)
   const cardRef = useRef(null)
-
-  // Función para obtener el símbolo de la moneda
-  const getCurrencySymbol = (currencyCode) => {
-    const currency = currencies.find(c => c.iso_code === currencyCode)
-    return currency ? currency.symbol : currencyCode
-  }
 
   // Intersection Observer para detectar cuando la tarjeta es visible
   useEffect(() => {
@@ -172,19 +166,24 @@ function HotelAvailabilityCard({ hotelData, rooms }) {
                 <>
                   <div className="mb-4 py-4">
                     {hotel.lowest_rate ? (
+                      (() => {
+                        const p = getPricingForDisplay(hotel.lowest_rate, searchData.selectedCurrency)
+                        return (
                       <>
                         <div className="text-2xl font-bold text-neutral-darkest">
-                          <span className="text-xl">{getCurrencySymbol(hotel.lowest_rate.requested_currency_code)}</span> {Number(hotel.lowest_rate.total_to_book_in_requested_currency).toLocaleString('en-US')}
+                          <span className="text-xl">{getCurrencySymbolOrIso(p.currencyCode)}</span> {Number(p.total).toLocaleString('en-US')}
                         </div>
                         <div className="text-xs text-neutral-dark mb-1">
                           Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax
                         </div>
                         <div className="w-full h-0.5 bg-neutral-300 mb-1"></div>
                         <div className="text-xs text-neutral-dark">
-                          Average per night inc tax {getCurrencySymbol(hotel.lowest_rate.requested_currency_code)} {Number(hotel.lowest_rate.rate_in_requested_currency).toLocaleString('en-US')}
+                          Average per night inc tax {getCurrencySymbolOrIso(p.currencyCode)} {Number(p.nightly).toLocaleString('en-US')}
                         </div>
                         
                       </>
+                        )
+                      })()
                     ) : null}
                   </div>
                   

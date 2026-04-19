@@ -1,5 +1,6 @@
 import { persistentMap } from '@nanostores/persistent'
 import { useState, useEffect } from 'react';
+import { isHotelNativeCurrencySelection } from '../lib/hotelRatePricing.js';
 
 // Estado inicial del booking
 const initialBookingData = {
@@ -13,7 +14,9 @@ const initialBookingData = {
   children: 0,
   guest_name: '',
   guest_email: '',
-  credit_card: null // Se almacenará como string JSON
+  credit_card: null, // Se almacenará como string JSON
+  /** 'hotel_native' | 'requested' — cómo mostrar precios en /booking */
+  rate_pricing_display: 'requested'
 };
 
 // Store de booking
@@ -35,7 +38,10 @@ export const bookingActions = {
       children: searchData.children || 0,
       guest_name: userData?.name || '',
       guest_email: userData?.email || '',
-      credit_card: null
+      credit_card: null,
+      rate_pricing_display: isHotelNativeCurrencySelection(searchData.selectedCurrency)
+        ? 'hotel_native'
+        : 'requested'
     };
     bookingStore.set(bookingData);
     return bookingData;

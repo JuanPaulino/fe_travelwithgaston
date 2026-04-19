@@ -5,6 +5,7 @@ import { bookingAPI, handleAPIError } from '../lib/http';
 import { showSuccess, showError } from '../stores/bannerStore';
 import CreditCardForm from './CreditCardForm';
 import { calculateNights } from '../lib/dateUtils';
+import { getPricingForBookingSummary } from '../lib/hotelRatePricing.js';
 
 // Función para obtener idempotency key del backend
 const getBookingIdempotencyKey = async (hotelId, checkIn, checkOut) => {
@@ -309,13 +310,22 @@ const Booking = ({ className = '' }) => {
             <div className="mb-6">
               {/* Nombre del hotel */}
               <h3 className="font-semibold text-gray-800 mb-2">Hotel: {bookingData.hotel_name}</h3>
-              {/* total_to_book_in_requested_currency */}
+              {(() => {
+                const p = getPricingForBookingSummary(
+                  bookingData.selected_rate,
+                  bookingData.rate_pricing_display || 'requested'
+                )
+                return (
+              <>
               <p className="text-gray-600 font-bold text-sm mb-2">
-                {bookingData.selected_rate.requested_currency_code} {bookingData.selected_rate.total_to_book_in_requested_currency}
+                {p.currencyCode} {p.total}
               </p>
               <p className="text-gray-600 text-sm mb-2">Total for {nights} {nights === 1 ? 'night' : 'nights'} inc tax</p>
               <div className='w-full h-0.5 bg-neutral-200 mb-2'></div>
-              <p className="text-gray-600 text-sm mb-2">Average per night inc tax {bookingData.selected_rate.requested_currency_code} {bookingData.selected_rate.rate_in_requested_currency}</p>
+              <p className="text-gray-600 text-sm mb-2">Average per night inc tax {p.currencyCode} {p.nightly}</p>
+              </>
+                )
+              })()}
               
 
               {/* Dirección del hotel */}
