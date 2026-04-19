@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { isAuthenticated, authActions } from '../stores/authStore';
 import CurrencyDropdown from './CurrencyDropdown';
 
-const AuthActions = ({ className = '', onButtonClick = null }) => {
+const AuthActions = ({ className = '', onButtonClick = null, hideCurrencyDropdown = false }) => {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const AuthActions = ({ className = '', onButtonClick = null }) => {
   if (authenticated) {
     return (
       <div className={`flex items-center gap-4 ${className}`}>
-        <CurrencyDropdown />
+        {!hideCurrencyDropdown && <CurrencyDropdown />}
         <a 
           href="/account"
           className="border border-neutral-light text-black hover:border-primary transition-colors px-3 py-1"
