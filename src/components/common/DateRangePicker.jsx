@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { DayPicker } from 'react-day-picker'
-import { format, addDays, startOfDay } from 'date-fns'
+import { format, startOfDay } from 'date-fns'
 import 'react-day-picker/style.css'
 import '../../styles/datepicker.css'
 
@@ -10,7 +10,7 @@ function DateRangePicker({
   onStartDateChange, 
   onEndDateChange,
   disabled = false,
-  minDate = addDays(new Date(), 1),
+  minDate = startOfDay(new Date()),
   className = ""
 }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -176,7 +176,7 @@ function DateRangePicker({
               numberOfMonths={typeof window !== 'undefined' && window.innerWidth >= 1024 ? 2 : 1}
               defaultMonth={parsedStartDate || minDate}
               showOutsideDays
-              navLayout="around" 
+              navLayout="around"
             />
           </div>
           
