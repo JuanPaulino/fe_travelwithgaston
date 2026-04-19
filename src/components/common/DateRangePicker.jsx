@@ -67,11 +67,6 @@ function DateRangePicker({
     if (to) {
       const formattedTo = startOfDay(to)
       onEndDateChange(formatDateForInput(formattedTo))
-      
-      // Solo cerrar el calendario si from y to son diferentes
-      if (from && to.getTime() !== from.getTime()) {
-        setTimeout(() => setIsOpen(false), 200)
-      }
     }
   }
 
