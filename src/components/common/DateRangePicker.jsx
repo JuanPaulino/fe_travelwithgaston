@@ -50,29 +50,49 @@ function DateRangePicker({
   }
 
   // Manejar selección de fecha - usando onSelect de DayPicker range mode
-  const handleRangeSelect = (range) => {
-    if (!range) {
-      onStartDateChange('')
+  const handleRangeSelect = (_range, selectedDay) => {
+    // Forzamos una UX de 2 pasos:
+    // 1er clic -> nuevo check-in (y limpiamos check-out)
+    // 2do clic -> check-out
+    if (!selectedDay) return
+
+    const clicked = startOfDay(selectedDay)
+
+    if (focusedInput === 'startDate') {
+      onStartDateChange(formatDateForInput(clicked))
       onEndDateChange('')
+      setFocusedInput('endDate')
       return
     }
 
-    const { from, to } = range
-
-    if (from) {
-      const formattedFrom = startOfDay(from)
-      onStartDateChange(formatDateForInput(formattedFrom))
+    // focusedInput === 'endDate'
+    const currentStart = parsedStartDate ? startOfDay(parsedStartDate) : null
+    if (!currentStart) {
+      onStartDateChange(formatDateForInput(clicked))
+      onEndDateChange('')
+      setFocusedInput('endDate')
+      return
     }
 
-    if (to) {
-      const formattedTo = startOfDay(to)
-      onEndDateChange(formatDateForInput(formattedTo))
+    if (clicked < currentStart) {
+      onStartDateChange(formatDateForInput(clicked))
+      onEndDateChange(formatDateForInput(currentStart))
+    } else {
+      onEndDateChange(formatDateForInput(clicked))
     }
+
+    setFocusedInput('startDate')
   }
 
   // Manejar el clic en los inputs
   const handleInputClick = (inputType) => {
-    setFocusedInput(inputType)
+    // Si ya hay un rango completo, reiniciar el flujo a selección de start
+    // para que el próximo clic del usuario empiece un rango nuevo.
+    if (parsedStartDate && parsedEndDate) {
+      setFocusedInput('startDate')
+    } else {
+      setFocusedInput(inputType)
+    }
     setIsOpen(true)
   }
 
@@ -86,7 +106,8 @@ function DateRangePicker({
     from: parsedStartDate,
     to: parsedEndDate
   } : parsedStartDate ? {
-    from: parsedStartDate
+    from: parsedStartDate,
+    to: parsedStartDate
   } : undefined
 
   return (
