@@ -544,7 +544,6 @@ function SearchAutocomplete({
       {/* Message when no results - desktop only */}
       {!isMobile && showSuggestions && !loading && suggestions.length === 0 && value.length >= 2 && (
         <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-xl p-6 text-center text-gray-500">
-          <div className="text-lg mb-2">🔍</div>
           <div className="text-sm">
             No results found for "{value}"
           </div>
